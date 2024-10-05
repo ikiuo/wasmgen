@@ -1144,3 +1144,23 @@ $exit:      end
 | <code>i62x2.const</code> | <code>i64x2.const  0x0706050403020100,0x0f0e0d0c0b0a0908</code> |
 | <code>f32x4.const</code> | <code>f32x4.const  1.0, 2.0, 3.0, 4.0</code> |
 | <code>f62x2.const</code> | <code>f64x2.const  0.5, 0.25</code> |
+
+## メモリ命令
+
+オペランドが<code>memarg</code>の命令を<code>&lt;memins&gt;</code>とすると、以下の記述パターンになります。
+
+```
+            <memins>                    ;# offset=0, align=<memins既定>
+            <memins>    offset          ;# align=<memins既定>
+            <memins>    offset, align
+```
+
+### <code>&lt;memins&gt;</code>と既定<code>align</code>
+
+| 既定 align | &lt;memins&gt; |
+|:-:|:--|
+| 1 | <code>i32.load8\_s i32.load8\_u</code><br/><code>i64.load8\_s i64.load8\_u</code><br/><code>i32.store8 i64.store8</code><br/><code>v128.load8\_splat</code><br/><code>v128.load8\_lane</code><br/><code>v128.store8\_lane</code> |
+| 2 | <code>i32.load16\_s i32.load16\_u</code><br/><code>i64.load16\_s i64.load16\_u</code><br/><code>i32.store16 i64.store16</code><br/><code>v128.load16\_splat</code><br/><code>v128.load16\_lane</code><br/><code>v128.store16\_lane</code> |
+| 4 | <code>i32.load f32.load</code><br/><code>i64.load32\_s i64.load32\_u</code><br/><code>i32.store f32.store i64.store32</code><br/><code>v128.load32\_splat</code><br/><code>v128.load32\_lane v128.load32_zero</code><br/><code>v128.store32\_lane</code> |
+| 8 | <code>i64.load f64.load i64.store f64.store</code><br/><code>v128.load8x8\_s v128.load8x8\_u</code><br/><code>v128.load16x4\_s v128.load16x4\_u</code><br/><code>v128.load32x2\_s v128.load32x2\_u</code><br/><code>v128.load64\_splat</code><br/><code>v128.load64\_lane v128.load64\_zero</code><br/><code>v128.store64\_lane</code> |
+| 16 | <code>v128.load v128.store</code> |
