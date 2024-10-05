@@ -1742,11 +1742,14 @@ namespace wasmgen
 
                 if (op_type->mode == Expression::LIST)
                 {
-                    if (impname && typeidx_name->has(*impname))
-                        return parse_error(ErrorCode::EXIST_TYPE_NAME, {label});
-
                     NewTypeData data;
 
+                    if (impname)
+                    {
+                        if (typeidx_name->has(*impname))
+                            return parse_error(ErrorCode::EXIST_TYPE_NAME, {label});
+                        data->name = impname;
+                    }
                     if (!getfunctype(data->type, op_type))
                         return false;
                     if (!parse_type_section_finish(label, data))
