@@ -158,7 +158,7 @@ name    .alias          value
 | Start Section | .start | |
 | Element Section | .element | elemidx |
 | Code Section | .code | funcidx |
-| Data Section | .data | memidx |
+| Data Section | .data | dataidx |
 | Data Count Section | | |
 
 
