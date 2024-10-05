@@ -3307,6 +3307,13 @@ namespace wasmgen
             if (oplen < cnt)
                 return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
 
+            if (mao && cnt < 2)
+            {
+                if (cnt < 1)
+                    opval.push_back(ExprValue(uint64_t(0)));
+                opval.push_back(ExprValue(mao));
+            }
+
             for (auto n : inc_range<size_t>(cnt))
             {
                 assert(opp != ope);
@@ -3323,9 +3330,6 @@ namespace wasmgen
                 opval.push_back(res);
                 ++opp;
             }
-
-            if (cnt == 1 && mao)
-                opval.push_back(ExprValue(mao));
         }
         if (opp != ope)
             parse_warning_too_many_operands(line, ops, opp - ops->begin());
