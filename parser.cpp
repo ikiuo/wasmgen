@@ -1742,14 +1742,16 @@ namespace wasmgen
 
                 if (op_type->mode == Expression::LIST)
                 {
-                    FuncType functype;
+                    if (impname && typeidx_name->has(*impname))
+                        return parse_error(ErrorCode::EXIST_TYPE_NAME, {label});
 
-                    if (!getfunctype(functype, op_type))
+                    NewTypeData data;
+
+                    if (!getfunctype(data->type, op_type))
                         return false;
-
-                    size_t index = add_functype(functype);
-
-                    typeidx = int(index);
+                    if (!parse_type_section_finish(label, data))
+                        return false;
+                    typeidx = data->index;
                 }
                 else
                 {
