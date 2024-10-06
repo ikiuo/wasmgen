@@ -1198,7 +1198,7 @@ $exit:      end
 | <code>3</code> |  | <code>table\.fill</code> | <code>tableidx</code> |
 | <code>0</code> | <code>i32</code> | <code>memory\.size</code> |  |
 | <code>1</code> | <code>i32</code> | <code>memory\.grow</code> |  |
-| <code>3</code> |  | <code>memory\.init</code> | <code>memidx</code> |
+| <code>3</code> |  | <code>memory\.init</code> | <code>dataidx</code> |
 | <code>3</code> |  | <code>memory\.copy</code> |  |
 | <code>3</code> |  | <code>memory\.fill</code> |  |
 | <code>1</code> | <code>i32</code> | <code>i32\.load</code> | <code>&lt;memarg&gt;</code> |

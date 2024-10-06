@@ -38,7 +38,7 @@ namespace wasmgen
             {"table.fill",{Operation(3,1,6,1,0,0),Operand(1,21,0,0),3,{252,17,256}}},
             {"memory.size",{Operation(0,0,0,0,1,0),Operand(0,0,0,0),2,{63,0}}},
             {"memory.grow",{Operation(1,1,0,0,1,0),Operand(0,0,0,0),2,{64,0}}},
-            {"memory.init",{Operation(3,1,1,1,0,0),Operand(1,18,0,0),4,{252,8,256,0}}},
+            {"memory.init",{Operation(3,1,1,1,0,0),Operand(1,13,0,0),4,{252,8,256,0}}},
             {"memory.copy",{Operation(3,1,1,1,0,0),Operand(0,0,0,0),4,{252,10,0,0}}},
             {"memory.fill",{Operation(3,1,1,1,0,0),Operand(0,0,0,0),3,{252,11,0}}},
             {"i32.load",{Operation(1,1,0,0,1,0),Operand(1,30,0,0),2,{40,256}}},
