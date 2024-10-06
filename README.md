@@ -1168,450 +1168,450 @@ $exit:      end
 
 ## 命令表
 
-| 命令 | オペランド |
-|:--|:--|
-| <code>i32\.const</code> | <code>i32</code> |
-| <code>i64\.const</code> | <code>i64</code> |
-| <code>f32\.const</code> | <code>f32</code> |
-| <code>f64\.const</code> | <code>f64</code> |
-| <code>i8x16\.const</code> | <code>i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8</code> |
-| <code>i16x8\.const</code> | <code>i16,i16,i16,i16,i16,i16,i16,i16</code> |
-| <code>i32x4\.const</code> | <code>i32,i32,i32,i32</code> |
-| <code>i64x2\.const</code> | <code>i64,i64</code> |
-| <code>f32x4\.const</code> | <code>f32,f32,f32,f32</code> |
-| <code>f64x2\.const</code> | <code>f64,f64</code> |
-| <code>v128\.const</code> | <code>i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8,i8</code> |
-| <code>drop</code> |  |
-| <code>elem\.drop</code> | <code>elemidx</code> |
-| <code>data\.drop</code> | <code>dataidx</code> |
-| <code>global\.get</code> | <code>globalidx</code> |
-| <code>global\.set</code> | <code>globalidx</code> |
-| <code>local\.get</code> | <code>localidx</code> |
-| <code>local\.set</code> | <code>localidx</code> |
-| <code>local\.tee</code> | <code>localidx</code> |
-| <code>table\.get</code> | <code>tableidx</code> |
-| <code>table\.set</code> | <code>tableidx</code> |
-| <code>table\.init</code> | <code>tableidx, elemidx</code> |
-| <code>table\.copy</code> | <code>tableidx, tableidx</code> |
-| <code>table\.grow</code> | <code>tableidx</code> |
-| <code>table\.size</code> | <code>tableidx</code> |
-| <code>table\.fill</code> | <code>tableidx</code> |
-| <code>memory\.size</code> |  |
-| <code>memory\.grow</code> |  |
-| <code>memory\.init</code> | <code>memidx</code> |
-| <code>memory\.copy</code> |  |
-| <code>memory\.fill</code> |  |
-| <code>i32\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>f32\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>f64\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load32\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.load32\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>f32\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>f64\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.store8</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.store16</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.store8</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.store16</code> | <code>&lt;memarg&gt;</code> |
-| <code>i64\.store32</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load8x8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load8x8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load16x4\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load16x4\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load32x2\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load32x2\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load8\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load16\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load32\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load64\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load8\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.load16\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.load32\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.load64\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.store8\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.store16\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.store32\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.store64\_lane</code> | <code>lane, &lt;memarg&gt;</code> |
-| <code>v128\.load32\_zero</code> | <code>&lt;memarg&gt;</code> |
-| <code>v128\.load64\_zero</code> | <code>&lt;memarg&gt;</code> |
-| <code>i32\.extend8\_s</code> |  |
-| <code>i32\.extend16\_s</code> |  |
-| <code>i64\.extend8\_s</code> |  |
-| <code>i64\.extend16\_s</code> |  |
-| <code>i64\.extend32\_s</code> |  |
-| <code>i32\.wrap</code> |  |
-| <code>i64\.extend\_i32\_s</code> |  |
-| <code>i64\.extend\_i32\_u</code> |  |
-| <code>i32\.trunc\_f32\_s</code> |  |
-| <code>i32\.trunc\_f32\_u</code> |  |
-| <code>i32\.trunc\_f64\_s</code> |  |
-| <code>i32\.trunc\_f64\_u</code> |  |
-| <code>i64\.trunc\_f32\_s</code> |  |
-| <code>i64\.trunc\_f32\_u</code> |  |
-| <code>i64\.trunc\_f64\_s</code> |  |
-| <code>i64\.trunc\_f64\_u</code> |  |
-| <code>i32\.trunc\_sat\_f32\_s</code> |  |
-| <code>i32\.trunc\_sat\_f32\_u</code> |  |
-| <code>i32\.trunc\_sat\_f64\_s</code> |  |
-| <code>i32\.trunc\_sat\_f64\_u</code> |  |
-| <code>i64\.trunc\_sat\_f32\_s</code> |  |
-| <code>i64\.trunc\_sat\_f32\_u</code> |  |
-| <code>i64\.trunc\_sat\_f64\_s</code> |  |
-| <code>i64\.trunc\_sat\_f64\_u</code> |  |
-| <code>f32\.demote\_f64</code> |  |
-| <code>f64\.promote\_f32</code> |  |
-| <code>f32\.convert\_i32\_s</code> |  |
-| <code>f32\.convert\_i32\_u</code> |  |
-| <code>f32\.convert\_i64\_s</code> |  |
-| <code>f32\.convert\_i64\_u</code> |  |
-| <code>f64\.convert\_i32\_s</code> |  |
-| <code>f64\.convert\_i32\_u</code> |  |
-| <code>f64\.convert\_i64\_s</code> |  |
-| <code>f64\.convert\_i64\_u</code> |  |
-| <code>i32\.reinterpret\_f32</code> |  |
-| <code>i64\.reinterpret\_f64</code> |  |
-| <code>f32\.reinterpret\_i32</code> |  |
-| <code>f64\.reinterpret\_i64</code> |  |
-| <code>i8x16\.splat</code> |  |
-| <code>i16x8\.splat</code> |  |
-| <code>i32x4\.splat</code> |  |
-| <code>i64x2\.splat</code> |  |
-| <code>f32x4\.splat</code> |  |
-| <code>f64x2\.splat</code> |  |
-| <code>i8x16\.extract\_lane\_s</code> | <code>lane</code> |
-| <code>i8x16\.extract\_lane\_u</code> | <code>lane</code> |
-| <code>i16x8\.extract\_lane\_s</code> | <code>lane</code> |
-| <code>i16x8\.extract\_lane\_u</code> | <code>lane</code> |
-| <code>i32x4\.extract\_lane</code> | <code>lane</code> |
-| <code>i64x2\.extract\_lane</code> | <code>lane</code> |
-| <code>f32x4\.extract\_lane</code> | <code>lane</code> |
-| <code>f64x2\.extract\_lane</code> | <code>lane</code> |
-| <code>i32x4\.trunc\_sat\_f32x4\_s</code> |  |
-| <code>i32x4\.trunc\_sat\_f32x4\_u</code> |  |
-| <code>i32x4\.trunc\_sat\_f64x2\_s\_zero</code> |  |
-| <code>i32x4\.trunc\_sat\_f64x2\_u\_zero</code> |  |
-| <code>f32x4\.convert\_i32x4\_s</code> |  |
-| <code>f32x4\.convert\_i32x4\_u</code> |  |
-| <code>f64x2\.convert\_low\_i32x4\_s</code> |  |
-| <code>f64x2\.convert\_low\_i32x4\_u</code> |  |
-| <code>f32x4\.demote\_f64x2\_zero</code> |  |
-| <code>f64x2\.promote\_low\_f32x4</code> |  |
-| <code>i16x8\.extend\_low\_i8x16\_s</code> |  |
-| <code>i16x8\.extend\_high\_i8x16\_s</code> |  |
-| <code>i16x8\.extend\_low\_i8x16\_u</code> |  |
-| <code>i16x8\.extend\_high\_i8x16\_u</code> |  |
-| <code>i32x4\.extend\_low\_i16x8\_s</code> |  |
-| <code>i32x4\.extend\_high\_i16x8\_s</code> |  |
-| <code>i32x4\.extend\_low\_i16x8\_u</code> |  |
-| <code>i32x4\.extend\_high\_i16x8\_u</code> |  |
-| <code>i64x2\.extend\_low\_i32x4\_s</code> |  |
-| <code>i64x2\.extend\_high\_i32x4\_s</code> |  |
-| <code>i64x2\.extend\_low\_i32x4\_u</code> |  |
-| <code>i64x2\.extend\_high\_i32x4\_u</code> |  |
-| <code>i8x16\.narrow\_i16x8\_s</code> |  |
-| <code>i8x16\.narrow\_i16x8\_u</code> |  |
-| <code>i16x8\.narrow\_i32x4\_s</code> |  |
-| <code>i16x8\.narrow\_i32x4\_u</code> |  |
-| <code>i32x4\.narrow\_i32x4\_s</code> |  |
-| <code>i32x4\.narrow\_i32x4\_u</code> |  |
-| <code>i8x16\.replace\_lane</code> | <code>lane</code> |
-| <code>i16x8\.replace\_lane</code> | <code>lane</code> |
-| <code>i32x4\.replace\_lane</code> | <code>lane</code> |
-| <code>i64x2\.replace\_lane</code> | <code>lane</code> |
-| <code>f32x4\.replace\_lane</code> | <code>lane</code> |
-| <code>f64x2\.replace\_lane</code> | <code>lane</code> |
-| <code>i8x16\.shuffle</code> | <code>lane1,\.\.\.,lane16</code> |
-| <code>i8x16\.swizzle</code> |  |
-| <code>i32\.eqz</code> |  |
-| <code>i32\.eq</code> |  |
-| <code>i32\.ne</code> |  |
-| <code>i32\.lt\_s</code> |  |
-| <code>i32\.lt\_u</code> |  |
-| <code>i32\.gt\_s</code> |  |
-| <code>i32\.gt\_u</code> |  |
-| <code>i32\.le\_s</code> |  |
-| <code>i32\.le\_u</code> |  |
-| <code>i32\.ge\_s</code> |  |
-| <code>i32\.ge\_u</code> |  |
-| <code>i64\.eqz</code> |  |
-| <code>i64\.eq</code> |  |
-| <code>i64\.ne</code> |  |
-| <code>i64\.lt\_s</code> |  |
-| <code>i64\.lt\_u</code> |  |
-| <code>i64\.gt\_s</code> |  |
-| <code>i64\.gt\_u</code> |  |
-| <code>i64\.le\_s</code> |  |
-| <code>i64\.le\_u</code> |  |
-| <code>i64\.ge\_s</code> |  |
-| <code>i64\.ge\_u</code> |  |
-| <code>f32\.eq</code> |  |
-| <code>f32\.ne</code> |  |
-| <code>f32\.lt</code> |  |
-| <code>f32\.gt</code> |  |
-| <code>f32\.le</code> |  |
-| <code>f32\.ge</code> |  |
-| <code>f64\.eq</code> |  |
-| <code>f64\.ne</code> |  |
-| <code>f64\.lt</code> |  |
-| <code>f64\.gt</code> |  |
-| <code>f64\.le</code> |  |
-| <code>f64\.ge</code> |  |
-| <code>i8x16\.eq</code> |  |
-| <code>i8x16\.ne</code> |  |
-| <code>i8x16\.lt\_s</code> |  |
-| <code>i8x16\.lt\_u</code> |  |
-| <code>i8x16\.gt\_s</code> |  |
-| <code>i8x16\.gt\_u</code> |  |
-| <code>i8x16\.le\_s</code> |  |
-| <code>i8x16\.le\_u</code> |  |
-| <code>i8x16\.ge\_s</code> |  |
-| <code>i8x16\.ge\_u</code> |  |
-| <code>i16x8\.eq</code> |  |
-| <code>i16x8\.ne</code> |  |
-| <code>i16x8\.lt\_s</code> |  |
-| <code>i16x8\.lt\_u</code> |  |
-| <code>i16x8\.gt\_s</code> |  |
-| <code>i16x8\.gt\_u</code> |  |
-| <code>i16x8\.le\_s</code> |  |
-| <code>i16x8\.le\_u</code> |  |
-| <code>i16x8\.ge\_s</code> |  |
-| <code>i16x8\.ge\_u</code> |  |
-| <code>i32x4\.eq</code> |  |
-| <code>i32x4\.ne</code> |  |
-| <code>i32x4\.lt\_s</code> |  |
-| <code>i32x4\.lt\_u</code> |  |
-| <code>i32x4\.gt\_s</code> |  |
-| <code>i32x4\.gt\_u</code> |  |
-| <code>i32x4\.le\_s</code> |  |
-| <code>i32x4\.le\_u</code> |  |
-| <code>i32x4\.ge\_s</code> |  |
-| <code>i32x4\.ge\_u</code> |  |
-| <code>i64x2\.eq</code> |  |
-| <code>i64x2\.ne</code> |  |
-| <code>i64x2\.lt\_s</code> |  |
-| <code>i64x2\.gt\_s</code> |  |
-| <code>i64x2\.le\_s</code> |  |
-| <code>i64x2\.ge\_s</code> |  |
-| <code>f32x4\.eq</code> |  |
-| <code>f32x4\.ne</code> |  |
-| <code>f32x4\.lt</code> |  |
-| <code>f32x4\.gt</code> |  |
-| <code>f32x4\.le</code> |  |
-| <code>f32x4\.ge</code> |  |
-| <code>f64x2\.eq</code> |  |
-| <code>f64x2\.ne</code> |  |
-| <code>f64x2\.lt</code> |  |
-| <code>f64x2\.gt</code> |  |
-| <code>f64x2\.le</code> |  |
-| <code>f64x2\.ge</code> |  |
-| <code>v128\.any\_true</code> |  |
-| <code>i8x16\.all\_true</code> |  |
-| <code>i16x8\.all\_true</code> |  |
-| <code>i32x4\.all\_true</code> |  |
-| <code>i64x2\.all\_true</code> |  |
-| <code>select</code> |  |
-| <code>select</code> | <code>valtype,valtype,\.\.\.</code> |
-| <code>i32\.clz</code> |  |
-| <code>i32\.ctz</code> |  |
-| <code>i32\.popcnt</code> |  |
-| <code>i32\.add</code> |  |
-| <code>i32\.sub</code> |  |
-| <code>i32\.mul</code> |  |
-| <code>i32\.div\_s</code> |  |
-| <code>i32\.div\_u</code> |  |
-| <code>i32\.rem\_s</code> |  |
-| <code>i32\.rem\_u</code> |  |
-| <code>i32\.and</code> |  |
-| <code>i32\.or</code> |  |
-| <code>i32\.xor</code> |  |
-| <code>i32\.shl</code> |  |
-| <code>i32\.shr\_s</code> |  |
-| <code>i32\.shr\_u</code> |  |
-| <code>i32\.rotl</code> |  |
-| <code>i32\.rotr</code> |  |
-| <code>i64\.clz</code> |  |
-| <code>i64\.ctz</code> |  |
-| <code>i64\.popcnt</code> |  |
-| <code>i64\.add</code> |  |
-| <code>i64\.sub</code> |  |
-| <code>i64\.mul</code> |  |
-| <code>i64\.div\_s</code> |  |
-| <code>i64\.div\_u</code> |  |
-| <code>i64\.rem\_s</code> |  |
-| <code>i64\.rem\_u</code> |  |
-| <code>i64\.and</code> |  |
-| <code>i64\.or</code> |  |
-| <code>i64\.xor</code> |  |
-| <code>i64\.shl</code> |  |
-| <code>i64\.shr\_s</code> |  |
-| <code>i64\.shr\_u</code> |  |
-| <code>i64\.rotl</code> |  |
-| <code>i64\.rotr</code> |  |
-| <code>f32\.abs</code> |  |
-| <code>f32\.neg</code> |  |
-| <code>f32\.ceil</code> |  |
-| <code>f32\.floor</code> |  |
-| <code>f32\.trunc</code> |  |
-| <code>f32\.nearest</code> |  |
-| <code>f32\.sqrt</code> |  |
-| <code>f32\.add</code> |  |
-| <code>f32\.sub</code> |  |
-| <code>f32\.mul</code> |  |
-| <code>f32\.div</code> |  |
-| <code>f32\.min</code> |  |
-| <code>f32\.max</code> |  |
-| <code>f32\.copysign</code> |  |
-| <code>f64\.abs</code> |  |
-| <code>f64\.neg</code> |  |
-| <code>f64\.ceil</code> |  |
-| <code>f64\.floor</code> |  |
-| <code>f64\.trunc</code> |  |
-| <code>f64\.nearest</code> |  |
-| <code>f64\.sqrt</code> |  |
-| <code>f64\.add</code> |  |
-| <code>f64\.sub</code> |  |
-| <code>f64\.mul</code> |  |
-| <code>f64\.div</code> |  |
-| <code>f64\.min</code> |  |
-| <code>f64\.max</code> |  |
-| <code>f64\.copysign</code> |  |
-| <code>v128\.not</code> |  |
-| <code>v128\.and</code> |  |
-| <code>v128\.andnot</code> |  |
-| <code>v128\.or</code> |  |
-| <code>v128\.xor</code> |  |
-| <code>v128\.bitselect</code> |  |
-| <code>i8x16\.abs</code> |  |
-| <code>i8x16\.neg</code> |  |
-| <code>i8x16\.popcnt</code> |  |
-| <code>i8x16\.bitmask</code> |  |
-| <code>i8x16\.shl</code> |  |
-| <code>i8x16\.shr\_s</code> |  |
-| <code>i8x16\.shr\_u</code> |  |
-| <code>i8x16\.add</code> |  |
-| <code>i8x16\.add\_sat\_s</code> |  |
-| <code>i8x16\.add\_sat\_u</code> |  |
-| <code>i8x16\.sub</code> |  |
-| <code>i8x16\.sub\_sat\_s</code> |  |
-| <code>i8x16\.sub\_sat\_u</code> |  |
-| <code>i8x16\.min\_s</code> |  |
-| <code>i8x16\.min\_u</code> |  |
-| <code>i8x16\.max\_s</code> |  |
-| <code>i8x16\.max\_u</code> |  |
-| <code>i8x16\.avr\_u</code> |  |
-| <code>i16x8\.abs</code> |  |
-| <code>i16x8\.neg</code> |  |
-| <code>i16x8\.bitmask</code> |  |
-| <code>i16x8\.shl</code> |  |
-| <code>i16x8\.shr\_s</code> |  |
-| <code>i16x8\.shr\_u</code> |  |
-| <code>i16x8\.add</code> |  |
-| <code>i16x8\.add\_sat\_s</code> |  |
-| <code>i16x8\.add\_sat\_u</code> |  |
-| <code>i16x8\.sub</code> |  |
-| <code>i16x8\.sub\_sat\_s</code> |  |
-| <code>i16x8\.sub\_sat\_u</code> |  |
-| <code>i16x8\.mul</code> |  |
-| <code>i16x8\.min\_s</code> |  |
-| <code>i16x8\.min\_u</code> |  |
-| <code>i16x8\.max\_s</code> |  |
-| <code>i16x8\.max\_u</code> |  |
-| <code>i16x8\.avr\_u</code> |  |
-| <code>i16x8\.q15mulr\_sat\_s</code> |  |
-| <code>i16x8\.extadd\_pairwise\_i8x16\_s</code> |  |
-| <code>i16x8\.extadd\_pairwise\_i8x16\_u</code> |  |
-| <code>i16x8\.extmul\_low\_i8x16\_s</code> |  |
-| <code>i16x8\.extmul\_high\_i8x16\_s</code> |  |
-| <code>i16x8\.extmul\_low\_i8x16\_u</code> |  |
-| <code>i16x8\.extmul\_high\_i8x16\_u</code> |  |
-| <code>i32x4\.abs</code> |  |
-| <code>i32x4\.neg</code> |  |
-| <code>i32x4\.bitmask</code> |  |
-| <code>i32x4\.shl</code> |  |
-| <code>i32x4\.shr\_s</code> |  |
-| <code>i32x4\.shr\_u</code> |  |
-| <code>i32x4\.add</code> |  |
-| <code>i32x4\.sub</code> |  |
-| <code>i32x4\.mul</code> |  |
-| <code>i32x4\.min\_s</code> |  |
-| <code>i32x4\.min\_u</code> |  |
-| <code>i32x4\.max\_s</code> |  |
-| <code>i32x4\.max\_u</code> |  |
-| <code>i32x4\.dot\_i16x8\_s</code> |  |
-| <code>i32x4\.extadd\_pairwise\_i16x8\_s</code> |  |
-| <code>i32x4\.extadd\_pairwise\_i16x8\_u</code> |  |
-| <code>i32x4\.extmul\_low\_i16x8\_s</code> |  |
-| <code>i32x4\.extmul\_high\_i16x8\_s</code> |  |
-| <code>i32x4\.extmul\_low\_i16x8\_u</code> |  |
-| <code>i32x4\.extmul\_high\_i16x8\_u</code> |  |
-| <code>i64x2\.abs</code> |  |
-| <code>i64x2\.neg</code> |  |
-| <code>i64x2\.bitmask</code> |  |
-| <code>i64x2\.shl</code> |  |
-| <code>i64x2\.shr\_s</code> |  |
-| <code>i64x2\.shr\_u</code> |  |
-| <code>i64x2\.add</code> |  |
-| <code>i64x2\.sub</code> |  |
-| <code>i64x2\.mul</code> |  |
-| <code>i64x2\.extmul\_low\_i8x16\_s</code> |  |
-| <code>i64x2\.extmul\_high\_i8x16\_s</code> |  |
-| <code>i64x2\.extmul\_low\_i8x16\_u</code> |  |
-| <code>i64x2\.extmul\_high\_i8x16\_u</code> |  |
-| <code>f32x4\.ceil</code> |  |
-| <code>f32x4\.floor</code> |  |
-| <code>f32x4\.trunc</code> |  |
-| <code>f32x4\.nearest</code> |  |
-| <code>f32x4\.abs</code> |  |
-| <code>f32x4\.neg</code> |  |
-| <code>f32x4\.sqrt</code> |  |
-| <code>f32x4\.add</code> |  |
-| <code>f32x4\.sub</code> |  |
-| <code>f32x4\.mul</code> |  |
-| <code>f32x4\.div</code> |  |
-| <code>f32x4\.min</code> |  |
-| <code>f32x4\.max</code> |  |
-| <code>f32x4\.pmin</code> |  |
-| <code>f32x4\.pmax</code> |  |
-| <code>f64x2\.ceil</code> |  |
-| <code>f64x2\.floor</code> |  |
-| <code>f64x2\.trunc</code> |  |
-| <code>f64x2\.nearest</code> |  |
-| <code>f64x2\.abs</code> |  |
-| <code>f64x2\.neg</code> |  |
-| <code>f64x2\.sqrt</code> |  |
-| <code>f64x2\.add</code> |  |
-| <code>f64x2\.sub</code> |  |
-| <code>f64x2\.mul</code> |  |
-| <code>f64x2\.div</code> |  |
-| <code>f64x2\.min</code> |  |
-| <code>f64x2\.max</code> |  |
-| <code>f64x2\.pmin</code> |  |
-| <code>f64x2\.pmax</code> |  |
-| <code>ref\.null</code> | <code>reftype</code> |
-| <code>ref\.is\_null</code> |  |
-| <code>ref\.func</code> | <code>funcidx</code> |
-| <code>unreachable</code> |  |
-| <code>nop</code> |  |
-| <code>block</code> | <code>blocktype</code> |
-| <code>loop</code> | <code>blocktype</code> |
-| <code>if</code> | <code>blocktype</code> |
-| <code>else</code> |  |
-| <code>end</code> |  |
-| <code>br</code> | <code>labelidx</code> |
-| <code>br\_if</code> | <code>labelidx</code> |
-| <code>br\_table</code> | <code>labelidx,labelidx,\.\.\.</code> |
-| <code>return</code> |  |
-| <code>call</code> | <code>funcidx</code> |
-| <code>call\_indirect</code> | <code>tableidx, typeidx</code> |
+| 引数 | 返値 | 命令 | オペランド |
+|:-:|:-:|:--|:--|
+| <code>0</code> | <code>i32</code> | <code>i32\.const</code> | <code>i32</code> |
+| <code>0</code> | <code>i64</code> | <code>i64\.const</code> | <code>i64</code> |
+| <code>0</code> | <code>f32</code> | <code>f32\.const</code> | <code>f32</code> |
+| <code>0</code> | <code>f64</code> | <code>f64\.const</code> | <code>f64</code> |
+| <code>0</code> | <code>v128</code> | <code>i8x16\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> |
+| <code>0</code> | <code>v128</code> | <code>i16x8\.const</code> | <code>i16<sub>1</sub>,i16<sub>2</sub>,...,i16<sub>8</sub></code> |
+| <code>0</code> | <code>v128</code> | <code>i32x4\.const</code> | <code>i32,i32,i32,i32</code> |
+| <code>0</code> | <code>v128</code> | <code>i64x2\.const</code> | <code>i64,i64</code> |
+| <code>0</code> | <code>v128</code> | <code>f32x4\.const</code> | <code>f32,f32,f32,f32</code> |
+| <code>0</code> | <code>v128</code> | <code>f64x2\.const</code> | <code>f64,f64</code> |
+| <code>0</code> | <code>v128</code> | <code>v128\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> |
+| <code>1</code> |  | <code>drop</code> |  |
+| <code>0</code> |  | <code>elem\.drop</code> | <code>elemidx</code> |
+| <code>0</code> |  | <code>data\.drop</code> | <code>dataidx</code> |
+| <code>0</code> | <code>any</code> | <code>global\.get</code> | <code>globalidx</code> |
+| <code>1</code> |  | <code>global\.set</code> | <code>globalidx</code> |
+| <code>1</code> |  | <code>local\.get</code> | <code>localidx</code> |
+| <code>0</code> | <code>any</code> | <code>local\.set</code> | <code>localidx</code> |
+| <code>1</code> | <code>any</code> | <code>local\.tee</code> | <code>localidx</code> |
+| <code>1</code> | <code>any</code> | <code>table\.get</code> | <code>tableidx</code> |
+| <code>2</code> |  | <code>table\.set</code> | <code>tableidx</code> |
+| <code>3</code> |  | <code>table\.init</code> | <code>tableidx,elemidx</code> |
+| <code>3</code> |  | <code>table\.copy</code> | <code>tableidx,tableidx</code> |
+| <code>0</code> | <code>i32</code> | <code>table\.grow</code> | <code>tableidx</code> |
+| <code>0</code> | <code>i32</code> | <code>table\.size</code> | <code>tableidx</code> |
+| <code>3</code> |  | <code>table\.fill</code> | <code>tableidx</code> |
+| <code>0</code> | <code>i32</code> | <code>memory\.size</code> |  |
+| <code>1</code> | <code>i32</code> | <code>memory\.grow</code> |  |
+| <code>3</code> |  | <code>memory\.init</code> | <code>memidx</code> |
+| <code>3</code> |  | <code>memory\.copy</code> |  |
+| <code>3</code> |  | <code>memory\.fill</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.load</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>f32</code> | <code>f32\.load</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.load</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load32\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i64</code> | <code>i64\.load32\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i32\.store</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i64\.store</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>f32\.store</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>f64\.store</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i32\.store8</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i32\.store16</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i64\.store8</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i64\.store16</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>i64\.store32</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load8x8\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load8x8\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load16x4\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load16x4\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load32x2\_s</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load32x2\_u</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load8\_splat</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load16\_splat</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load32\_splat</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load64\_splat</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.store</code> | <code>&lt;memarg&gt;</code> |
+| <code>2</code> | <code>v128</code> | <code>v128\.load8\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> | <code>v128</code> | <code>v128\.load16\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> | <code>v128</code> | <code>v128\.load32\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> | <code>v128</code> | <code>v128\.load64\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>v128\.store8\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>v128\.store16\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>v128\.store32\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>2</code> |  | <code>v128\.store64\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load32\_zero</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>v128</code> | <code>v128\.load64\_zero</code> | <code>&lt;memarg&gt;</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.extend8\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i32\.extend16\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.extend8\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.extend16\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.extend32\_s</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.wrap</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.extend\_i32\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.extend\_i32\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f32\_s</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f32\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f64\_s</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f64\_u</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f32\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f32\_u</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f64\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f64\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f32\_s</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f32\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f64\_s</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f64\_u</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f32\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f32\_u</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f64\_s</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f64\_u</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.demote\_f64</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.promote\_f32</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i32\_s</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i32\_u</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i64\_s</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i64\_u</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i32\_s</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i32\_u</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i64\_s</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i64\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.reinterpret\_f32</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.reinterpret\_f64</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.reinterpret\_i32</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.reinterpret\_i64</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.splat</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.splat</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.splat</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.splat</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.splat</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.splat</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i8x16\.extract\_lane\_s</code> | <code>lane</code> |
+| <code>1</code> | <code>i32</code> | <code>i8x16\.extract\_lane\_u</code> | <code>lane</code> |
+| <code>1</code> | <code>i32</code> | <code>i16x8\.extract\_lane\_s</code> | <code>lane</code> |
+| <code>1</code> | <code>i32</code> | <code>i16x8\.extract\_lane\_u</code> | <code>lane</code> |
+| <code>1</code> | <code>i32</code> | <code>i32x4\.extract\_lane</code> | <code>lane</code> |
+| <code>1</code> | <code>i64</code> | <code>i64x2\.extract\_lane</code> | <code>lane</code> |
+| <code>1</code> | <code>f32</code> | <code>f32x4\.extract\_lane</code> | <code>lane</code> |
+| <code>1</code> | <code>f64</code> | <code>f64x2\.extract\_lane</code> | <code>lane</code> |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f64x2\_s\_zero</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f64x2\_u\_zero</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.convert\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.convert\_i32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.convert\_low\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.convert\_low\_i32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.demote\_f64x2\_zero</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.promote\_low\_f32x4</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_low\_i8x16\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_high\_i8x16\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_low\_i8x16\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_high\_i8x16\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_low\_i16x8\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_high\_i16x8\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_low\_i16x8\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_high\_i16x8\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_low\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_high\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_low\_i32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_high\_i32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.narrow\_i16x8\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.narrow\_i16x8\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.narrow\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.narrow\_i32x4\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.narrow\_i32x4\_s</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.narrow\_i32x4\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.replace\_lane</code> | <code>lane</code> |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.shuffle</code> | <code>lane<sub>1</sub>,...,lane<sub>16</sub></code> |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.swizzle</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.eqz</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.eq</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.ne</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.lt\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.lt\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.gt\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.gt\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.le\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.le\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.ge\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.ge\_u</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i64\.eqz</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.eq</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.ne</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.lt\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.lt\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.gt\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.gt\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.le\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.le\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.ge\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i64\.ge\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.eq</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.ne</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.lt</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.gt</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.le</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f32\.ge</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.eq</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.ne</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.lt</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.gt</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.le</code> |  |
+| <code>2</code> | <code>i32</code> | <code>f64\.ge</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.lt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.lt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.gt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.gt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.le\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.le\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.ge\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.ge\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.lt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.lt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.gt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.gt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.le\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.le\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.ge\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.ge\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.lt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.lt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.gt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.gt\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.le\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.le\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.ge\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.ge\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.lt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.gt\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.le\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.ge\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.lt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.gt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.le</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.ge</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.eq</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.ne</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.lt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.gt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.le</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.ge</code> |  |
+| <code>1</code> | <code>i32</code> | <code>v128\.any\_true</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i8x16\.all\_true</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i16x8\.all\_true</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32x4\.all\_true</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i64x2\.all\_true</code> |  |
+| <code>3</code> | <code>any</code> | <code>select</code> |  |
+| <code>3</code> | <code>any</code> | <code>select</code> | <code>valtype,valtype,...</code> |
+| <code>1</code> | <code>i32</code> | <code>i32\.clz</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.ctz</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32\.popcnt</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.add</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.sub</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.mul</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.div\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.div\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.rem\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.rem\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.and</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.or</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.xor</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.shl</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.shr\_s</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.shr\_u</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.rotl</code> |  |
+| <code>2</code> | <code>i32</code> | <code>i32\.rotr</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.clz</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.ctz</code> |  |
+| <code>1</code> | <code>i64</code> | <code>i64\.popcnt</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.add</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.sub</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.mul</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.div\_s</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.div\_u</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.rem\_s</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.rem\_u</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.and</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.or</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.xor</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.shl</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.shr\_s</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.shr\_u</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.rotl</code> |  |
+| <code>2</code> | <code>i64</code> | <code>i64\.rotr</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.abs</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.neg</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.ceil</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.floor</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.trunc</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.nearest</code> |  |
+| <code>1</code> | <code>f32</code> | <code>f32\.sqrt</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.add</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.sub</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.mul</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.div</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.min</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.max</code> |  |
+| <code>2</code> | <code>f32</code> | <code>f32\.copysign</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.abs</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.neg</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.ceil</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.floor</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.trunc</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.nearest</code> |  |
+| <code>1</code> | <code>f64</code> | <code>f64\.sqrt</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.add</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.sub</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.mul</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.div</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.min</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.max</code> |  |
+| <code>2</code> | <code>f64</code> | <code>f64\.copysign</code> |  |
+| <code>1</code> | <code>v128</code> | <code>v128\.not</code> |  |
+| <code>2</code> | <code>v128</code> | <code>v128\.and</code> |  |
+| <code>2</code> | <code>v128</code> | <code>v128\.andnot</code> |  |
+| <code>2</code> | <code>v128</code> | <code>v128\.or</code> |  |
+| <code>2</code> | <code>v128</code> | <code>v128\.xor</code> |  |
+| <code>3</code> | <code>v128</code> | <code>v128\.bitselect</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.neg</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i8x16\.popcnt</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i8x16\.bitmask</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.shl</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.shr\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.shr\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.add\_sat\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.add\_sat\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.sub\_sat\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.sub\_sat\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.min\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.min\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.max\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.max\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i8x16\.avr\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i16x8\.neg</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i16x8\.bitmask</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.shl</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.shr\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.shr\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.add\_sat\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.add\_sat\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.sub\_sat\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.sub\_sat\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.mul</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.min\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.min\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.max\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.max\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.avr\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.q15mulr\_sat\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extadd\_pairwise\_i8x16\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extadd\_pairwise\_i8x16\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i32x4\.neg</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i32x4\.bitmask</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.shl</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.shr\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.shr\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.mul</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.min\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.min\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.max\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.max\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.dot\_i16x8\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extadd\_pairwise\_i16x8\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extadd\_pairwise\_i16x8\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>i64x2\.neg</code> |  |
+| <code>1</code> | <code>i32</code> | <code>i64x2\.bitmask</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.shl</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.shr\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.shr\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.mul</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i8x16\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i8x16\_s</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i8x16\_u</code> |  |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i8x16\_u</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.ceil</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.floor</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.trunc</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.nearest</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.neg</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.sqrt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.mul</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.div</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.min</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.max</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.pmin</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.pmax</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.ceil</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.floor</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.trunc</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.nearest</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.abs</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.neg</code> |  |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.sqrt</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.add</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.sub</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.mul</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.div</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.min</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.max</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.pmin</code> |  |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.pmax</code> |  |
+| <code>0</code> | <code>func</code> | <code>ref\.null</code> | <code>reftype</code> |
+| <code>1</code> | <code>i32</code> | <code>ref\.is\_null</code> |  |
+| <code>0</code> | <code>func</code> | <code>ref\.func</code> | <code>funcidx</code> |
+| <code>0</code> |  | <code>unreachable</code> |  |
+| <code>0</code> |  | <code>nop</code> |  |
+| <code>0</code> |  | <code>block</code> | <code>blocktype</code> |
+| <code>0</code> |  | <code>loop</code> | <code>blocktype</code> |
+| <code>0</code> |  | <code>if</code> | <code>blocktype</code> |
+| <code>0</code> |  | <code>else</code> |  |
+| <code>0</code> |  | <code>end</code> |  |
+| <code>0</code> |  | <code>br</code> | <code>labelidx</code> |
+| <code>1</code> |  | <code>br\_if</code> | <code>labelidx</code> |
+| <code>1</code> |  | <code>br\_table</code> | <code>labelidx,labelidx,...</code> |
+| <code>0</code> |  | <code>return</code> |  |
+| <code>0</code> |  | <code>call</code> | <code>funcidx</code> |
+| <code>1</code> |  | <code>call\_indirect</code> | <code>tableidx,typeidx</code> |
