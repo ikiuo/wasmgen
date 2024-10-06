@@ -29,7 +29,7 @@ namespace wasmgen
             {"local.get",{Operation(1,7,0,0,0,0),Operand(1,17,0,0),2,{32,256}}},
             {"local.set",{Operation(0,0,0,0,7,0),Operand(1,17,0,0),2,{33,256}}},
             {"local.tee",{Operation(1,7,0,0,7,0),Operand(1,17,0,0),2,{34,256}}},
-            {"table.get",{Operation(1,1,0,0,7,0),Operand(1,21,0,0),2,{37,256}}},
+            {"table.get",{Operation(1,1,0,0,6,0),Operand(1,21,0,0),2,{37,256}}},
             {"table.set",{Operation(2,1,7,0,0,0),Operand(1,21,0,0),2,{38,256}}},
             {"table.init",{Operation(3,1,1,1,0,0),Operand(2,21,14,0),4,{252,12,257,256}}},
             {"table.copy",{Operation(3,1,1,1,0,0),Operand(2,22,23,0),4,{252,14,256,257}}},
