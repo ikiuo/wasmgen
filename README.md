@@ -126,9 +126,17 @@ $ . _ @
 | 種類 | 型 |
 |:-:|:--|
 | numtype | i32 i64 f32 f64 |
-| vectype | v128 <br/> (i8x16 i16x8 i32x4 i64x2 f32x4 f64x2) |
+| vectype | v128 |
 | reftype | funcref externref |
 | valtype | numtype:<br/>&nbsp;&nbsp;&nbsp; i32 i64 f32 f64 <br/> vectype:<br/>&nbsp;&nbsp;&nbsp; v128 <br/> reftype:<br/>&nbsp;&nbsp;&nbsp; funcref externref |
+
+numtype と vectype では同型で符号の扱いが存在する表現があります。
+
+| 共通型 | 符号あり | 符号なし |
+|:--|:--|:--|
+| i32 | s32 | u32 |
+| i64 | s64 | u64 |
+| i8x16 <br/> i16x8 <br/> i32x4 <br/> i64x2 <br/> &nbsp;↑ <br/> v128 | s8x16 <br/> s16x8 <br/> s32x4 <br/> s64x2 <br/> &nbsp; <br/> &nbsp; | u8x16 <br/> u16x8 <br/> u32x4 <br/> u64x2  <br/> &nbsp; <br/> &nbsp; |
 
 
 # 疑似命令
@@ -1022,7 +1030,7 @@ x           .param      i32
 
 # 実行命令
 
-[WebAssembly - Instructions](https://webassembly.github.io/spec/core/binary/instructions.html) を参照してください。
+詳細は [WebAssembly - Instructions](https://webassembly.github.io/spec/core/binary/instructions.html) を参照してください。
 
 
 ## 制御ブロック
@@ -1166,452 +1174,961 @@ $exit:      end
 | 16 | <code>v128.load v128.store</code> |
 
 
-## 命令表
+# 命令表
 
-| 引数 | 返値 | 命令 | オペランド |
-|:-:|:-:|:--|:--|
-| <code>0</code> | <code>i32</code> | <code>i32\.const</code> | <code>i32</code> |
-| <code>0</code> | <code>i64</code> | <code>i64\.const</code> | <code>i64</code> |
-| <code>0</code> | <code>f32</code> | <code>f32\.const</code> | <code>f32</code> |
-| <code>0</code> | <code>f64</code> | <code>f64\.const</code> | <code>f64</code> |
-| <code>0</code> | <code>v128</code> | <code>i8x16\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> |
-| <code>0</code> | <code>v128</code> | <code>i16x8\.const</code> | <code>i16<sub>1</sub>,i16<sub>2</sub>,...,i16<sub>8</sub></code> |
-| <code>0</code> | <code>v128</code> | <code>i32x4\.const</code> | <code>i32,i32,i32,i32</code> |
-| <code>0</code> | <code>v128</code> | <code>i64x2\.const</code> | <code>i64,i64</code> |
-| <code>0</code> | <code>v128</code> | <code>f32x4\.const</code> | <code>f32,f32,f32,f32</code> |
-| <code>0</code> | <code>v128</code> | <code>f64x2\.const</code> | <code>f64,f64</code> |
-| <code>0</code> | <code>v128</code> | <code>v128\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> |
-| <code>1</code> |  | <code>drop</code> |  |
-| <code>0</code> |  | <code>elem\.drop</code> | <code>elemidx</code> |
-| <code>0</code> |  | <code>data\.drop</code> | <code>dataidx</code> |
-| <code>0</code> | <code>any</code> | <code>global\.get</code> | <code>globalidx</code> |
-| <code>1</code> |  | <code>global\.set</code> | <code>globalidx</code> |
-| <code>1</code> |  | <code>local\.get</code> | <code>localidx</code> |
-| <code>0</code> | <code>any</code> | <code>local\.set</code> | <code>localidx</code> |
-| <code>1</code> | <code>any</code> | <code>local\.tee</code> | <code>localidx</code> |
-| <code>1</code> | <code>any</code> | <code>table\.get</code> | <code>tableidx</code> |
-| <code>2</code> |  | <code>table\.set</code> | <code>tableidx</code> |
-| <code>3</code> |  | <code>table\.init</code> | <code>tableidx,elemidx</code> |
-| <code>3</code> |  | <code>table\.copy</code> | <code>tableidx,tableidx</code> |
-| <code>0</code> | <code>i32</code> | <code>table\.grow</code> | <code>tableidx</code> |
-| <code>0</code> | <code>i32</code> | <code>table\.size</code> | <code>tableidx</code> |
-| <code>3</code> |  | <code>table\.fill</code> | <code>tableidx</code> |
-| <code>0</code> | <code>i32</code> | <code>memory\.size</code> |  |
-| <code>1</code> | <code>i32</code> | <code>memory\.grow</code> |  |
-| <code>3</code> |  | <code>memory\.init</code> | <code>dataidx</code> |
-| <code>3</code> |  | <code>memory\.copy</code> |  |
-| <code>3</code> |  | <code>memory\.fill</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>f32</code> | <code>f32\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>f64</code> | <code>f64\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load16\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load16\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load32\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i64</code> | <code>i64\.load32\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i32\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i64\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>f32\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>f64\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i32\.store8</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i32\.store16</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i64\.store8</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i64\.store16</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>i64\.store32</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load8x8\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load8x8\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load16x4\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load16x4\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load32x2\_s</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load32x2\_u</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load8\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load16\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load32\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load64\_splat</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.store</code> | <code>&lt;memarg&gt;</code> |
-| <code>2</code> | <code>v128</code> | <code>v128\.load8\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> | <code>v128</code> | <code>v128\.load16\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> | <code>v128</code> | <code>v128\.load32\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> | <code>v128</code> | <code>v128\.load64\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>v128\.store8\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>v128\.store16\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>v128\.store32\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>2</code> |  | <code>v128\.store64\_lane</code> | <code>lane,&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load32\_zero</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>v128</code> | <code>v128\.load64\_zero</code> | <code>&lt;memarg&gt;</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.extend8\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i32\.extend16\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.extend8\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.extend16\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.extend32\_s</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.wrap</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.extend\_i32\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.extend\_i32\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f32\_s</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f32\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f64\_s</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_f64\_u</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f32\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f32\_u</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f64\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_f64\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f32\_s</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f32\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f64\_s</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.trunc\_sat\_f64\_u</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f32\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f32\_u</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f64\_s</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.trunc\_sat\_f64\_u</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.demote\_f64</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.promote\_f32</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i32\_s</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i32\_u</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i64\_s</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.convert\_i64\_u</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i32\_s</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i32\_u</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i64\_s</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.convert\_i64\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.reinterpret\_f32</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.reinterpret\_f64</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.reinterpret\_i32</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.reinterpret\_i64</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.splat</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.splat</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.splat</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.splat</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.splat</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.splat</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i8x16\.extract\_lane\_s</code> | <code>lane</code> |
-| <code>1</code> | <code>i32</code> | <code>i8x16\.extract\_lane\_u</code> | <code>lane</code> |
-| <code>1</code> | <code>i32</code> | <code>i16x8\.extract\_lane\_s</code> | <code>lane</code> |
-| <code>1</code> | <code>i32</code> | <code>i16x8\.extract\_lane\_u</code> | <code>lane</code> |
-| <code>1</code> | <code>i32</code> | <code>i32x4\.extract\_lane</code> | <code>lane</code> |
-| <code>1</code> | <code>i64</code> | <code>i64x2\.extract\_lane</code> | <code>lane</code> |
-| <code>1</code> | <code>f32</code> | <code>f32x4\.extract\_lane</code> | <code>lane</code> |
-| <code>1</code> | <code>f64</code> | <code>f64x2\.extract\_lane</code> | <code>lane</code> |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f64x2\_s\_zero</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.trunc\_sat\_f64x2\_u\_zero</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.convert\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.convert\_i32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.convert\_low\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.convert\_low\_i32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.demote\_f64x2\_zero</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.promote\_low\_f32x4</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_low\_i8x16\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_high\_i8x16\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_low\_i8x16\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.extend\_high\_i8x16\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_low\_i16x8\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_high\_i16x8\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_low\_i16x8\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.extend\_high\_i16x8\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_low\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_high\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_low\_i32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.extend\_high\_i32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.narrow\_i16x8\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.narrow\_i16x8\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.narrow\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.narrow\_i32x4\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.narrow\_i32x4\_s</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.narrow\_i32x4\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.replace\_lane</code> | <code>lane</code> |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.shuffle</code> | <code>lane<sub>1</sub>,...,lane<sub>16</sub></code> |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.swizzle</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.eqz</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.eq</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.ne</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.lt\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.lt\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.gt\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.gt\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.le\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.le\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.ge\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.ge\_u</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i64\.eqz</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.eq</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.ne</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.lt\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.lt\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.gt\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.gt\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.le\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.le\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.ge\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i64\.ge\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.eq</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.ne</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.lt</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.gt</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.le</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f32\.ge</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.eq</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.ne</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.lt</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.gt</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.le</code> |  |
-| <code>2</code> | <code>i32</code> | <code>f64\.ge</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.lt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.lt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.gt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.gt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.le\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.le\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.ge\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.ge\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.lt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.lt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.gt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.gt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.le\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.le\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.ge\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.ge\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.lt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.lt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.gt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.gt\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.le\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.le\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.ge\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.ge\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.lt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.gt\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.le\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.ge\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.lt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.gt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.le</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.ge</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.eq</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.ne</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.lt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.gt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.le</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.ge</code> |  |
-| <code>1</code> | <code>i32</code> | <code>v128\.any\_true</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i8x16\.all\_true</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i16x8\.all\_true</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32x4\.all\_true</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i64x2\.all\_true</code> |  |
-| <code>3</code> | <code>any</code> | <code>select</code> |  |
-| <code>3</code> | <code>any</code> | <code>select</code> | <code>valtype,valtype,...</code> |
-| <code>1</code> | <code>i32</code> | <code>i32\.clz</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.ctz</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32\.popcnt</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.add</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.sub</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.mul</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.div\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.div\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.rem\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.rem\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.and</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.or</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.xor</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.shl</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.shr\_s</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.shr\_u</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.rotl</code> |  |
-| <code>2</code> | <code>i32</code> | <code>i32\.rotr</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.clz</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.ctz</code> |  |
-| <code>1</code> | <code>i64</code> | <code>i64\.popcnt</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.add</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.sub</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.mul</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.div\_s</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.div\_u</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.rem\_s</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.rem\_u</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.and</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.or</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.xor</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.shl</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.shr\_s</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.shr\_u</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.rotl</code> |  |
-| <code>2</code> | <code>i64</code> | <code>i64\.rotr</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.abs</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.neg</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.ceil</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.floor</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.trunc</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.nearest</code> |  |
-| <code>1</code> | <code>f32</code> | <code>f32\.sqrt</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.add</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.sub</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.mul</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.div</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.min</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.max</code> |  |
-| <code>2</code> | <code>f32</code> | <code>f32\.copysign</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.abs</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.neg</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.ceil</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.floor</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.trunc</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.nearest</code> |  |
-| <code>1</code> | <code>f64</code> | <code>f64\.sqrt</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.add</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.sub</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.mul</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.div</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.min</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.max</code> |  |
-| <code>2</code> | <code>f64</code> | <code>f64\.copysign</code> |  |
-| <code>1</code> | <code>v128</code> | <code>v128\.not</code> |  |
-| <code>2</code> | <code>v128</code> | <code>v128\.and</code> |  |
-| <code>2</code> | <code>v128</code> | <code>v128\.andnot</code> |  |
-| <code>2</code> | <code>v128</code> | <code>v128\.or</code> |  |
-| <code>2</code> | <code>v128</code> | <code>v128\.xor</code> |  |
-| <code>3</code> | <code>v128</code> | <code>v128\.bitselect</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.neg</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i8x16\.popcnt</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i8x16\.bitmask</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.shl</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.shr\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.shr\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.add\_sat\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.add\_sat\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.sub\_sat\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.sub\_sat\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.min\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.min\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.max\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.max\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i8x16\.avr\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i16x8\.neg</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i16x8\.bitmask</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.shl</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.shr\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.shr\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.add\_sat\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.add\_sat\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.sub\_sat\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.sub\_sat\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.mul</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.min\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.min\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.max\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.max\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.avr\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.q15mulr\_sat\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extadd\_pairwise\_i8x16\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extadd\_pairwise\_i8x16\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i32x4\.neg</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i32x4\.bitmask</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.shl</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.shr\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.shr\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.mul</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.min\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.min\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.max\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.max\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.dot\_i16x8\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extadd\_pairwise\_i16x8\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extadd\_pairwise\_i16x8\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>i64x2\.neg</code> |  |
-| <code>1</code> | <code>i32</code> | <code>i64x2\.bitmask</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.shl</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.shr\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.shr\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.mul</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i8x16\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i8x16\_s</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i8x16\_u</code> |  |
-| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i8x16\_u</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.ceil</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.floor</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.trunc</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.nearest</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.neg</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f32x4\.sqrt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.mul</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.div</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.min</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.max</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.pmin</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f32x4\.pmax</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.ceil</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.floor</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.trunc</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.nearest</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.abs</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.neg</code> |  |
-| <code>1</code> | <code>v128</code> | <code>f64x2\.sqrt</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.add</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.sub</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.mul</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.div</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.min</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.max</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.pmin</code> |  |
-| <code>2</code> | <code>v128</code> | <code>f64x2\.pmax</code> |  |
-| <code>0</code> | <code>func</code> | <code>ref\.null</code> | <code>reftype</code> |
-| <code>1</code> | <code>i32</code> | <code>ref\.is\_null</code> |  |
-| <code>0</code> | <code>func</code> | <code>ref\.func</code> | <code>funcidx</code> |
-| <code>0</code> |  | <code>unreachable</code> |  |
-| <code>0</code> |  | <code>nop</code> |  |
-| <code>0</code> |  | <code>block</code> | <code>blocktype</code> |
-| <code>0</code> |  | <code>loop</code> | <code>blocktype</code> |
-| <code>0</code> |  | <code>if</code> | <code>blocktype</code> |
-| <code>0</code> |  | <code>else</code> |  |
-| <code>0</code> |  | <code>end</code> |  |
-| <code>0</code> |  | <code>br</code> | <code>labelidx</code> |
-| <code>1</code> |  | <code>br\_if</code> | <code>labelidx</code> |
-| <code>1</code> |  | <code>br\_table</code> | <code>labelidx,labelidx,...</code> |
-| <code>0</code> |  | <code>return</code> |  |
-| <code>0</code> |  | <code>call</code> | <code>funcidx</code> |
-| <code>1</code> |  | <code>call\_indirect</code> | <code>tableidx,typeidx</code> |
+### [仕様書](https://webassembly.github.io/spec/core/exec/instructions.html)にある配列の略記
+
+| インデックス<code>𝑥</code> | 略記 | 仕様表記 |
+|:--|:--|:--|
+| <code>funcidx</code> | <code>FUNC[𝑥]</code> | <code>S.tables[F.module.funcaddrs[𝑥]]</code> |
+| <code>tableidx</code> | <code>TAB[𝑥]</code> | <code>S.tables[F.module.tableaddrs[𝑥]].elem</code> |
+| <code>memidx</code> | <code>MEM[𝑥]</code> | <code>S.mems[F.module.elemaddrs[𝑥]].elem</code> |
+| <code>dataidx</code> |<code>DATA[𝑥]</code> | <code>S.datas[F.module.dataaddrs[𝑥]].data</code> |
+
+また、<code>MEM0 = MEM[0]</code> とします。
+
+
+### 内容・備考などでの機能表現
+
+処理表現を JavaScript 風にすると以下のようになります。
+
+| 機能 | 出力 | 備考 |
+|:-:|:--|:--|
+| <code>abs(x)</code> | <code>x &lt; 0 ? -x : x</code> | 絶対値 |
+| <code>sqrt(x)</code> | <code>√x</code> | 平方根 |
+| <code>ceil(x)</code> | <code>x</code>以上の整数 | 天井関数（切り上げ） |
+| <code>nearest(x)</code> | <code>x</code>を四捨五入した整数 | 丸め関数（四捨五入） |
+| <code>floor(x)</code> | <code>x</code>以下の整数 | 床関数（切り捨て） |
+| <code>trunc(x)</code> | <code>x</code>の小数部を切り捨て | ゼロ方向丸め関数 |
+| | | |
+| <code>minU(x)</code> | <code>0</code> | 符号なし<code>x</code>ビットの最小値<code>0</code> |
+| <code>maxU(x)</code> | <code>(1 &lt;&lt; b) - 1</code> | 符号なし<code>x</code>ビットの最大値<code>2<sup>x</sup>-1</code> |
+| <code>minS(x)</code> | <code>- (1 &lt;&lt; (b - 1))</code> | 符号あり<code>x</code>ビットの最小値<code>-2<sup>x-1</sup></code> |
+| <code>maxS(x)</code> | <code>+ (1 &lt;&lt; (b - 1)) - 1</code> | 符号あり<code>x</code>ビットの最大値<code>+2<sup>x-1</sup>-1</code> |
+| | | |
+| <code>sign(x)</code> | <code>x &lt; 0 ? 1 : 0</code> | 符号ビット |
+| <code>signN(x,N)</code> | <code>(x &gt;&gt; (N - 1)) &amp; 1</code> | <code>N</code>ビット データの符号 |
+| <code>sign8(x)</code> | <code>signN(8)</code> | 8ビット データの符号 |
+| <code>sign16(x)</code> | <code>signN(16)</code> | 16ビット データの符号 |
+| <code>sign32(x)</code> | <code>signN(32)</code> | 32ビット データの符号 |
+| <code>sign64(x)</code> | <code>signN(64)</code> | 64ビット データの符号 |
+| | | |
+| <code>ext8u(x)</code> | <code>x &amp; maxU(8)</code> | 下位8ビットが有効なゼロ拡張 |
+| <code>ext16u(x)</code> | <code>x &amp; maxU(16)</code> | 下位16ビットが有効なゼロ拡張 |
+| <code>ext32u(x)</code> | <code>x &amp; maxU(32)</code> | 下位32ビットが有効なゼロ拡張 |
+| | | |
+| <code>extM(x,b)</code> | <code>signN(x,b) * ~maxU(b)</code> | 符号拡張用マスク値 |
+| <code>ext8s(x)</code> | <code>ext8u(x) \| extM(x, 8)</code> | ビット7を符号として上位ビットに拡張 |
+| <code>ext16s(x)</code> | <code>ext16u(x) \| extM(x, 16)</code> | ビット15を符号として上位ビットに拡張 |
+| <code>ext32s(x)</code> | <code>ext32u(x) \| extM(x, 32)</code> | ビット31を符号として上位ビットに拡張 |
+| | | |
+| <code>min(x,y)</code> | <code>x &lt; y ? x : y</code> | <code>x</code>と<code>y</code>の小さい方 |
+| <code>pmin(x,y)</code> | 同上 | <code>min(x,y)</code> の無限・非数の扱い違い版 |
+| <code>max(x,y)</code> | <code>x &gt; y ? x : y</code> | <code>x</code>と<code>y</code>の大きい方 |
+| <code>pmin(x,y)</code> | 同上 | <code>max(x,y)</code> の無限・非数の扱い違い版 |
+| <code>clamp(s,x,e)</code> | <code>max(s, min(x, e))</code> | <code>x</code>を<code>s</code>から<code>e</code>の範囲内に留める |
+| | | |
+| <code>satS(x,b)</code> | <code>clamp(minS(b), x, maxS(b))</code> | <code>x</code>を<code>-2<sup>b-1</sup></code>から<code>2<sup>b-1</sup>-1</code>の範囲内に留める |
+| <code>sat8s(x)</code> | <code>satS(x, 8)</code> | <code>x</code>を<code>-2<sup>7</sup></code>から<code>2<sup>7</sup>-1</code>の範囲内に留める |
+| <code>sat16s(x)</code> | <code>satS(x, 16)</code> | <code>x</code>を<code>-2<sup>15</sup></code>から<code>2<sup>15</sup>-1</code>の範囲内に留める |
+| <code>sat32s(x)</code> | <code>satS(x, 32)</code> | <code>x</code>を<code>-2<sup>31</sup></code>から<code>2<sup>31</sup>-1</code>の範囲内に留める |
+| <code>sat64s(x)</code> | <code>satS(x, 64)</code> | <code>x</code>を<code>-2<sup>63</sup></code>から<code>2<sup>63</sup>-1</code>の範囲内に留める |
+| | | |
+| <code>satU(x,b)</code> | <code>clamp(0, x, (1&lt;&lt;b)-1)</code> | <code>x</code>を<code>0</code>から<code>2<sup>b</sup>-1</code>の範囲内に留める |
+| <code>sat8u(x)</code> | <code>satU(x, 8)</code> | <code>x</code>を<code>0</code>から<code>2<sup>8</sup>-1</code>の範囲内に留める |
+| <code>sat16u(x)</code> | <code>satU(x, 16)</code> | <code>x</code>を<code>0</code>から<code>2<sup>16</sup>-1</code>の範囲内に留める |
+| <code>sat32u(x)</code> | <code>satU(x, 32)</code> | <code>x</code>を<code>0</code>から<code>2<sup>32</sup>-1</code>の範囲内に留める |
+| <code>sat64u(x)</code> | <code>satU(x, 64)</code> | <code>x</code>を<code>0</code>から<code>2<sup>64</sup>-1</code>の範囲内に留める |
+| | | |
+| <code>copysign(x,y)</code> | <code>y / abs(y) * abs(x)</code> | <code>x</code>の符号を<code>y</code>の符号にする |
+| | | |
+| <code>clzN(x,b)</code> | 最上位ビットから続く<code>0</code>の数 | 最小は<code>0</code>,最大で<code>b</code> |
+| <code>clz32(x)</code> | <code>clzN(x, 32)</code> | <code>clz</code> の32ビット版 |
+| <code>clz64(x)</code> | <code>clzN(x, 64)</code> | <code>clz</code> の64ビット版 |
+| | | |
+| <code>ctzN(x,b)</code> | 最下位ビットから続く<code>0</code>の数 | 最小は<code>0</code>,最大で<code>b</code> |
+| <code>ctz32(x)</code> | <code>ctzN(x, 32)</code> | <code>ctz</code> の32ビット版 |
+| <code>ctz64(x)</code> | <code>ctzN(x, 64)</code> | <code>ctz</code> の64ビット版 |
+| | | |
+| <code>popcnt(x)</code> | <code>x</code>の2進数表現で<code>1</code>の数 | |
+| | | |
+| <code>rotlN(x,n,b)</code> | <code>(x&lt;&lt;n)\|((x&amp;maxU(b))&gt;&gt;&gt;(b-n))</code> | 左ローテート |
+| <code>rotl32(x,n)</code> | <code>rotlN(x, n, 32)</code> | 32ビット左ローテート |
+| <code>rotl64(x,n)</code> | <code>rotlN(x, n, 64)</code> | 64ビット左ローテート |
+| <code>rotrN(x,n,b)</code> | <code>((x&amp;maxU(b))&gt;&gt;&gt;n)\|(x&lt;&lt;(b-n))</code> | 右ローテート |
+| <code>rotr32(x,n)</code> | <code>rotrN(x, n, 32)</code> | 32ビット右ローテート |
+| <code>rotr64(x,n)</code> | <code>rotrN(x, n, 64)</code> | 64ビット右ローテート |
+| | | |
+| <code>avgr(x, y)</code>  | <code>(x + y + 1) &gt;&gt; 1</code> | 加算平均(四捨五入) |
+| <code>i15mul(x, y)</code>  | <code>(x * y + (1<<14)) &gt;&gt; 15</code> | 15ビット固定小数点乗算 |
+
+
+## 命令表の各列
+
+| 列 | 内容 |
+|:-:|:--|
+| 引数 | 実行に必要な引数の数で、最初の引数の記号は<code><var>p1</var></code>で<code><var>p2</var>,<var>p3</var>...</code>と続く |
+| 返値 | 実行結果で、記号<code><var>r</var></code>とする |
+| 命令 | コード(同一セル内に別名も列挙) |
+| OP | 命令のオペランド |
+| 備考 | 主に動作内容 |
+
+
+## 定数
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.const</code><br/><code>s32\.const</code><br/><code>u32\.const</code> | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← <var>i32</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.const</code><br/><code>s64\.const</code><br/><code>u64\.const</code> | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← <var>i64</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code> | <code>f32</code> | <code>f32\.const</code> | <code>f32</code> | <code><var>r</var><sub>f32</sub> ← <var>f32</var></code> |
+| <code>0</code> | <code>f64</code> | <code>f64\.const</code> | <code>f64</code> | <code><var>r</var><sub>f64</sub> ← <var>f64</var></code> |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.const</code><br/><code>s8x16\.const</code><br/><code>u8x16\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.const</code><br/><code>s16x8\.const</code><br/><code>u16x8\.const</code> | <code>i16<sub>1</sub>,i16<sub>2</sub>,...,i16<sub>8</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.const</code><br/><code>s32x4\.const</code><br/><code>u32x4\.const</code> | <code>i32,i32,i32,i32</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.const</code><br/><code>s64x2\.const</code><br/><code>u64x2\.const</code> | <code>i64,i64</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code> | <code>v128</code> | <code>f32x4\.const</code> | <code>f32,f32,f32,f32</code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
+| <code>0</code> | <code>v128</code> | <code>f64x2\.const</code> | <code>f64,f64</code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
+| <code>0</code> | <code>v128</code> | <code>v128\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
+
+
+## ローカル変数
+
+| 引数 | 返値 | 命令 | OP<code>𝑥</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | | <code>local\.get</code> | <code>localidx</code> | <code><var>r</var> ← locals[𝑥]</code> |
+| <code>0</code> | <code>any</code> | <code>local\.set</code> | <code>localidx</code> | <code>locals[𝑥] ← <var>p1</var></code> |
+| <code>1</code> | <code>any</code> | <code>local\.tee</code> | <code>localidx</code> | <code><var>r</var> ← <var>p1</var> ; locals[𝑥] ← <var>p1</var></code>  |
+
+
+## グローバル変数
+
+| 引数 | 返値 | 命令 | OP<code>𝑥</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code> | <code>any</code> | <code>global\.get</code> | <code>globalidx</code> | <code><var>r</var> ← globals[𝑥]</code> |
+| <code>1</code> | | <code>global\.set</code> | <code>globalidx</code> | <code>globals[𝑥] ← <var>p1</var></code> |
+
+
+## テーブル・アクセス
+
+| 引数 | 返値 | 命令 | OP<code>𝑥</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>func</code> | <code>table\.get</code> | <code>tableidx</code> | <code><var>r</var><sub>func</sub> ← TAB[𝑥]\[<var>p1</var><sub>i32</sub>]</code> |
+| <code>2</code> | | <code>table\.set</code> | <code>tableidx</code> | <code>TAB[𝑥]\[<var>p1</var><sub>i32</sub>] ← <var>p2</var></code> |
+
+
+## メモリ・アクセス
+
+| 引数 | 返値 | 命令 | OP | 備考 (<code>𝑚 = オフセット</code>) |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.load</code><br/><code>s32\.load</code><br/><code>u32\.load</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.load</code><br/><code>s64\.load</code><br/><code>u64\.load</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code> | <code>f32</code> | <code>f32\.load</code> | <code>memarg</code> | <code><var>r</var><sub>f32</sub> ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>f32</sub></code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.load</code> | <code>memarg</code> | <code><var>r</var><sub>f64</sub> ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>f64</sub></code> |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.load8\_s</code><br/><code>s32\.load8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← ext8s(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.load16\_s</code><br/><code>s32\.load16</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← ext16s(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load8\_s</code><br/><code>s64\.load8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext8s(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load16\_s</code><br/><code>s64\.load16</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext16s(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load32\_s</code><br/><code>s64\.load32</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext32s(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code> <br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.load8\_u</code><br/><code>u32\.load8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← ext8u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.load16\_u</code><br/><code>u32\.load16</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub> ← ext16u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load8\_u</code><br/><code>u64\.load8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext8u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load16\_u</code><br/><code>u64\.load16</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext16u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.load32\_u</code><br/><code>u64\.load32</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub> ← ext32u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code> <br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i32\.store</code><br/><code>s32\.store</code><br/><code>u32\.store</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub> ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i64\.store</code><br/><code>s64\.store</code><br/><code>u64\.store</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub> ← <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | | <code>f32\.store</code> | <code>memarg</code> | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>f32</sub> ← <var>p2</var><sub>f32</sub></code> |
+| <code>2</code> | | <code>f64\.store</code> | <code>memarg</code> | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>f64</sub> ← <var>p2</var><sub>f64</sub></code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i32\.store8</code><br/><code>s32\.store8</code><br/><code>u32\.store8</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub> ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i32\.store16</code><br/><code>s32\.store16</code><br/><code>u32\.store16</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub> ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i64\.store8</code><br/><code>s64\.store8</code><br/><code>u64\.store8</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub> ← <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i64\.store16</code><br/><code>s64\.store16</code><br/><code>u64\.store16</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub> ← <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | | <code>i64\.store32</code><br/><code>s64\.store32</code><br/><code>u64\.store32</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub> ← <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+
+| 引数 | 返値 | 命令 | OP | 備考 (<code>𝑚 = オフセット</code>) |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load</code><br/><code>i8x16\.load</code><br/><code>s8x16\.load</code><br/><code>u8x16\.load</code><br/><code>i16x8\.load</code><br/><code>s16x8\.load</code><br/><code>u16x8\.load</code><br/><code>i32x4\.load</code><br/><code>s32x4\.load</code><br/><code>u32x4\.load</code><br/><code>i64x2\.load</code><br/><code>s64x2\.load</code><br/><code>u64x2\.load</code><br/><code>f32x4\.load</code><br/><code>f64x2\.load</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | | <code>v128\.store</code><br/><code>i8x16\.store</code><br/><code>s8x16\.store</code><br/><code>u8x16\.store</code><br/><code>i16x8\.store</code><br/><code>s16x8\.store</code><br/><code>u16x8\.store</code><br/><code>i32x4\.store</code><br/><code>s32x4\.store</code><br/><code>u32x4\.store</code><br/><code>i64x2\.store</code><br/><code>s64x2\.store</code><br/><code>u64x2\.store</code><br/><code>f32x4\.store</code><br/><code>f64x2\.store</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>v128</sub> ← <var>p2</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load8x8\_s</code><br/><code>s16x8\.load8x8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i16</sub>[𝑛] ← ext8s(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 𝑛]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load16x4\_s</code><br/><code>s32x4\.load16x4</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub>[𝑛] ← ext16s(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 2𝑛]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load32x2\_s</code><br/><code>s64x2\.load32x2</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub>[𝑛] ← ext32s(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 4𝑛]<sub>i32</sub>)</code> <br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load8x8\_u</code><br/><code>u16x8\.load8x8</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i16</sub>[𝑛] ← ext8u(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 𝑛]<sub>i8</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load16x4\_u</code><br/><code>u32x4\.load16x4</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i32</sub>[𝑛] ← ext16u(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 2𝑛]<sub>i16</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>v128\.load32x2\_u</code><br/><code>u64x2\.load32x2</code> | <code>memarg</code><br/>&nbsp; | <code><var>r</var><sub>i64</sub>[𝑛] ← ext32u(MEM0[𝑚 + <var>p1</var><sub>i32</sub> + 4𝑛]<sub>i32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load32\_zero</code><br/><code>i32x4.load\_zero</code><br/><code>s32x4.load\_zero</code><br/><code>u32x4.load\_zero</code><br/><code>f32x4.load\_zero</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← ext32u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code>  <br/> 上位96ビットはゼロ <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load64\_zero</code><br/><code>i64x2\.load\_zero</code><br/><code>s64x2\.load\_zero</code><br/><code>u64x2\.load\_zero</code><br/><code>f64x2\.load\_zero</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← ext64u(MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub>)</code> <br/> 上位64ビットはゼロ <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load8\_splat</code><br/><code>i8x16\.load\_splat</code><br/><code>s8x16\.load\_splat</code><br/><code>u8x16\.load\_splat</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i8x16</sub>[0..15] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load16\_splat</code><br/><code>i16x8\.load\_splat</code><br/><code>s16x8\.load\_splat</code><br/><code>u16x8\.load\_splat</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i16x8</sub>[0..7] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load32\_splat</code><br/><code>i32x4\.load\_splat</code><br/><code>s32x4\.load\_splat</code><br/><code>u32x4\.load\_splat</code><br/><code>f32x4\.load\_splat</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i32x4</sub>[0..3] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load64\_splat</code><br/><code>i64x2\.load\_splat</code><br/><code>s64x2\.load\_splat</code><br/><code>u64x2\.load\_splat</code><br/><code>f64x2\.load\_splat</code> | <code>memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i64x2</sub>[0..1] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load8\_lane</code><br/><code>i8x16\.load\_lane</code><br/><code>s8x16\.load\_lane</code><br/><code>u8x16\.load\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i8x16</sub> ← p2<sub>v128</sub></code><br/><code><var>r</var><sub>i8x16</sub>[𝑛] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load16\_lane</code><br/><code>i16x8\.load\_lane</code><br/><code>s16x8\.load\_lane</code><br/><code>u16x8\.load\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i16x8</sub> ← p2<sub>v128</sub></code><br/><code><var>r</var><sub>i16x8</sub>[𝑛] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load32\_lane</code><br/><code>i32x4\.load\_lane</code><br/><code>s32x4\.load\_lane</code><br/><code>u32x4\.load\_lane</code><br/><code>f32x4\.load\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i32x4</sub> ← p2<sub>v128</sub></code><br/><code><var>r</var><sub>i32x4</sub>[𝑛] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub></code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.load64\_lane</code><br/><code>i64x2\.load\_lane</code><br/><code>s64x2\.load\_lane</code><br/><code>u64x2\.load\_lane</code><br/><code>f64x2\.load\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i64x2</sub> ← p2<sub>v128</sub></code><br/><code><var>r</var><sub>i64x2</sub>[𝑛] ← MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | | <code>v128\.store8\_lane</code><br/><code>i8x16\.store\_lane</code><br/><code>s8x16\.store\_lane</code><br/><code>u8x16\.store\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i8</sub> ← <var>p2</var><sub>i8x16</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | | <code>v128\.store16\_lane</code><br/><code>i16x8\.store\_lane</code><br/><code>s16x8\.store\_lane</code><br/><code>u16x8\.store\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i16</sub> ← <var>p2</var><sub>i16x8</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | | <code>v128\.store32\_lane</code><br/><code>i32x4\.store\_lane</code><br/><code>s32x4\.store\_lane</code><br/><code>u32x4\.store\_lane</code><br/><code>f32x4\.store\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i32</sub> ← <var>p2</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | | <code>v128\.store64\_lane</code><br/><code>i64x2\.store\_lane</code><br/><code>s64x2\.store\_lane</code><br/><code>u64x2\.store\_lane</code><br/><code>f64x2\.store\_lane</code> | <code>lane,memarg</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>MEM0[𝑚 + <var>p1</var><sub>i32</sub>]<sub>i64</sub> ← <var>p2</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+
+## 数値型変換
+
+
+### <code>i32</code>・<code>i64</code>間変換
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64\.extend\_i32\_s</code><br/><code>i64\.extend\_s32</code><br/><code>s64\.extend\_i32</code><br/><code>s64\.extend\_s32</code> | | <code><var>r</var><sub>i64</sub> ← ext64s(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64\.extend\_i32\_u</code><br/><code>i64\.extend\_u32</code><br/><code>u64\.extend\_i32</code><br/><code>u64\.extend\_u32</code> | | <code><var>r</var><sub>i64</sub> ← ext64u(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.wrap</code><br/><code>s32\.wrap</code><br/><code>u32\.wrap</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i64</sub> &amp; (2<sup>32</sup>-1)</code> <br/>&nbsp;<br/>&nbsp; |
+
+
+### 符号拡張
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.extend8\_s</code><br/><code>s32\.extend8</code> | | <code><var>r</var><sub>i32</sub> ← ext8s(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.extend8\_s</code><br/><code>s64\.extend8</code> | | <code><var>r</var><sub>i64</sub> ← ext8s(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.extend16\_s</code><br/><code>s32\.extend16</code> | | <code><var>r</var><sub>i32</sub> ← ext16s(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.extend16\_s</code><br/><code>s64\.extend16</code> | | <code><var>r</var><sub>i64</sub> ← ext16s(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.extend32\_s</code><br/><code>s64\.extend32</code> | | <code><var>r</var><sub>i64</sub> ← ext32s(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extend\_low\_i8x16\_s</code><br/><code>i16x8\.extend\_low\_s8x16</code><br/><code>s16x8\.extend\_low\_i8x16</code><br/><code>s16x8\.extend\_low\_s8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← ext8s(<var>p1</var><sub>i8x16</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extend\_high\_i8x16\_s</code><br/><code>i16x8\.extend\_high\_s8x16</code><br/><code>s16x8\.extend\_high\_i8x16</code><br/><code>s16x8\.extend\_high\_s8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← ext8s(<var>p1</var><sub>i8x16</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extend\_low\_i16x8\_s</code><br/><code>i32x4\.extend\_low\_s16x8</code><br/><code>s32x4\.extend\_low\_i16x8</code><br/><code>s32x4\.extend\_low\_s16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← ext16s(<var>p1</var><sub>i16x8</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extend\_high\_i16x8\_s</code><br/><code>i32x4\.extend\_high\_s16x8</code><br/><code>s32x4\.extend\_high\_i16x8</code><br/><code>s32x4\.extend\_high\_s16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← ext16s(<var>p1</var><sub>i16x8</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64x2\.extend\_low\_i32x4\_s</code><br/><code>i64x2\.extend\_low\_s32x4</code><br/><code>s64x2\.extend\_low\_i32x4</code><br/><code>s64x2\.extend\_low\_s32x4</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← ext32s(<var>p1</var><sub>i32x4</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64x2\.extend\_high\_i32x4\_s</code><br/><code>i64x2\.extend\_high\_s32x4</code><br/><code>s64x2\.extend\_high\_i32x4</code><br/><code>s64x2\.extend\_high\_s32x4</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← ext32s(<var>p1</var><sub>i32x4</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+
+### ゼロ拡張
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extend\_low\_i8x16\_u</code><br/><code>i16x8\.extend\_low\_u8x16</code><br/><code>u16x8\.extend\_low\_i8x16</code><br/><code>u16x8\.extend\_low\_u8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← ext8u(<var>p1</var><sub>i8x16</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extend\_high\_i8x16\_u</code><br/><code>i16x8\.extend\_high\_u8x16</code><br/><code>u16x8\.extend\_high\_i8x16</code><br/><code>u16x8\.extend\_high\_u8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← ext8u(<var>p1</var><sub>i8x16</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extend\_low\_i16x8\_u</code><br/><code>i32x4\.extend\_low\_u16x8</code><br/><code>u32x4\.extend\_low\_i16x8</code><br/><code>u32x4\.extend\_low\_u16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← ext16u(<var>p1</var><sub>i16x8</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extend\_high\_i16x8\_u</code><br/><code>i32x4\.extend\_high\_u16x8</code><br/><code>u32x4\.extend\_high\_i16x8</code><br/><code>u32x4\.extend\_high\_u16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← ext16u(<var>p1</var><sub>i16x8</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64x2\.extend\_low\_i32x4\_u</code><br/><code>i64x2\.extend\_low\_u32x4</code><br/><code>u64x2\.extend\_low\_i32x4</code><br/><code>u64x2\.extend\_low\_u32x4</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← ext32u(<var>p1</var><sub>i32x4</sub>[2𝑛+0])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64x2\.extend\_high\_i32x4\_u</code><br/><code>i64x2\.extend\_high\_u32x4</code><br/><code>u64x2\.extend\_high\_i32x4</code><br/><code>u64x2\.extend\_high\_u32x4</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← ext32u(<var>p1</var><sub>i32x4</sub>[2𝑛+1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+
+### ビット幅縮小
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i8x16\.narrow\_i16x8\_s</code><br/><code>i8x16\.narrow\_s16x8</code><br/><code>s8x16\.narrow\_i16x8</code><br/><code>s8x16\.narrow\_s16x8</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8s(<var>t</var><sub>s16x8</sub>[𝑛 &gt;&gt; 1])</code><br/><code>    <var>t</var><sub>s16x8</sub> = (𝑛 &amp; 1) ? <var>p2</var><sub>s16x8</sub> : <var>p1</var><sub>s16x8</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i8x16\.narrow\_i16x8\_u</code><br/><code>i8x16\.narrow\_u16x8</code><br/><code>u8x16\.narrow\_i16x8</code><br/><code>u8x16\.narrow\_u16x8</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8u(<var>t</var><sub>u16x8</sub>[𝑛 &gt;&gt; 1])</code><br/><code>    <var>t</var><sub>u16x8</sub> = (𝑛 &amp; 1) ? <var>p2</var><sub>u16x8</sub> : <var>p1</var><sub>u16x8</sub></code><br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.narrow\_i32x4\_s</code><br/><code>i16x8\.narrow\_s32x4</code><br/><code>s16x8\.narrow\_i32x4</code><br/><code>s16x8\.narrow\_s32x4</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16s(<var>t</var><sub>s32x4</sub>[𝑛 &gt;&gt; 1])</code><br/><code>    <var>t</var><sub>s32x4</sub> = (𝑛 &amp; 1) ? <var>p2</var><sub>s32x4</sub> : <var>p1</var><sub>s32x4</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.narrow\_i32x4\_u</code><br/><code>i16x8\.narrow\_u32x4</code><br/><code>u16x8\.narrow\_i32x4</code><br/><code>u16x8\.narrow\_u32x4</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16u(<var>t</var><sub>u32x4</sub>[𝑛 &gt;&gt; 1])</code><br/><code>    <var>t</var><sub>u32x4</sub> = (𝑛 &amp; 1) ? <var>p2</var><sub>u32x4</sub> : <var>p1</var><sub>u32x4</sub></code> <br/>&nbsp;<br/>&nbsp; |
+
+
+### 整数型と浮動小数点型の変換
+
+
+#### 整数化(飽和処理なし)
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_f32\_s</code><br/><code>s32\.trunc\_f32</code> | | <code><var>r</var><sub>s32</sub> ← trunc(<var>p1</var><sub>f32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_f32\_u</code><br/><code>u32\.trunc\_f32</code> | | <code><var>r</var><sub>u32</sub> ← trunc(<var>p1</var><sub>f32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_f64\_s</code><br/><code>s32\.trunc\_f64</code> | | <code><var>r</var><sub>s32</sub> ← trunc(<var>p1</var><sub>f64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_f64\_u</code><br/><code>u32\.trunc\_f64</code> | | <code><var>r</var><sub>u32</sub> ← trunc(<var>p1</var><sub>f64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_f32\_s</code><br/><code>s64\.trunc\_f32</code> | | <code><var>r</var><sub>s64</sub> ← trunc(<var>p1</var><sub>f32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_f32\_u</code><br/><code>u64\.trunc\_f32</code> | | <code><var>r</var><sub>u64</sub> ← trunc(<var>p1</var><sub>f32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_f64\_s</code><br/><code>s64\.trunc\_f64</code> | | <code><var>r</var><sub>s64</sub> ← trunc(<var>p1</var><sub>f64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_f64\_u</code><br/><code>u64\.trunc\_f64</code> | | <code><var>r</var><sub>u64</sub> ← trunc(<var>p1</var><sub>f64</sub>)</code> <br/>&nbsp; |
+
+
+#### 整数化(飽和処理あり)
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_sat\_f32\_s</code><br/><code>s32\.trunc\_sat\_f32</code> | | <code><var>r</var><sub>i32</sub> ← trunc(sat32s(<var>p1</var><sub>f32</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_sat\_f32\_u</code><br/><code>u32\.trunc\_sat\_f32</code> | | <code><var>r</var><sub>i32</sub> ← trunc(sat32u(<var>p1</var><sub>f32</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_sat\_f64\_s</code><br/><code>s32\.trunc\_sat\_f64</code> | | <code><var>r</var><sub>i32</sub> ← trunc(sat32s(<var>p1</var><sub>f64</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.trunc\_sat\_f64\_u</code><br/><code>u32\.trunc\_sat\_f64</code> | | <code><var>r</var><sub>i32</sub> ← trunc(sat32u(<var>p1</var><sub>f64</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_sat\_f32\_s</code><br/><code>s64\.trunc\_sat\_f32</code> | | <code><var>r</var><sub>i64</sub> ← trunc(sat64s(<var>p1</var><sub>f32</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_sat\_f32\_u</code><br/><code>u64\.trunc\_sat\_f32</code> | | <code><var>r</var><sub>i64</sub> ← trunc(sat64u(<var>p1</var><sub>f32</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_sat\_f64\_s</code><br/><code>s64\.trunc\_sat\_f64</code> | | <code><var>r</var><sub>i64</sub> ← trunc(sat64s(<var>p1</var><sub>f64</sub>))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.trunc\_sat\_f64\_u</code><br/><code>u64\.trunc\_sat\_f64</code> | | <code><var>r</var><sub>i64</sub> ← trunc(sat64u(<var>p1</var><sub>f64</sub>))</code> <br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.trunc\_sat\_f32x4\_s</code><br/><code>s32x4\.trunc\_sat\_f32x4</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← trunc(sat32s(<var>p1</var><sub>f32x4</sub>[𝑛]))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.trunc\_sat\_f32x4\_u</code><br/><code>u32x4\.trunc\_sat\_f32x4</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← trunc(sat32u(<var>p1</var><sub>f32x4</sub>[𝑛]))</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.trunc\_sat\_f64x2\_s\_zero</code><br/><code>s32x4\.trunc\_sat\_f64x2\_zero</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← trunc(sat64s(<var>t</var><sub>f64</sub>))</code><br/><code>    <var>t</var><sub>f64</sub> = 𝑛 &lt; 2 ? <var>p1</var><sub>f64x2</sub>[𝑛] : 0</code> |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.trunc\_sat\_f64x2\_u\_zero</code><br/><code>u32x4\.trunc\_sat\_f64x2\_zero</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← trunc(sat64u(<var>t</var><sub>f64</sub>))</code><br/><code>    <var>t</var><sub>f64</sub> = 𝑛 &lt; 2 ? <var>p1</var><sub>f64x2</sub>[𝑛] : 0</code> |
+
+
+#### 浮動小数点化
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp; | <code>f32</code><br/>&nbsp; | <code>f32\.convert\_i32\_s</code><br/><code>f32\.convert\_s32</code> | | <code><var>r</var><sub>f32</sub> ← f32(<var>p1</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f32</code><br/>&nbsp; | <code>f32\.convert\_i32\_u</code><br/><code>f32\.convert\_u32</code> | | <code><var>r</var><sub>f32</sub> ← f32(<var>p1</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f32</code><br/>&nbsp; | <code>f32\.convert\_i64\_s</code><br/><code>f32\.convert\_s64</code> | | <code><var>r</var><sub>f32</sub> ← f32(<var>p1</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f32</code><br/>&nbsp; | <code>f32\.convert\_i64\_u</code><br/><code>f32\.convert\_u64</code> | | <code><var>r</var><sub>f32</sub> ← f32(<var>p1</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f64</code><br/>&nbsp; | <code>f64\.convert\_i32\_s</code><br/><code>f64\.convert\_s32</code> | | <code><var>r</var><sub>f64</sub> ← f64(<var>p1</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f64</code><br/>&nbsp; | <code>f64\.convert\_i32\_u</code><br/><code>f64\.convert\_u32</code> | | <code><var>r</var><sub>f64</sub> ← f64(<var>p1</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f64</code><br/>&nbsp; | <code>f64\.convert\_i64\_s</code><br/><code>f64\.convert\_s64</code> | | <code><var>r</var><sub>f64</sub> ← f64(<var>p1</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>f64</code><br/>&nbsp; | <code>f64\.convert\_i64\_u</code><br/><code>f64\.convert\_u64</code> | | <code><var>r</var><sub>f64</sub> ← f64(<var>p1</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f32x4\.convert\_i32x4\_s</code><br/><code>f32x4\.convert\_s32x4</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← f32(<var>p1</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f32x4\.convert\_i32x4\_u</code><br/><code>f32x4\.convert\_u32x4</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← f32(<var>p1</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f64x2\.convert\_low\_i32x4\_s</code><br/><code>f64x2\.convert\_low\_s32x4</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← f64(<var>p1</var><sub>s32x4</sub>[2𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f64x2\.convert\_low\_i32x4\_u</code><br/><code>f64x2\.convert\_low\_u32x4</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← f64(<var>p1</var><sub>u32x4</sub>[2𝑛])</code> <br/>&nbsp; |
+
+
+#### ビット複写型変換
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.reinterpret\_f32</code><br/><code>s32\.reinterpret\_f32</code><br/><code>u32\.reinterpret\_f32</code> | | <code><var>r</var><sub>i32</sub> ← bit\_cast(<var>p1</var><sub>f32</sub></code>) <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.reinterpret\_f64</code><br/><code>s64\.reinterpret\_f64</code><br/><code>u64\.reinterpret\_f64</code> | | <code><var>r</var><sub>i64</sub> ← bit\_cast(<var>p1</var><sub>f64</sub></code>) <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>f32</code><br/>&nbsp;<br/>&nbsp; | <code>f32\.reinterpret\_i32</code><br/><code>f32\.reinterpret\_s32</code><br/><code>f32\.reinterpret\_u32</code> | | <code><var>r</var><sub>f32</sub> ← bit\_cast(<var>p1</var><sub>i32</sub></code>) <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>f64</code><br/>&nbsp;<br/>&nbsp; | <code>f64\.reinterpret\_i64</code><br/><code>f64\.reinterpret\_s64</code><br/><code>f64\.reinterpret\_u64</code> | | <code><var>r</var><sub>f64</sub> ← bit\_cast(<var>p1</var><sub>i64</sub></code>) <br/>&nbsp;<br/>&nbsp; |
+
+<code>bit_cast(x)</code>の出力はバイナリ レベルでは <code>x</code> と同一です。
+
+例: <code>bit\_cast(0x3f800000<sub>i32</sub>) → 1.0<sub>f32</sub></code>
+
+
+#### 単精度と倍精度の変換
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>f32</code> | <code>f32\.demote\_f64</code> | | <code><var>r</var><sub>f32</sub> ← f32(<var>p1</var><sub>f64</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.promote\_f32</code> | | <code><var>r</var><sub>f64</sub> ← f64(<var>p1</var><sub>f32</sub>)</code> |
+| | | | | |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.demote\_f64x2\_zero</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← f32(<var>p1</var><sub>f64x2</sub>[𝑛] ?? 0)</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.promote\_low\_f32x4</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← f64(<var>p1</var><sub>f32x4</sub>[2𝑛])</code> |
+
+
+### 数値型とベクトル型
+
+
+#### ベクトルの全要素に同一値を設定
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.splat</code><br/><code>s8x16\.splat</code><br/><code>u8x16\.splat</code> | | <code><var>r</var><sub>i8x16</sub>[0..15] ← (<var>p1</var><sub>i32</sub> &amp; 0xff)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.splat</code><br/><code>s16x8\.splat</code><br/><code>u16x8\.splat</code> | | <code><var>r</var><sub>i16x8</sub>[0..7] ← (<var>p1</var><sub>i32</sub> &amp; 0xffff)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.splat</code><br/><code>s32x4\.splat</code><br/><code>u32x4\.splat</code> | | <code><var>r</var><sub>i32x4</sub>[0..3] ← <var>p1</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.splat</code><br/><code>s64x2\.splat</code><br/><code>u64x2\.splat</code> | | <code><var>r</var><sub>i64x2</sub>[0..1] ← <var>p1</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.splat</code> | | <code><var>r</var><sub>f32x4</sub>[0..3] ← <var>p1</var><sub>f32</sub></code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.splat</code> | | <code><var>r</var><sub>f64x2</sub>[0..1] ← <var>p1</var><sub>f64</sub></code> |
+
+
+#### ベクトル要素の取得と設定
+
+| 引数 | 返値 | 命令 | OP | 備考 (<code>𝑛 = lane</code>) |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i8x16\.extract\_lane\_s</code><br/><code>s8x16\.extract\_lane</code> | <code>lane</code><br/>&nbsp; | <code><var>r<sub>i32</sub></var> ← ext8s(<var>p1</var><sub>i8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i8x16\.extract\_lane\_u</code><br/><code>u8x16\.extract\_lane</code> | <code>lane</code><br/>&nbsp; | <code><var>r<sub>i32</sub></var> ← ext8u(<var>p1</var><sub>i8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i16x8\.extract\_lane\_s</code><br/><code>s16x8\.extract\_lane</code> | <code>lane</code><br/>&nbsp; | <code><var>r<sub>i32</sub></var> ← ext16s(<var>p1</var><sub>i16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i16x8\.extract\_lane\_u</code><br/><code>u16x8\.extract\_lane</code> | <code>lane</code><br/>&nbsp; | <code><var>r<sub>i32</sub></var> ← ext16u(<var>p1</var><sub>i16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extract\_lane</code><br/><code>s32x4\.extract\_lane</code><br/><code>u32x4\.extract\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r<sub>i32</sub></var> ← <var>p1</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.extract\_lane</code><br/><code>s64x2\.extract\_lane</code><br/><code>u64x2\.extract\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r<sub>i64</sub></var> ← <var>p1</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code> | <code>f32</code> | <code>f32x4\.extract\_lane</code> | <code>lane</code> | <code><var>r<sub>f32</sub></var> ← <var>p1</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>1</code> | <code>f64</code> | <code>f64x2\.extract\_lane</code> | <code>lane</code> | <code><var>r<sub>f64</sub></var> ← <var>p1</var><sub>f64x2</sub>[𝑛]</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.replace\_lane</code><br/><code>s8x16\.replace\_lane</code><br/><code>u8x16\.replace\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i8x16</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>i8x16</sub>[lane] ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.replace\_lane</code><br/><code>s16x8\.replace\_lane</code><br/><code>u16x8\.replace\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i16x8</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>i16x8</sub>[lane] ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.replace\_lane</code><br/><code>s32x4\.replace\_lane</code><br/><code>u32x4\.replace\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i32x4</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>i32x4</sub>[lane] ← <var>p2</var><sub>i32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.replace\_lane</code><br/><code>s64x2\.replace\_lane</code><br/><code>u64x2\.replace\_lane</code> | <code>lane</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i64x2</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>i64x2</sub>[lane] ← <var>p2</var><sub>i64</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f32x4\.replace\_lane</code><br/>&nbsp; | <code>lane</code><br/>&nbsp; | <code><var>r</var><sub>f32x4</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>f32x4</sub>[lane] ← <var>p2</var><sub>f32</sub></code> |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>f64x2\.replace\_lane</code><br/>&nbsp; | <code>lane</code><br/>&nbsp; | <code><var>r</var><sub>f64x2</sub> ← <var>p1</var><sub>v128</sub></code><br><code><var>r</var><sub>f64x2</sub>[lane] ← <var>p2</var><sub>f64</sub></code> |
+
+
+### 混成
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.shuffle</code><br/><code>s8x16\.shuffle</code><br/><code>u8x16\.shuffle</code> | <code>lane<sub>0</sub>,...,lane<sub>15</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← data[lane<sub>𝑛</sub>]</code><br/><code>    data = [...<var>p1</var><sub>i8x16</sub>, ...<var>p2</var><sub>i8x16</sub>] </code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.swizzle</code><br/><code>s8x16\.swizzle</code><br/><code>u8x16\.swizzle</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[<var>p2</var><sub>i8x16</sub>[𝑛]] ?? 0</code> <br/>&nbsp;<br/>&nbsp; |
+
+
+## 数値比較
+
+
+### 条件：一致
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.eqz</code><br/><code>s32\.eqz</code><br/><code>u32\.eqz</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i32</sub> == 0)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.eqz</code><br/><code>s64\.eqz</code><br/><code>u64\.eqz</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i64</sub> == 0)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.eq</code><br/><code>s32\.eq</code><br/><code>u32\.eq</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i32</sub> == <var>p2</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.eq</code><br/><code>s64\.eq</code><br/><code>u64\.eq</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i64</sub> == <var>p2</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.eq</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> == <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.eq</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> == <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.eq</code><br/><code>s8x16\.eq</code><br/><code>u8x16\.eq</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>i8x16</sub>[𝑛] == <var>p2</var><sub>i8x16</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.eq</code><br/><code>s16x8\.eq</code><br/><code>u16x8\.eq</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>i16x8</sub>[𝑛] == <var>p2</var><sub>i16x8</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.eq</code><br/><code>s32x4\.eq</code><br/><code>u32x4\.eq</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>i32x4</sub>[𝑛] == <var>p2</var><sub>i32x4</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.eq</code><br/><code>s64x2\.eq</code><br/><code>u64x2\.eq</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>i64x2</sub>[𝑛] == <var>p2</var><sub>i64x2</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.eq</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] == <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.eq</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] == <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：不一致
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.ne</code><br/><code>s32\.ne</code><br/><code>u32\.ne</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i32</sub> != <var>p2</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.ne</code><br/><code>s64\.ne</code><br/><code>u64\.ne</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i64</sub> != <var>p2</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.ne</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> != <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.ne</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> != <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.ne</code><br/><code>s8x16\.ne</code><br/><code>u8x16\.ne</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>i8x16</sub>[𝑛] != <var>p2</var><sub>i8x16</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.ne</code><br/><code>s16x8\.ne</code><br/><code>u16x8\.ne</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>i16x8</sub>[𝑛] != <var>p2</var><sub>i16x8</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.ne</code><br/><code>s32x4\.ne</code><br/><code>u32x4\.ne</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>i32x4</sub>[𝑛] != <var>p2</var><sub>i32x4</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.ne</code><br/><code>s64x2\.ne</code><br/><code>u64x2\.ne</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>i64x2</sub>[𝑛] != <var>p2</var><sub>i64x2</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.ne</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] != <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.ne</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] != <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：小なり
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.lt\_s</code><br/><code>s32\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s32</sub> &lt; <var>p2</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.lt\_u</code><br/><code>u32\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u32</sub> &lt; <var>p2</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.lt\_s</code><br/><code>s64\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s64</sub> &lt; <var>p2</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.lt\_u</code><br/><code>u64\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u64</sub> &lt; <var>p2</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> &lt; <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.lt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> &lt; <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.lt\_s</code><br/><code>s8x16\.lt</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>s8x16</sub>[𝑛] &lt; <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.lt\_u</code><br/><code>u8x16\.lt</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>u8x16</sub>[𝑛] &lt; <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.lt\_s</code><br/><code>s16x8\.lt</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>s16x8</sub>[𝑛] &lt; <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.lt\_u</code><br/><code>u16x8\.lt</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>u16x8</sub>[𝑛] &lt; <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.lt\_s</code><br/><code>s32x4\.lt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>s32x4</sub>[𝑛] &lt; <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.lt\_u</code><br/><code>u32x4\.lt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>u32x4</sub>[𝑛] &lt; <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.lt\_s</code><br/><code>s64x2\.lt</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>s64x2</sub>[𝑛] &lt; <var>p2</var><sub>s64x2</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.lt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] &lt; <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.lt</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] &lt; <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：以下
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.le\_s</code><br/><code>s32\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s32</sub> &lt;= <var>p2</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.le\_u</code><br/><code>u32\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u32</sub> &lt;= <var>p2</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.le\_s</code><br/><code>s64\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s64</sub> &lt;= <var>p2</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.le\_u</code><br/><code>u64\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u64</sub> &lt;= <var>p2</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> &lt;= <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.le</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> &lt;= <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.le\_s</code><br/><code>s8x16\.le</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>s8x16</sub>[𝑛] &lt;= <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.le\_u</code><br/><code>u8x16\.le</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>u8x16</sub>[𝑛] &lt;= <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.le\_s</code><br/><code>s16x8\.le</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>s16x8</sub>[𝑛] &lt;= <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.le\_u</code><br/><code>u16x8\.le</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>u16x8</sub>[𝑛] &lt;= <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.le\_s</code><br/><code>s32x4\.le</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>s32x4</sub>[𝑛] &lt;= <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.le\_u</code><br/><code>u32x4\.le</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>u32x4</sub>[𝑛] &lt;= <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.le\_s</code><br/><code>s64x2\.le</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>s64x2</sub>[𝑛] &lt;= <var>p2</var><sub>s64x2</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.le</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] &lt;= <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.le</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] &lt;= <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：以上
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.ge\_s</code><br/><code>s32\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s32</sub> &gt;= <var>p2</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.ge\_u</code><br/><code>u32\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u32</sub> &gt;= <var>p2</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.ge\_s</code><br/><code>s64\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s64</sub> &gt;= <var>p2</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.ge\_u</code><br/><code>u64\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u64</sub> &gt;= <var>p2</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> &gt;= <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.ge</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> &gt;= <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.ge\_s</code><br/><code>s8x16\.ge</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>s8x16</sub>[𝑛] &gt;= <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.ge\_u</code><br/><code>u8x16\.ge</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>u8x16</sub>[𝑛] &gt;= <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.ge\_s</code><br/><code>s16x8\.ge</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>s16x8</sub>[𝑛] &gt;= <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.ge\_u</code><br/><code>u16x8\.ge</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>u16x8</sub>[𝑛] &gt;= <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.ge\_s</code><br/><code>s32x4\.ge</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>s32x4</sub>[𝑛] &gt;= <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.ge\_u</code><br/><code>u32x4\.ge</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>u32x4</sub>[𝑛] &gt;= <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.ge\_s</code><br/><code>s64x2\.ge</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>s64x2</sub>[𝑛] &gt;= <var>p2</var><sub>s64x2</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.ge</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] &gt;= <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.ge</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] &gt;= <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：大なり
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.gt\_s</code><br/><code>s32\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s32</sub> &gt; <var>p2</var><sub>s32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.gt\_u</code><br/><code>u32\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u32</sub> &gt; <var>p2</var><sub>u32</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.gt\_s</code><br/><code>s64\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>s64</sub> &gt; <var>p2</var><sub>s64</sub>)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i64\.gt\_u</code><br/><code>u64\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>u64</sub> &gt; <var>p2</var><sub>u64</sub>)</code> <br/>&nbsp; |
+| <code>2</code> | <code>i32</code> | <code>f32\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f32</sub> &gt; <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>i32</code> | <code>f64\.gt</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>f64</sub> &gt; <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.gt\_s</code><br/><code>s8x16\.gt</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>s8x16</sub>[𝑛] &gt; <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.gt\_u</code><br/><code>u8x16\.gt</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← (<var>p1</var><sub>u8x16</sub>[𝑛] &gt; <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.gt\_s</code><br/><code>s16x8\.gt</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>s16x8</sub>[𝑛] &gt; <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.gt\_u</code><br/><code>u16x8\.gt</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← (<var>p1</var><sub>u16x8</sub>[𝑛] &gt; <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.gt\_s</code><br/><code>s32x4\.gt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>s32x4</sub>[𝑛] &gt; <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.gt\_u</code><br/><code>u32x4\.gt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>u32x4</sub>[𝑛] &gt; <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.gt\_s</code><br/><code>s64x2\.gt</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>s64x2</sub>[𝑛] &gt; <var>p2</var><sub>s64x2</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.gt</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← (<var>p1</var><sub>f32x4</sub>[𝑛] &gt; <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.gt</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← (<var>p1</var><sub>f64x2</sub>[𝑛] &gt; <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件：全要素
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.any\_true</code><br/><code>i8x16\.any\_true</code><br/><code>s8x16\.any\_true</code><br/><code>u8x16\.any\_true</code><br/><code>i16x8\.any\_true</code><br/><code>s16x8\.any\_true</code><br/><code>u16x8\.any\_true</code><br/><code>i32x4\.any\_true</code><br/><code>s32x4\.any\_true</code><br/><code>u32x4\.any\_true</code><br/><code>i64x2\.any\_true</code><br/><code>s64x2\.any\_true</code><br/><code>u64x2\.any\_true</code><br/><code>f32x4\.any\_true</code><br/><code>f64x2\.any\_true</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i128</sub> != 0)</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.all\_true</code><br/><code>s8x16\.all\_true</code><br/><code>u8x16\.all\_true</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i8x16</sub>[0] &amp;&amp; ... &amp;&amp; <var>p1</var><sub>i8x16</sub>[15])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.all\_true</code><br/><code>s16x8\.all\_true</code><br/><code>u16x8\.all\_true</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i16x8</sub>[0] &amp;&amp; ... &amp;&amp; <var>p1</var><sub>i16x8</sub>[7])</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.all\_true</code><br/><code>s32x4\.all\_true</code><br/><code>u32x4\.all\_true</code><br/><code>f32x4\.all\_true</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i32x4</sub>[0] &amp;&amp; ... &amp;&amp; <var>p1</var><sub>i32x4</sub>[3])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i64x2\.all\_true</code><br/><code>s64x2\.all\_true</code><br/><code>u64x2\.all\_true</code><br/><code>f64x2\.all\_true</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>i64x2</sub>[0] &amp;&amp; <var>p1</var><sub>i64x2</sub>[1])</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+
+## 論理演算
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.and</code><br/><code>s32\.and</code><br/><code>u32\.and</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> &amp; <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.and</code><br/><code>s64\.and</code><br/><code>u64\.and</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> &amp; <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.or</code><br/><code>s32\.or</code><br/><code>u32\.or</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> \| <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.or</code><br/><code>s64\.or</code><br/><code>u64\.or</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> \| <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.xor</code><br/><code>s32\.xor</code><br/><code>u32\.xor</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> ^ <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.xor</code><br/><code>s64\.xor</code><br/><code>u64\.xor</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> ^ <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.not</code><br/><code>i8x16\.not</code><br/><code>s8x16\.not</code><br/><code>u8x16\.not</code><br/><code>i16x8\.not</code><br/><code>s16x8\.not</code><br/><code>u16x8\.not</code><br/><code>i32x4\.not</code><br/><code>s32x4\.not</code><br/><code>u32x4\.not</code><br/><code>i64x2\.not</code><br/><code>s64x2\.not</code><br/><code>u64x2\.not</code> | | <code><var>r</var><sub>v128</sub> ← ~ <var>p1</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.and</code><br/><code>i8x16\.and</code><br/><code>s8x16\.and</code><br/><code>u8x16\.and</code><br/><code>i16x8\.and</code><br/><code>s16x8\.and</code><br/><code>u16x8\.and</code><br/><code>i32x4\.and</code><br/><code>s32x4\.and</code><br/><code>u32x4\.and</code><br/><code>i64x2\.and</code><br/><code>s64x2\.and</code><br/><code>u64x2\.and</code> | | <code><var>r</var><sub>v128</sub> ← <var>p1</var><sub>v128</sub> &amp; <var>p2</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.andnot</code><br/><code>i8x16\.andnot</code><br/><code>s8x16\.andnot</code><br/><code>u8x16\.andnot</code><br/><code>i16x8\.andnot</code><br/><code>s16x8\.andnot</code><br/><code>u16x8\.andnot</code><br/><code>i32x4\.andnot</code><br/><code>s32x4\.andnot</code><br/><code>u32x4\.andnot</code><br/><code>i64x2\.andnot</code><br/><code>s64x2\.andnot</code><br/><code>u64x2\.andnot</code> | | <code><var>r</var><sub>v128</sub> ← <var>p1</var><sub>v128</sub> &amp; ~<var>p2</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.or</code><br/><code>i8x16\.or</code><br/><code>s8x16\.or</code><br/><code>u8x16\.or</code><br/><code>i16x8\.or</code><br/><code>s16x8\.or</code><br/><code>u16x8\.or</code><br/><code>i32x4\.or</code><br/><code>s32x4\.or</code><br/><code>u32x4\.or</code><br/><code>i64x2\.or</code><br/><code>s64x2\.or</code><br/><code>u64x2\.or</code> | | <code><var>r</var><sub>v128</sub> ← <var>p1</var><sub>v128</sub> \| <var>p2</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.xor</code><br/><code>i8x16\.xor</code><br/><code>s8x16\.xor</code><br/><code>u8x16\.xor</code><br/><code>i16x8\.xor</code><br/><code>s16x8\.xor</code><br/><code>u16x8\.xor</code><br/><code>i32x4\.xor</code><br/><code>s32x4\.xor</code><br/><code>u32x4\.xor</code><br/><code>i64x2\.xor</code><br/><code>s64x2\.xor</code><br/><code>u64x2\.xor</code> | | <code><var>r</var><sub>v128</sub> ← <var>p1</var><sub>v128</sub> ^ <var>p2</var><sub>v128</sub></code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>3</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128\.bitselect</code><br/><code>i8x16\.bitselect</code><br/><code>s8x16\.bitselect</code><br/><code>u8x16\.bitselect</code><br/><code>i16x8\.bitselect</code><br/><code>s16x8\.bitselect</code><br/><code>u16x8\.bitselect</code><br/><code>i32x4\.bitselect</code><br/><code>s32x4\.bitselect</code><br/><code>u32x4\.bitselect</code><br/><code>i64x2\.bitselect</code><br/><code>s64x2\.bitselect</code><br/><code>u64x2\.bitselect</code> | | <code><var>r</var><sub>v128</sub> ← (<var>p1</var><sub>v128</sub> &amp; <var>p3</var><sub>v128</sub>) \| (<var>p2</var><sub>v128</sub> & ~<var>p3</var><sub>v128</sub>)</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+
+## 算術演算
+
+
+### 整数値化
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>f32</code> | <code>f32\.ceil</code> | | <code><var>r</var><sub>f32</sub> ← ceil(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.ceil</code> | | <code><var>r</var><sub>f64</sub> ← ceil(<var>p1</var><sub>f64</sub>)</code> |
+| <code>1</code> | <code>f32</code> | <code>f32\.floor</code> | | <code><var>r</var><sub>f32</sub> ← floor(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.floor</code> | | <code><var>r</var><sub>f64</sub> ← floor(<var>p1</var><sub>f64</sub>)</code> |
+| <code>1</code> | <code>f32</code> | <code>f32\.trunc</code> | | <code><var>r</var><sub>f32</sub> ← trunc(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.trunc</code> | | <code><var>r</var><sub>f64</sub> ← trunc(<var>p1</var><sub>f64</sub>)</code> |
+| <code>1</code> | <code>f32</code> | <code>f32\.nearest</code> | | <code><var>r</var><sub>f32</sub> ← nearest(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.nearest</code> | | <code><var>r</var><sub>f64</sub> ← nearest(<var>p1</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.ceil</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← ceil(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.ceil</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← ceil(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.floor</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← floor(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.floor</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← floor(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.trunc</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← trunc(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.trunc</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← trunc(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.nearest</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← nearest(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.nearest</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← nearest(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 絶対値
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>f32</code> | <code>f32\.abs</code> | | <code><var>r</var><sub>f32</sub> ← abs(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.abs</code> | | <code><var>r</var><sub>f64</sub> ← abs(<var>p1</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.abs</code><br/><code>s8x16\.abs</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← abs(<var>p1</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.abs</code><br/><code>s16x8\.abs</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← abs(<var>p1</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.abs</code><br/><code>s32x4\.abs</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← abs(<var>p1</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.abs</code><br/><code>s64x2\.abs</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← abs(<var>p1</var><sub>s64x2</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.abs</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← abs(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.abs</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← abs(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 符号反転
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>f32</code> | <code>f32\.neg</code> | | <code><var>r</var><sub>f32</sub> ← -<var>p1</var><sub>f32</sub></code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.neg</code> | | <code><var>r</var><sub>f64</sub> ← -<var>p1</var><sub>f64</sub></code> |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.neg</code><br/><code>s8x16\.neg</code><br/><code>u8x16\.neg</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← -<var>p1</var><sub>i8x16</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.neg</code><br/><code>s16x8\.neg</code><br/><code>u16x8\.neg</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← -<var>p1</var><sub>i16x8</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.neg</code><br/><code>s32x4\.neg</code><br/><code>u32x4\.neg</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← -<var>p1</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.neg</code><br/><code>s64x2\.neg</code><br/><code>u64x2\.neg</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← -<var>p1</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.neg</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← -<var>p1</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.neg</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← -<var>p1</var><sub>f64x2</sub>[𝑛]</code> |
+
+
+### 符号複写
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code> | <code>f32</code> | <code>f32\.copysign</code> | | <code><var>r</var><sub>f32</sub> ← copsign(<var>p1</var><sub>f32</sub>, <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.copysign</code> | | <code><var>r</var><sub>f64</sub> ← copsign(<var>p1</var><sub>f64</sub>, <var>p2</var><sub>f64</sub>)</code> |
+
+
+### 加算
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.add</code><br/><code>s32\.add</code><br/><code>u32\.add</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> + <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.add</code><br/><code>s64\.add</code><br/><code>u64\.add</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> + <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>f32</code> | <code>f32\.add</code> | | <code><var>r</var><sub>f32</sub> ← <var>p1</var><sub>f32</sub> + <var>p2</var><sub>f32</sub></code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.add</code> | | <code><var>r</var><sub>f64</sub> ← <var>p1</var><sub>f64</sub> + <var>p2</var><sub>f64</sub></code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.add</code><br/><code>s8x16\.add</code><br/><code>u8x16\.add</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[𝑛] + <var>p2</var><sub>i8x16</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.add</code><br/><code>s16x8\.add</code><br/><code>u16x8\.add</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] + <var>p2</var><sub>i16x8</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.add</code><br/><code>s32x4\.add</code><br/><code>u32x4\.add</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] + <var>p2</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.add</code><br/><code>s64x2\.add</code><br/><code>u64x2\.add</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] + <var>p2</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.add</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>f32x4</sub>[𝑛] + <var>p2</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.add</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>f64x2</sub>[𝑛] + <var>p2</var><sub>f64x2</sub>[𝑛]</code> |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.add\_sat\_s</code><br/><code>s8x16\.add\_sat</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8s(<var>p1</var><sub>s8x16</sub>[𝑛] + <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.add\_sat\_u</code><br/><code>u8x16\.add\_sat</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8u(<var>p1</var><sub>u8x16</sub>[𝑛] + <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.add\_sat\_s</code><br/><code>s16x8\.add\_sat</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16s(<var>p1</var><sub>s16x8</sub>[𝑛] + <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.add\_sat\_u</code><br/><code>u16x8\.add\_sat</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16u(<var>p1</var><sub>u16x8</sub>[𝑛] + <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extadd\_pairwise\_i8x16\_s</code><br/><code>i16x8\.extadd\_pairwise\_s8x16</code><br/><code>s16x8\.extadd\_pairwise\_i8x16</code><br/><code>s16x8\.extadd\_pairwise\_s8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s8x16</sub>[2𝑛] + <var>p1</var><sub>s8x16</sub>[2𝑛+1]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i16x8\.extadd\_pairwise\_i8x16\_u</code><br/><code>i16x8\.extadd\_pairwise\_u8x16</code><br/><code>u16x8\.extadd\_pairwise\_i8x16</code><br/><code>u16x8\.extadd\_pairwise\_u8x16</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u8x16</sub>[2𝑛] + <var>p1</var><sub>u8x16</sub>[2𝑛+1]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extadd\_pairwise\_i16x8\_s</code><br/><code>i32x4\.extadd\_pairwise\_s16x8</code><br/><code>s32x4\.extadd\_pairwise\_i16x8</code><br/><code>s32x4\.extadd\_pairwise\_s16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s16x8</sub>[2𝑛] + <var>p1</var><sub>s16x8</sub>[2𝑛+1]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.extadd\_pairwise\_i16x8\_u</code><br/><code>i32x4\.extadd\_pairwise\_u16x8</code><br/><code>u32x4\.extadd\_pairwise\_i16x8</code><br/><code>u32x4\.extadd\_pairwise\_u16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u16x8</sub>[2𝑛] + <var>p1</var><sub>u16x8</sub>[2𝑛+1]</code> <br/>&nbsp;<br/>&nbsp;<br/>&nbsp; |
+
+### 減算
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.sub</code><br/><code>s32\.sub</code><br/><code>u32\.sub</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> - <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.sub</code><br/><code>s64\.sub</code><br/><code>u64\.sub</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> - <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>f32</code> | <code>f32\.sub</code> | | <code><var>r</var><sub>f32</sub> ← <var>p1</var><sub>f32</sub> - <var>p2</var><sub>f32</sub></code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.sub</code> | | <code><var>r</var><sub>f64</sub> ← <var>p1</var><sub>f64</sub> - <var>p2</var><sub>f64</sub></code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.sub</code><br/><code>s8x16\.sub</code><br/><code>u8x16\.sub</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[𝑛] - <var>p2</var><sub>i8x16</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.sub</code><br/><code>s16x8\.sub</code><br/><code>u16x8\.sub</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] - <var>p2</var><sub>i16x8</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.sub</code><br/><code>s32x4\.sub</code><br/><code>u32x4\.sub</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] - <var>p2</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.sub</code><br/><code>s64x2\.sub</code><br/><code>u64x2\.sub</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] - <var>p2</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.sub</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>f32x4</sub>[𝑛] - <var>p2</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.sub</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>f64x2</sub>[𝑛] - <var>p2</var><sub>f64x2</sub>[𝑛]</code> |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.sub\_sat\_s</code><br/><code>s8x16\.sub\_sat</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8s(<var>p1</var><sub>s8x16</sub>[𝑛] - <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.sub\_sat\_u</code><br/><code>u8x16\.sub\_sat</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← sat8u(<var>p1</var><sub>u8x16</sub>[𝑛] - <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.sub\_sat\_s</code><br/><code>s16x8\.sub\_sat</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16s(<var>p1</var><sub>s16x8</sub>[𝑛] - <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.sub\_sat\_u</code><br/><code>u16x8\.sub\_sat</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16u(<var>p1</var><sub>u16x8</sub>[𝑛] - <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+
+
+### 乗算
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.mul</code><br/><code>s32\.mul</code><br/><code>u32\.mul</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> * <var>p2</var><sub>i32</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.mul</code><br/><code>s64\.mul</code><br/><code>u64\.mul</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> * <var>p2</var><sub>i64</sub></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>f32</code> | <code>f32\.mul</code> | | <code><var>r</var><sub>f32</sub> ← <var>p1</var><sub>f32</sub> * <var>p2</var><sub>f32</sub></code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.mul</code> | | <code><var>r</var><sub>f64</sub> ← <var>p1</var><sub>f64</sub> * <var>p2</var><sub>f64</sub></code> |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.mul</code><br/><code>s16x8\.mul</code><br/><code>u16x8\.mul</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] \* <var>p2</var><sub>i16x8</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.mul</code><br/><code>s32x4\.mul</code><br/><code>u32x4\.mul</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] \* <var>p2</var><sub>i32x4</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.mul</code><br/><code>s64x2\.mul</code><br/><code>u64x2\.mul</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] \* <var>p2</var><sub>i64x2</sub>[𝑛]</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.mul</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>f32x4</sub>[𝑛] \* <var>p2</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.mul</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>f64x2</sub>[𝑛] \* <var>p2</var><sub>f64x2</sub>[𝑛]</code> |
+| | | | | |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_s</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s8x16</sub>[2𝑛+0] * <var>p2</var><sub>s8x16</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_low\_i8x16\_u</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u8x16</sub>[2𝑛+0] * <var>p2</var><sub>u8x16</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_s</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s8x16</sub>[2𝑛+1] * <var>p2</var><sub>s8x16</sub>[2𝑛+1]</code> |
+| <code>2</code> | <code>v128</code> | <code>i16x8\.extmul\_high\_i8x16\_u</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u8x16</sub>[2𝑛+1] * <var>p2</var><sub>u8x16</sub>[2𝑛+1]</code> |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_s</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s16x8</sub>[2𝑛+0] * <var>p2</var><sub>s16x8</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_low\_i16x8\_u</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u16x8</sub>[2𝑛+0] * <var>p2</var><sub>u16x8</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_s</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s16x8</sub>[2𝑛+1] * <var>p2</var><sub>s16x8</sub>[2𝑛+1]</code> |
+| <code>2</code> | <code>v128</code> | <code>i32x4\.extmul\_high\_i16x8\_u</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u16x8</sub>[2𝑛+1] * <var>p2</var><sub>u16x8</sub>[2𝑛+1]</code> |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i32x4\_s</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>s32x4</sub>[2𝑛+0] * <var>p2</var><sub>s32x4</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_low\_i32x4\_u</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>u32x4</sub>[2𝑛+0] * <var>p2</var><sub>u32x4</sub>[2𝑛+0]</code> |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i32x4\_s</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>s32x4</sub>[2𝑛+1] * <var>p2</var><sub>s32x4</sub>[2𝑛+1]</code> |
+| <code>2</code> | <code>v128</code> | <code>i64x2\.extmul\_high\_i32x4\_u</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>u32x4</sub>[2𝑛+1] * <var>p2</var><sub>u32x4</sub>[2𝑛+1]</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.q15mulr\_sat\_s</code><br/><code>s16x8\.q15mulr\_sat</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← sat16s(t)</code><br/><code>    t = i15mul(<var>p1</var><sub>s16x8</sub>[𝑛], <var>p2</var><sub>s16x8</sub>[𝑛])</code> |
+
+
+### 除算
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.div\_s</code><br/><code>s32\.div</code> | | <code><var>r</var><sub>s32</sub> ← <var>p1</var><sub>s32</sub> / <var>p2</var><sub>s32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.div\_u</code><br/><code>u32\.div</code> | | <code><var>r</var><sub>u32</sub> ← <var>p1</var><sub>u32</sub> / <var>p2</var><sub>u32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.div\_s</code><br/><code>s64\.div</code> | | <code><var>r</var><sub>s64</sub> ← <var>p1</var><sub>s64</sub> / <var>p2</var><sub>s64</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.div\_u</code><br/><code>u64\.div</code> | | <code><var>r</var><sub>u64</sub> ← <var>p1</var><sub>u64</sub> / <var>p2</var><sub>u64</sub></code> <br/>&nbsp; |
+| <code>2</code> | <code>f32</code> | <code>f32\.div</code> | | <code><var>r</var><sub>f32</sub> ← <var>p1</var><sub>f32</sub> / <var>p2</var><sub>f32</sub></code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.div</code> | | <code><var>r</var><sub>f64</sub> ← <var>p1</var><sub>f64</sub> / <var>p2</var><sub>f64</sub></code> |
+| | | | | |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.div</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>f32x4</sub>[𝑛] / <var>p2</var><sub>f32x4</sub>[𝑛]</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.div</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>f64x2</sub>[𝑛] / <var>p2</var><sub>f64x2</sub>[𝑛]</code> |
+
+
+### 剰余
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.rem\_s</code><br/><code>s32\.rem</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>s32</sub> % <var>p2</var><sub>s32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.rem\_u</code><br/><code>u32\.rem</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>u32</sub> % <var>p2</var><sub>u32</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.rem\_s</code><br/><code>s64\.rem</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>s64</sub> % <var>p2</var><sub>s64</sub></code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.rem\_u</code><br/><code>u64\.rem</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>u64</sub> % <var>p2</var><sub>u64</sub></code> <br/>&nbsp; |
+
+
+### 加算平均
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.avgr\_u</code><br/><code>u8x16\.avgr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← avgr(<var>p1</var><sub>u8x16</sub>[𝑛], <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.avgr\_u</code><br/><code>u16x8\.avgr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← avgr(<var>p1</var><sub>u16x8</sub>[𝑛], <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+
+
+### 平方根
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>f32</code> | <code>f32\.sqrt</code> | | <code><var>r</var><sub>f32</sub> ← sqrt(<var>p1</var><sub>f32</sub>)</code> |
+| <code>1</code> | <code>f64</code> | <code>f64\.sqrt</code> | | <code><var>r</var><sub>f64</sub> ← sqrt(<var>p1</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>1</code> | <code>v128</code> | <code>f32x4\.sqrt</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← sqrt(<var>p1</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>1</code> | <code>v128</code> | <code>f64x2\.sqrt</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← sqrt(<var>p1</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 内積
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp;<br/>&nbsp; | <code>i32x4\.dot\_i16x8\_s</code><br/><code>i32x4\.dot\_s16x8</code><br/><code>s32x4\.dot\_i16x8</code><br/><code>s32x4\.dot\_s16x8</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← x + y</code><br/><code>    x = <var>p1</var><sub>s16x8</sub>[2𝑛+0] * <var>p2</var><sub>s16x8</sub>[2𝑛+0]</code><br/><code>    y = <var>p1</var><sub>s16x8</sub>[2𝑛+1] * <var>p2</var><sub>s16x8</sub>[2𝑛+1]</code> <br/>&nbsp; |
+
+
+## シフト・ローテート
+
+
+### 左シフト
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.shl</code><br/><code>s32\.shl</code><br/><code>u32\.shl</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.shl</code><br/><code>s64\.shl</code><br/><code>u64\.shl</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> &lt;&lt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.shl</code><br/><code>s8x16\.shl</code><br/><code>u8x16\.shl</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.shl</code><br/><code>s16x8\.shl</code><br/><code>u16x8\.shl</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.shl</code><br/><code>s32x4\.shl</code><br/><code>u32x4\.shl</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.shl</code><br/><code>s64x2\.shl</code><br/><code>u64x2\.shl</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp;<br/>&nbsp; |
+
+
+### 符号あり右シフト
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.shr\_s</code><br/><code>s32\.shr</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>s32</sub> &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.shr\_s</code><br/><code>s64\.shr</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>s64</sub> &gt;&gt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_s</code><br/><code>s8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>s8x16</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_s</code><br/><code>s16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s16x8</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_s</code><br/><code>s32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s32x4</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_s</code><br/><code>s64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>s64x2</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp; |
+
+
+### 符号なし右シフト
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.shr\_u</code><br/><code>u32\.shr</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>u32</sub> &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.shr\_u</code><br/><code>u64\.shr</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>u64</sub> &gt;&gt;&gt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp; |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_u</code><br/><code>u8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>u8x16</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_u</code><br/><code>u16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u16x8</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_u</code><br/><code>u32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u32x4</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_u</code><br/><code>u64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>u64x2</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp; |
+
+
+### ローテート
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.rotl</code><br/><code>s32\.rotl</code><br/><code>u32\.rotl</code> | | <code><var>r</var><sub>i32</sub> ← rotl32(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.rotl</code><br/><code>s64\.rotl</code><br/><code>u64\.rotl</code> | | <code><var>r</var><sub>i64</sub> ← rotl64(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.rotr</code><br/><code>s32\.rotr</code><br/><code>u32\.rotr</code> | | <code><var>r</var><sub>i32</sub> ← rotr32(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.rotr</code><br/><code>s64\.rotr</code><br/><code>u64\.rotr</code> | | <code><var>r</var><sub>i64</sub> ← rotr64(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+
+
+## 選択
+
+
+### 小さい方
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code> | <code>f32</code> | <code>f32\.min</code> | | <code><var>r</var><sub>f32</sub> ← min(<var>p1</var><sub>f32</sub>, <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.min</code> | | <code><var>r</var><sub>f64</sub> ← min(<var>p1</var><sub>f64</sub>, <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.min\_s</code><br/><code>s8x16\.min</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← min(<var>p1</var><sub>s8x16</sub>[𝑛], <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.min\_u</code><br/><code>u8x16\.min</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← min(<var>p1</var><sub>u8x16</sub>[𝑛], <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.min\_s</code><br/><code>s16x8\.min</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← min(<var>p1</var><sub>s16x8</sub>[𝑛], <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.min\_u</code><br/><code>u16x8\.min</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← min(<var>p1</var><sub>u16x8</sub>[𝑛], <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.min\_s</code><br/><code>s32x4\.min</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← min(<var>p1</var><sub>s32x4</sub>[𝑛], <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.min\_u</code><br/><code>u32x4\.min</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← min(<var>p1</var><sub>u32x4</sub>[𝑛], <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.min</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← min(<var>p1</var><sub>f32x4</sub>[𝑛], <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.min</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← min(<var>p1</var><sub>f64x2</sub>[𝑛], <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.pmin</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← pmin(<var>p1</var><sub>f32x4</sub>[𝑛], <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.pmin</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← pmin(<var>p1</var><sub>f64x2</sub>[𝑛], <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 大きい方
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>2</code> | <code>f32</code> | <code>f32\.max</code> | | <code><var>r</var><sub>f32</sub> ← max(<var>p1</var><sub>f32</sub>, <var>p2</var><sub>f32</sub>)</code> |
+| <code>2</code> | <code>f64</code> | <code>f64\.max</code> | | <code><var>r</var><sub>f64</sub> ← max(<var>p1</var><sub>f64</sub>, <var>p2</var><sub>f64</sub>)</code> |
+| | | | | |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.max\_s</code><br/><code>s8x16\.max</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← max(<var>p1</var><sub>s8x16</sub>[𝑛], <var>p2</var><sub>s8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.max\_u</code><br/><code>u8x16\.max</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← max(<var>p1</var><sub>u8x16</sub>[𝑛], <var>p2</var><sub>u8x16</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.max\_s</code><br/><code>s16x8\.max</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← max(<var>p1</var><sub>s16x8</sub>[𝑛], <var>p2</var><sub>s16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.max\_u</code><br/><code>u16x8\.max</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← max(<var>p1</var><sub>u16x8</sub>[𝑛], <var>p2</var><sub>u16x8</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.max\_s</code><br/><code>s32x4\.max</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← max(<var>p1</var><sub>s32x4</sub>[𝑛], <var>p2</var><sub>s32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.max\_u</code><br/><code>u32x4\.max</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← max(<var>p1</var><sub>u32x4</sub>[𝑛], <var>p2</var><sub>u32x4</sub>[𝑛])</code> <br/>&nbsp; |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.max</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← max(<var>p1</var><sub>f32x4</sub>[𝑛], <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.max</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← max(<var>p1</var><sub>f64x2</sub>[𝑛], <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f32x4\.pmax</code> | | <code><var>r</var><sub>f32x4</sub>[𝑛:0..3] ← pmax(<var>p1</var><sub>f32x4</sub>[𝑛], <var>p2</var><sub>f32x4</sub>[𝑛])</code> |
+| <code>2</code> | <code>v128</code> | <code>f64x2\.pmax</code> | | <code><var>r</var><sub>f64x2</sub>[𝑛:0..1] ← pmax(<var>p1</var><sub>f64x2</sub>[𝑛], <var>p2</var><sub>f64x2</sub>[𝑛])</code> |
+
+
+### 条件選択
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>3</code> | <code>any</code> | <code>select</code> | | <code><var>r</var> ← <var>p3</var><sub>i32</sub> ? <var>p1</var> : <var>p2</var></code> |
+| <code>3</code> | <code>any</code> | <code>select</code> | <code>valtype,valtype,...</code> | 同上 (<code>valtype</code>リスト形式は将来予約) |
+
+
+## ビット計数
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.clz</code><br/><code>s32\.clz</code><br/><code>u32\.clz</code> | | <code><var>r</var><sub>i32</sub> ← clz32(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.clz</code><br/><code>s64\.clz</code><br/><code>u64\.clz</code> | | <code><var>r</var><sub>i64</sub> ← clz64(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.ctz</code><br/><code>s32\.ctz</code><br/><code>u32\.ctz</code> | | <code><var>r</var><sub>i32</sub> ← ctz32(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.ctz</code><br/><code>s64\.ctz</code><br/><code>u64\.ctz</code> | | <code><var>r</var><sub>i64</sub> ← ctz64(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.popcnt</code><br/><code>s32\.popcnt</code><br/><code>u32\.popcnt</code> | | <code><var>r</var><sub>i32</sub> ← popcnt(<var>p1</var><sub>i32</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.popcnt</code><br/><code>s64\.popcnt</code><br/><code>u64\.popcnt</code> | | <code><var>r</var><sub>i64</sub> ← popcnt(<var>p1</var><sub>i64</sub>)</code> <br/>&nbsp;<br/>&nbsp; |
+| | | | | |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.popcnt</code><br/><code>s8x16\.popcnt</code><br/><code>u8x16\.popcnt</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← popcnt(<var>p1</var><sub>i8x16</sub>[𝑛])</code> <br/>&nbsp;<br/>&nbsp; |
+
+
+## 符号の集積
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.bitmask</code><br/><code>s8x16\.bitmask</code><br/><code>u8x16\.bitmask</code> | | <code><var>r</var><sub>i32</sub> ← 0 </code><br><code><var>r</var><sub>i32</sub> &vert;= sign8(<var>p1</var><sub>i8x16</sub>[𝑛:0..15]) &lt;&lt; 𝑛</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.bitmask</code><br/><code>s16x8\.bitmask</code><br/><code>u16x8\.bitmask</code> | | <code><var>r</var><sub>i32</sub> ← 0 </code><br><code><var>r</var><sub>i32</sub> &vert;= sign16(<var>p1</var><sub>i16x8</sub>[𝑛:0..7]) &lt;&lt; 𝑛</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.bitmask</code><br/><code>s32x4\.bitmask</code><br/><code>u32x4\.bitmask</code> | | <code><var>r</var><sub>i32</sub> ← 0 </code><br><code><var>r</var><sub>i32</sub> &vert;= sign32(<var>p1</var><sub>i32x4</sub>[𝑛:0..3]) &lt;&lt; 𝑛</code> <br/>&nbsp; |
+| <code>1</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.bitmask</code><br/><code>s64x2\.bitmask</code><br/><code>u64x2\.bitmask</code> | | <code><var>r</var><sub>i32</sub> ← 0 </code><br><code><var>r</var><sub>i32</sub> &vert;= sign64(<var>p1</var><sub>i64x2</sub>[𝑛:0..1]) &lt;&lt; 𝑛</code> <br/>&nbsp; |
+
+
+## スタック操作
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | | <code>drop</code> | | <code><var>p1</var></code> を破棄 |
+
+
+## 関数ポインタ
+
+| 引数 | 返値 | 命令 | OP | 備考 (<code>𝑥 = funcidx</code>) |
+|:-:|:-:|:--|:--|:--|
+| <code>1</code> | <code>i32</code> | <code>ref\.is\_null</code> | | <code><var>r</var><sub>i32</sub> ← (<var>p1</var><sub>func</sub> == null)</code> |
+| <code>0</code> | <code>func</code> | <code>ref\.null</code> | <code>reftype</code> | <code><var>r</var><sub><var>func</var></sub> ← null</code> |
+| <code>0</code> | <code>func</code> | <code>ref\.func</code> | <code>funcidx</code> | <code><var>r</var><sub>func</sub> ← FUNC[𝑥]</code> |
+
+
+## テーブル領域操作
+
+| 引数 | 返値 | 命令 | OP<code>𝑥,𝑦</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code> | <code>i32</code> | <code>table\.size</code> | <code>tableidx</code> |  <code><var>r</var><sub>i32</sub> ← (TAB[𝑥] のサイズ)</code> |
+| <code>0</code> | <code>i32</code> | <code>table\.grow</code> | <code>tableidx</code> | <code><var>r</var><sub>i32</sub> ← (TAB[𝑥] のサイズ)</code> <br> <code>TAB[𝑥]</code> をサイズ <code><var>p2</var><sub>i32</sub></code> に変更(内容は <code><var>p1</var></code>) |
+| <code>3</code> | | <code>table\.fill</code> | <code>tableidx</code> | <code>TAB[𝑥]\[<var>p1</var><sub>i32</sub> : <var>p3</var><sub>i32</sub>] ← <var>p2</var></code> |
+| <code>3</code> | | <code>table\.copy</code> | <code>tableidx,tableidx</code> | <code>TAB[𝑥]\[<var>p1</var><sub>i32</sub> : <var>p3</var><sub>i32</sub>] ← TAB[𝑦]\[<var>p2</var><sub>i32</sub> : <var>p3</var><sub>i32</sub>]</code> |
+| <code>3</code> | | <code>table\.init</code> | <code>tableidx,elemidx</code> | <code>TAB[𝑥]\[<var>p1</var><sub>i32</sub> : <var>p3</var><sub>i32</sub>] ← MEM[𝑦]\[<var>p2</var><sub>i32</sub> : <var>p3</var><sub>i32</sub>]</code> |
+
+| 引数 | 返値 | 命令 | OP<code>𝑥</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code> | | <code>elem\.drop</code> | <code>elemidx</code> | <code>ELEM[𝑥]</code> の要素を破棄 |
+
+
+## メモリ領域操作
+
+| 引数 | 返値 | 命令 | OP<code>𝑥</code> | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code> | <code>i32</code> | <code>memory\.size</code> | | <code><var>r</var><sub>i32</sub> ← (MEM0 のページ サイズ)</code> |
+| <code>1</code> | <code>i32</code> | <code>memory\.grow</code> | | <code><var>r</var><sub>i32</sub> ← (MEM0 のページ サイズ)</code> <br> <code>MEM0</code> のページをサイズ <code><var>p1</var><sub>i32</sub></code> に変更 |
+| <code>3</code> | | <code>memory\.fill</code> | | <code>memset(&amp;MEM0[<var>p1</var><sub>i32</sub>], <var>p2</var><sub>i32</sub>, <var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p1</code>から長さ<code>p3</code>を<code>p2</code>で埋める |
+| <code>3</code> | | <code>memory\.copy</code> | | <code>memmove(&amp;MEM0[<var>p1</var><sub>i32</sub>], &amp;MEM0[<var>p2</var><sub>i32</sub>], <var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p2</code>から長さ<code>p3</code>を位置<code>p1</code>に移動 |
+| <code>3</code> | | <code>memory\.init</code> | <code>dataidx</code> | <code>memcpy(&amp;MEM0[<var>p1</var><sub>i32</sub>], &amp;DATA[𝑥][<var>p2</var><sub>i32</sub>], <var>p3</var><sub>i32</sub>)</code> <br/> <cod>DATA</code>の位置<code>p2</code>から長さ<code>p3</code>を<code>MEM0</code>の位置<code>p1</code>へコピー |
+
+<code>memset, mommove, memcpy</code>はC言語の標準Cライブラリを参照してください。
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>0</code> | | <code>data\.drop</code> | <code>dataidx</code> | <code>DATA[𝑥]</code> を破棄 |
+
+
+## ブロック指定と制御命令
+
+| 引数 | 返値 | 命令 | OP | 備考 |
+|:-:|:-:|:--|:--|:--|
+| <code>?</code> | | <code>block</code> | <code>blocktype</code> | ブロックの開始 |
+| <code>?</code> | | <code>loop</code> | <code>blocktype</code> | ループ・ブロックの開始 |
+| <code>1</code> | | <code>if</code> | <code>blocktype</code> | <code>if</code>ブロックの開始 |
+| <code>0</code> | | <code>else</code> | | <code>else</code>ブロックの開始 |
+| <code>?</code> | | <code>end</code> | | ブロックまたはコードの終端 |
+| | | | | |
+| <code>0</code> | | <code>br</code> | <code>labelidx</code> | ブロックからの脱出<br/><code>labelidx</code>は<code>ブロック段数-1</code></code> |
+| <code>1</code> | | <code>br\_if</code> | <code>labelidx</code> | <code><var>p1</var><sub>i32</sub></code>が真なら<br/>&nbsp;&nbsp;&nbsp;&nbsp;<code>br  labelidx</code><br/>が実行される |
+| <code>1</code> | | <code>br\_table</code> | <code>labelidx,labelidx,...</code> | <code>br  [...labelidx]\[<var>p1</var><sub>i32</sub>]</code> |
+| <code>?</code> | | <code>return</code> | | 関数から戻る |
+| <code>?</code> | <code>?</code> | <code>call</code> | <code>funcidx</code> | 関数を呼び出す |
+| <code>1+?</code> | <code>?</code> | <code>call\_indirect</code> | <code>tableidx,typeidx</code> | <code>typeidx</code>型の関数<br/>&nbsp;&nbsp;&nbsp;&nbsp;<code>TAB[tableidx]\[<var>p1</var><sub>i32</sub>]</code><br/>を呼び出す |
+| | | | | |
+| <code>0</code> | | <code>unreachable</code> | | 不到達(<code>trap</code>発生) |
+| <code>0</code> | | <code>nop</code> | | 何もしない |
+
+
+# ブロック
+
+以下の表は処理順を表します。ブロック内の<code>br</code>分岐命令の行き先は次の通り。
+
+### block 〜 end
+
+| <code>br</code> | コード | 備考 |
+|:-:|:--|:--|
+| | <code>block <var>t</var></code> | ブロックの開始 |
+| ↓ | <code>𝑖𝑛𝑠𝑡𝑟...</code> | ブロック内のコード |
+| ✓ | <code>end</code>  | ブロックの終了 |
+
+
+### loop 〜 end
+
+| <code>br</code> | コード | 備考 |
+|:-:|:--|:--|
+| ✓ | <code>loop <var>t</var></code> | ブロックの開始 |
+| ↑ | <code>𝑖𝑛𝑠𝑡𝑟...</code> | ブロック内のコード |
+| | <code>end</code> | ブロックの終了 |
+
+
+### if 〜 else 〜 end
+
+| <code>br</code> | コード | 備考 |
+|:-:|:--|:--|
+| | <code>if <var>t</var></code> | 引数<code><var>p1</var><sub>i32</sub></code>が偽ならば<code>else</code>の次へ |
+| ↓ | <code>𝑖𝑛𝑠𝑡𝑟...</code> | 下記に相当<br/><code>block <var>t</var></code><br/><code>𝑖𝑛𝑠𝑡𝑟...</code><br/><code>end</code> |
+| ✓ | <code>else</code> | <code>end</code>へジャンプ |
+| ↓ | <code>𝑖𝑛𝑠𝑡𝑟...</code> | 下記に相当<br/><code>block <var>t</var></code><br/><code>𝑖𝑛𝑠𝑡𝑟...</code><br/><code>end</code> |
+| ✓ | <code>end</code> | |

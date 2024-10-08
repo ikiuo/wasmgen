@@ -6,8 +6,8 @@
 
 #define WASMGEN_VERSION_MAJOR    0
 #define WASMGEN_VERSION_MINOR    1
-#define WASMGEN_VERSION_RELEASE  1
-#define WASMGEN_VERSION_STRING   "0.1.1"
+#define WASMGEN_VERSION_RELEASE  2
+#define WASMGEN_VERSION_STRING   "0.1.2"
 
 using namespace wasmgen;
 using EnvMap = StdStringMap<StringPtr>;
