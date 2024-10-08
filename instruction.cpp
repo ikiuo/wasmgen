@@ -261,7 +261,6 @@ namespace wasmgen
             {"i16x8.all_true",{Operation(1,5,0,0,1,0),Operand(0,0,0,0),2,{253,131}}},
             {"i32x4.all_true",{Operation(1,5,0,0,1,0),Operand(0,0,0,0),2,{253,163}}},
             {"i64x2.all_true",{Operation(1,5,0,0,1,0),Operand(0,0,0,0),2,{253,195}}},
-            {"select",{Operation(3,7,7,1,7,0),Operand(0,0,0,0),1,{27}}},
             {"select",{Operation(3,7,7,1,7,0),Operand(1,26,0,0),2,{28,256}}},
             {"i32.clz",{Operation(1,1,0,0,1,0),Operand(0,0,0,0),1,{103}}},
             {"i32.ctz",{Operation(1,1,0,0,1,0),Operand(0,0,0,0),1,{104}}},

@@ -3358,7 +3358,7 @@ namespace wasmgen
             }
             if (mbc)
             {
-                binary.push_back(uint8_t(code));
+                binary.append_leb128(uint8_t(code));
                 mbc = false;
                 continue;
             }
@@ -3464,9 +3464,17 @@ namespace wasmgen
                 break;
 
             case Instruction::OP_VTn:
-                binary.append_leb128(opval.size());
-                for (auto n : inc_range<size_t>(opval.size()))
-                    binary.append_leb128(int8_t(opval[n]));
+                if (opval.size())
+                {
+                    binary.append_leb128(opval.size());
+                    for (auto n : inc_range<size_t>(opval.size()))
+                        binary.append_leb128(int8_t(opval[n]));
+                }
+                else
+                {
+                    assert(binary.back() == 0x1c);
+                    binary.back() = 0x1b;
+                }
                 break;
 
             case Instruction::OP_BT:
