@@ -50,7 +50,7 @@ LDFLAGS       = $(LDLTO)
 # --------------
 
 SRCS          = main.cpp wmain.cpp option.cpp error.cpp \
-		object.cpp string.cpp file.cpp \
+		object.cpp array.cpp string.cpp file.cpp \
 		token.cpp expression.cpp instruction.cpp \
 		data.cpp section.cpp module.cpp \
 		lexer.cpp parser.cpp \

@@ -3858,6 +3858,16 @@ namespace wasmgen
      *
      */
 
+    ExprValue Parser::get_asmsw_value(const char* name)
+    {
+        ExprValue res;
+        Expression* expr = define_name->getexpr(name);
+
+        if (expr)
+            res = getvalue(expr);
+        return res;
+    }
+
     ExprValue Parser::getvalue(StdStringSet& nest, Expression* expr, IdentifierList* label)
     {
         auto& children = *expr->children;

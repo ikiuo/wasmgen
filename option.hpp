@@ -23,6 +23,10 @@ namespace wasmgen
     void message(const StringBlock& msg);
     template <typename... Args> void message(Args... args);
 
+    void puterr(const char* msg);
+    void puterr(const StringBlock& msg);
+    template <typename... Args> void puterr(Args... args);
+
     void dumpbin(const void* addr, size_t size, size_t indent = 0);
 }
 
@@ -60,16 +64,14 @@ namespace wasmgen
         return n < 10 ? n + '0' : n - 10 + 'A';
     }
 
+    /**/
+
     inline void debug(const char* file, int line, const StringBlock& msg)
     {
         message(file, ":", std::setw(4), std::setfill('0'), line, ": ", msg);
     }
 
-    template <typename... Args>
-    inline void message(Args... args)
-    {
-        message(StringBlock{args...});
-    }
+    /**/
 
     inline void message(const char* msg)
     {
@@ -81,6 +83,30 @@ namespace wasmgen
     {
         if (!flag_quiet)
             std::cout << msg;
+    }
+
+    template <typename... Args>
+    inline void message(Args... args)
+    {
+        message(StringBlock{args...});
+    }
+
+    /**/
+
+    inline void puterr(const char* msg)
+    {
+        std::cerr << msg;
+    }
+
+    inline void puterr(const StringBlock& msg)
+    {
+        std::cerr << msg;
+    }
+
+    template <typename... Args>
+    inline void puterr(Args... args)
+    {
+        puterr(StringBlock{args...});
     }
 
 } // wasmgen

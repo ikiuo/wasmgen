@@ -15,6 +15,9 @@ namespace wasmgen
     private:
         using super = StdVector<uint8_t>;
 
+    protected:
+        static const char base64_table[];
+
     public:
         using super::super;
 
@@ -27,6 +30,8 @@ namespace wasmgen
         void append_vector(const ByteArray& value);
 
         void append_name(const StdString& name);
+
+        ByteArray base64() const;
     };
 
     ///////////

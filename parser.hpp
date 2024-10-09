@@ -180,7 +180,9 @@ namespace wasmgen
         bool parse();
         void build_wasm(ModuleBinary& wasm);
 
-        void update_clset();
+        void update_clset() noexcept;
+
+        ExprValue get_asmsw_value(const char* name);
 
     protected:
         static void initialze_static_object();
@@ -405,7 +407,7 @@ namespace wasmgen
     // Parser //
     ////////////
 
-    inline void Parser::update_clset()
+    inline void Parser::update_clset() noexcept
     {
         clset_name = define_name;
     }

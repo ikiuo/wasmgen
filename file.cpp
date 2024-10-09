@@ -606,14 +606,14 @@ namespace wasmgen
 
         handle = ::fopen(fname, "wb");
         if (!handle)
-            ::fprintf(stderr, "open error: %s\n", fname);
+            puterr("open error(", errno, "): ", fname, "\n");
 
 #else  /* WINDOWS */
 
         errno_t error = ::fopen_s(&handle, fname, "wb");
 
         if (error)
-            ::fprintf(stderr, "open error(%d): %s\n", error, fname);
+            puterr("open error(", error, "): ", fname, "\n");
 
 #endif
     }

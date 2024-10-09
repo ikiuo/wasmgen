@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="array.cpp" />
     <ClCompile Include="data.cpp" />
     <ClCompile Include="error.cpp" />
     <ClCompile Include="expression.cpp" />
