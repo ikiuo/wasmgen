@@ -39,11 +39,18 @@ VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてくださ�
 
 ## コメント
 
-<code>#</code> または <code>;</code> から行末まで無視されます。
+<code>#</code>, <code>;</code>, <code>//</code> から行末まで無視されます。
 
 ```
 # コメント1↲
 ; コメント2↲
+// コメント3↲
+```
+
+<code>/\*</code> から <code>\*/</code> まで無視されます。
+
+```
+... /* コメント */ ...
 ```
 
 
@@ -946,6 +953,15 @@ x           .param      i32
 
 ```
 @option include.depth = <int>   ;# 既定=10
+```
+
+
+### オプション <code>comment.nest</code>
+
+<code>/\* ... \*/</code> の入れ子対応を指定します。
+
+```
+@option comment.nest = <bool>   ;# 既定=false
 ```
 
 

@@ -169,6 +169,7 @@ namespace wasmgen
         /**/
 
         _WARNING = 3000,
+        NESTED_COMMENTS,
         TOO_MANY_OPERANDS,
         IGNORE_CODE_AFTER_END,
 

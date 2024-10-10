@@ -55,6 +55,9 @@ namespace wasmgen
         FileTextPos text_pos;
         FileTextPos save_text_pos;
 
+        bool nestable_comment;
+        bool nested_comments;
+
         TokenEntry token_entry[token_entry_size];
 
         static const TokenDataList token_data;
@@ -96,6 +99,8 @@ namespace wasmgen
 
         void gettoken_space(UCharType c);
         void gettoken_comment(UCharType c);
+        void gettoken_comment_start(UCharType c);
+        void gettoken_comment_cstyle(UCharType c);
 
         void gettoken_name(UCharType c);
         void gettoken_number(UCharType c);

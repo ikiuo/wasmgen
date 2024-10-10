@@ -94,6 +94,7 @@ namespace wasmgen
         /*
          *
          */
+        {ErrorCode::NESTED_COMMENTS, {{0},{"コメントが入れ子になっています。"}}},
         {ErrorCode::TOO_MANY_OPERANDS, {{0,-2,1,-1,2},{"オペランド","番目(",")以降は無視されます。"}}},
         {ErrorCode::IGNORE_CODE_AFTER_END, {{0,-1,1},{"end より後の命令(",")は無視されます。"}}},
         /**/

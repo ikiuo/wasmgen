@@ -138,6 +138,7 @@ namespace wasmgen
     /**/
 
     SingletonString Parser::optname_include_depth("include.depth");
+    SingletonString Parser::optname_comment_nest("comment.nest");
     SingletonString Parser::optname_section_datacount("section.datacount");
     SingletonString Parser::optname_type_unique("type.unique");
 
@@ -285,12 +286,22 @@ namespace wasmgen
 
             if (Invalid(rt))
                 return Finish(rt);
-            if (*rt == TokenID::COMMENT)
+
+            switch (rt->id)
+            {
+            default:
+                if (IsSpace(rt))
+                    break;
+                fallthrough;
+            case TokenID::EOL:
+                return Finish(rt);
+            case TokenID::COMMENT:
                 return feed_eol();
-            else if (!IsSpace(rt))
-                return Finish(rt);
-            else if (*rt == TokenID::EOL)
-                return Finish(rt);
+            case TokenID::COMMENT_SPAN:
+                if (nested_comments && !nestable_comment)
+                    parse_warning(ErrorCode::NESTED_COMMENTS, {rt});
+                break;
+            }
         }
     }
 
@@ -389,7 +400,7 @@ namespace wasmgen
 
     bool Parser::parse_file(String* curdir, TextFileReader* reader)
     {
-        String* olddir = current_directory;
+        StringPtr olddir = current_directory;
 
         current_directory = curdir;
         push_reader(reader);
@@ -1108,6 +1119,7 @@ namespace wasmgen
 
         if (!(false ||
               update_option(name, tname, res, op, optname_include_depth, option.include_depth, 0, 100) ||
+              update_option(name, tname, res, op, optname_comment_nest, nestable_comment) ||
               update_option(name, tname, res, op, optname_section_datacount, option.section_datacount) ||
               update_option(name, tname, res, op, optname_type_unique, option.type_unique) ||
               false))

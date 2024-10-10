@@ -29,6 +29,8 @@ namespace wasmgen
         : freader()
         , text_pos(0, 0)
         , save_text_pos(0, 0)
+        , nestable_comment(false)
+        , nested_comments(false)
     {
         static_assert(sizeof(UCharType) == 1, "invalid type");
 
@@ -49,6 +51,7 @@ namespace wasmgen
         token_entry[size_t('#')] = &Lexer::gettoken_comment;
         token_entry[size_t(';')] = &Lexer::gettoken_comment;
         token_entry[size_t('.')] = &Lexer::gettoken_number;
+        token_entry[size_t('/')] = &Lexer::gettoken_comment_start;
 
         for (auto i : inc_range<size_t>(token_entry_size))
             if (token_scan_tree.code[i].next)
@@ -156,6 +159,72 @@ namespace wasmgen
                 break;
             }
             token_append(c);
+        }
+    }
+
+    void Lexer::gettoken_comment_start(UCharType c)
+    {
+        token_id(TokenID(c), c);
+
+        if (!fetchar())
+            return;
+        c = getchar();
+        switch (c)
+        {
+        case '/':   // "//"
+            gettoken_comment(c);
+            break;
+
+        case '*':
+            WASMGEN_DEBUG(2, "  comment enter\n");
+            gettoken_comment_cstyle(c);
+            break;
+
+        default:
+            rewindchar();
+            break;
+        }
+    }
+
+    void Lexer::gettoken_comment_cstyle(UCharType c)
+    {
+        int nest = 1;
+
+        nested_comments = false;
+        token_id(TokenID::COMMENT_SPAN, c);
+        while (fetchar())
+        {
+            c = getchar();
+            token_append(c);
+            switch (c)
+            {
+            case '*':
+                if (!fetchar())
+                    return;
+                c = getchar();
+                token_append(c);
+                if (c != '/')
+                    break;
+                WASMGEN_DEBUG(2, "  comment leave\n");
+                if (!--nest)
+                    return;
+                break;
+
+            case '/':
+                if (!fetchar())
+                    return;
+                c = getchar();
+                token_append(c);
+                if (c == '*')
+                {
+                    nest += nestable_comment;
+                    nested_comments = true;
+                }
+                break;
+
+            default:
+                break;
+            }
         }
     }
 

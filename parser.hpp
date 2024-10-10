@@ -113,6 +113,7 @@ namespace wasmgen
         static SingletonString ins_v128_const;
 
         static SingletonString optname_include_depth;
+        static SingletonString optname_comment_nest;
         static SingletonString optname_section_datacount;
         static SingletonString optname_type_unique;
 

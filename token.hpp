@@ -277,6 +277,7 @@ namespace wasmgen
         END = 256,
 
         COMMENT,
+        COMMENT_SPAN,
         CONTROL,
         NUMBER,
         NAME,
