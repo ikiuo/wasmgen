@@ -23,9 +23,17 @@ namespace wasmgen
     const ValTypeDict vectype_dict = {
         { "v128", ValType::V128 /*0x7b*/ },
         { "i8x16", ValType::V128 /*0x7b*/ },
+        { "s8x16", ValType::V128 /*0x7b*/ },
+        { "u8x16", ValType::V128 /*0x7b*/ },
         { "i16x8", ValType::V128 /*0x7b*/ },
+        { "s16x8", ValType::V128 /*0x7b*/ },
+        { "u16x8", ValType::V128 /*0x7b*/ },
         { "i32x4", ValType::V128 /*0x7b*/ },
+        { "s32x4", ValType::V128 /*0x7b*/ },
+        { "u32x4", ValType::V128 /*0x7b*/ },
         { "i64x2", ValType::V128 /*0x7b*/ },
+        { "s64x2", ValType::V128 /*0x7b*/ },
+        { "u64x2", ValType::V128 /*0x7b*/ },
         { "f32x4", ValType::V128 /*0x7b*/ },
         { "f64x2", ValType::V128 /*0x7b*/ },
     };
