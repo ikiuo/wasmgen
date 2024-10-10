@@ -83,6 +83,7 @@ namespace wasmgen
         struct Option
         {
             int include_depth;
+            bool comment_nest;
             bool section_datacount;
             bool type_unique;
 
@@ -319,6 +320,7 @@ namespace wasmgen
         bool update_option(String* name, Token* token, GetEqualRes& res,
                            Expression* op, String* optname, int &option,
                            int min = INT_MIN, int max = INT_MAX);
+        void update_option() noexcept;
 
         /*-*/
 

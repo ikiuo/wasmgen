@@ -256,6 +256,7 @@ namespace wasmgen
         }
 
         option.set_default();
+        update_option();
 
         predefined_name->push_back(boolean_name);
         {
@@ -1147,11 +1148,12 @@ namespace wasmgen
 
         if (!(false ||
               update_option(name, tname, res, op, optname_include_depth, option.include_depth, 0, 100) ||
-              update_option(name, tname, res, op, optname_comment_nest, nestable_comment) ||
+              update_option(name, tname, res, op, optname_comment_nest, option.comment_nest) ||
               update_option(name, tname, res, op, optname_section_datacount, option.section_datacount) ||
               update_option(name, tname, res, op, optname_type_unique, option.type_unique) ||
               false))
             parse_warning(ErrorCode::IGNORE_UNKNOWN_OPTION, {tname});
+        update_option();
     }
 
     void Parser::parse_pseudo_alias()
@@ -4934,9 +4936,15 @@ namespace wasmgen
         return true;
     }
 
+    void Parser::update_option() noexcept
+    {
+        nestable_comment = option.comment_nest;
+    }
+
     void Parser::Option::set_default() noexcept
     {
         include_depth = 10;
+        comment_nest = false;
         section_datacount = false;
         type_unique = false;
     }
