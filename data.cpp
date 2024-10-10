@@ -11,7 +11,11 @@ namespace wasmgen
 
     const ValTypeDict numtype_dict = {
         { "i32", ValType::I32 /*0x7f*/ },
+        { "s32", ValType::I32 /*0x7f*/ },
+        { "u32", ValType::I32 /*0x7f*/ },
         { "i64", ValType::I64 /*0x7e*/ },
+        { "s64", ValType::I64 /*0x7e*/ },
+        { "u64", ValType::I64 /*0x7e*/ },
         { "f32", ValType::F32 /*0x7d*/ },
         { "f64", ValType::F64 /*0x7c*/ },
     };
