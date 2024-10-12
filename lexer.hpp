@@ -57,6 +57,7 @@ namespace wasmgen
 
         bool nestable_comment;
         bool nested_comments;
+        bool asmsw_skip;
 
         TokenEntry token_entry[token_entry_size];
 

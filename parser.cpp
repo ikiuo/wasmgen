@@ -446,6 +446,7 @@ namespace wasmgen
         auto eit = Instruction::table.end();
         auto it = eit;
 
+        asmsw_skip = asmsw_flag.skip;
         code_line = new CodeLine;
 
         /**/
@@ -456,20 +457,24 @@ namespace wasmgen
         {
             rt = next_token();
             if (Invalid(rt))
-                return false;
+                return !asmsw_skip ? false : Valid(rt = feed_eol());
             if (!IsSpace(rt))
                 break;
         }
 
         if (*rt != TokenID::NAME)
         {
-            parse_error(ErrorCode::SYNTAX_ERROR, {rt});
+            if (!asmsw_skip)
+                return parse_error(ErrorCode::SYNTAX_ERROR, {rt});
             return Valid(rt = feed_eol());
         }
 
         it = Instruction::table.find(rt->text);
         if (it == eit)
         {
+            if (asmsw_skip)
+                return Valid(rt = feed_eol());
+
             code_line->label = rt;
             rt = next_token();
             if (Valid(rt) && (*rt == ':'))
@@ -479,6 +484,15 @@ namespace wasmgen
         }
         if (it != eit)
         {
+            if (asmsw_skip)
+            {
+                auto& operation = it->second.operation;
+
+                if (operation != Instruction::PSEUDO_ASSMBLE_SWITCH)
+                    return Valid(rt = feed_eol());
+                assert(operation != Instruction::ASW_NONE);
+            }
+
             code_line->instr = rt;
             code_line->instab = it;
             if (!parse_operands())
@@ -547,10 +561,9 @@ namespace wasmgen
         }
         assert(it != eit);
 
-        auto& operation = it->second.operation;
+        Instruction::PseudoCode pcode(it->second.operation);
 
-        if (!(operation == Instruction::ASW_NONE && asmsw_flag.skip))
-            (this->*pseudo_entry[Instruction::PseudoCode(operation)])();
+        (this->*pseudo_entry[pcode])();
         return true;
     }
 

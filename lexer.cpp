@@ -31,6 +31,7 @@ namespace wasmgen
         , save_text_pos(0, 0)
         , nestable_comment(false)
         , nested_comments(false)
+        , asmsw_skip(false)
     {
         static_assert(sizeof(UCharType) == 1, "invalid type");
 
