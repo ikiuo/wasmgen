@@ -3523,7 +3523,7 @@ namespace wasmgen
             case Instruction::OP_MA4:
                 {
                     uint32_t offset = 0;
-                    uint32_t align = 1 << (int(opc) - Instruction::OP_MA0);
+                    uint32_t align = uint32_t(opc - Instruction::OP_MA0);
                     switch (opval.size())
                     {
                     case 0:
