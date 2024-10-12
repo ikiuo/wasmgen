@@ -1933,10 +1933,10 @@ $exit:      end
 | <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i32</code><br/>&nbsp;<br/>&nbsp; | <code>i32\.shl</code><br/><code>s32\.shl</code><br/><code>u32\.shl</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>i32</sub> &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp;<br/>&nbsp; |
 | <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>i64</code><br/>&nbsp;<br/>&nbsp; | <code>i64\.shl</code><br/><code>s64\.shl</code><br/><code>u64\.shl</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>i64</sub> &lt;&lt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp;<br/>&nbsp; |
 | | | | | |
-| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.shl</code><br/><code>s8x16\.shl</code><br/><code>u8x16\.shl</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp;<br/>&nbsp; |
-| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.shl</code><br/><code>s16x8\.shl</code><br/><code>u16x8\.shl</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp;<br/>&nbsp; |
-| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.shl</code><br/><code>s32x4\.shl</code><br/><code>u32x4\.shl</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp;<br/>&nbsp; |
-| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.shl</code><br/><code>s64x2\.shl</code><br/><code>u64x2\.shl</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.shl</code><br/><code>s8x16\.shl</code><br/><code>u8x16\.shl</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>i8x16</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 7)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.shl</code><br/><code>s16x8\.shl</code><br/><code>u16x8\.shl</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>i16x8</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 15)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.shl</code><br/><code>s32x4\.shl</code><br/><code>u32x4\.shl</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>i32x4</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp;<br/>&nbsp; |
+| <code>2</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.shl</code><br/><code>s64x2\.shl</code><br/><code>u64x2\.shl</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>i64x2</sub>[𝑛] &lt;&lt; (<var>p2</var><sub>i32</sub> &amp; 63)</code> <br/>&nbsp;<br/>&nbsp; |
 
 
 ### 符号あり右シフト
@@ -1946,10 +1946,10 @@ $exit:      end
 | <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.shr\_s</code><br/><code>s32\.shr</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>s32</sub> &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
 | <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.shr\_s</code><br/><code>s64\.shr</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>s64</sub> &gt;&gt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp; |
 | | | | | |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_s</code><br/><code>s8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>s8x16</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_s</code><br/><code>s16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s16x8</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_s</code><br/><code>s32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s32x4</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_s</code><br/><code>s64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>s64x2</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_s</code><br/><code>s8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>s8x16</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 7)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_s</code><br/><code>s16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>s16x8</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 15)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_s</code><br/><code>s32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>s32x4</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_s</code><br/><code>s64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>s64x2</sub>[𝑛] &gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 63)</code> <br/>&nbsp; |
 
 
 ### 符号なし右シフト
@@ -1959,10 +1959,10 @@ $exit:      end
 | <code>2</code><br/>&nbsp; | <code>i32</code><br/>&nbsp; | <code>i32\.shr\_u</code><br/><code>u32\.shr</code> | | <code><var>r</var><sub>i32</sub> ← <var>p1</var><sub>u32</sub> &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
 | <code>2</code><br/>&nbsp; | <code>i64</code><br/>&nbsp; | <code>i64\.shr\_u</code><br/><code>u64\.shr</code> | | <code><var>r</var><sub>i64</sub> ← <var>p1</var><sub>u64</sub> &gt;&gt;&gt; (<var>p2</var><sub>i64</sub> &amp; 63)</code> <br/>&nbsp; |
 | | | | | |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_u</code><br/><code>u8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>u8x16</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i8x16</sub>[𝑛] &amp; 7)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_u</code><br/><code>u16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u16x8</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i16x8</sub>[𝑛] &amp; 15)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_u</code><br/><code>u32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u32x4</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32x4</sub>[𝑛] &amp; 31)</code> <br/>&nbsp; |
-| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_u</code><br/><code>u64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>u64x2</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i64x2</sub>[𝑛] &amp; 63)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i8x16\.shr\_u</code><br/><code>u8x16\.shr</code> | | <code><var>r</var><sub>i8x16</sub>[𝑛:0..15] ← <var>p1</var><sub>u8x16</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 7)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i16x8\.shr\_u</code><br/><code>u16x8\.shr</code> | | <code><var>r</var><sub>i16x8</sub>[𝑛:0..7] ← <var>p1</var><sub>u16x8</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 15)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i32x4\.shr\_u</code><br/><code>u32x4\.shr</code> | | <code><var>r</var><sub>i32x4</sub>[𝑛:0..3] ← <var>p1</var><sub>u32x4</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 31)</code> <br/>&nbsp; |
+| <code>2</code><br/>&nbsp; | <code>v128</code><br/>&nbsp; | <code>i64x2\.shr\_u</code><br/><code>u64x2\.shr</code> | | <code><var>r</var><sub>i64x2</sub>[𝑛:0..1] ← <var>p1</var><sub>u64x2</sub>[𝑛] &gt;&gt;&gt; (<var>p2</var><sub>i32</sub> &amp; 63)</code> <br/>&nbsp; |
 
 
 ### ローテート
