@@ -3195,7 +3195,6 @@ namespace wasmgen
 
             IdentifierList* idmap = nullptr;
             size_t cnt = 1;
-            int64_t mao = 0;
 
             switch (opc)
             {
@@ -3339,7 +3338,6 @@ namespace wasmgen
             case Instruction::OP_MA3:
             case Instruction::OP_MA4:
                 cnt = std::min<size_t>(2, oplen);
-                mao = int64_t(1) << (opc - Instruction::OP_MA0);
                 break;
 
             default:
@@ -3348,13 +3346,6 @@ namespace wasmgen
 
             if (oplen < cnt)
                 return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
-
-            if (mao && cnt < 2)
-            {
-                if (cnt < 1)
-                    opval.push_back(ExprValue(uint64_t(0)));
-                opval.push_back(ExprValue(mao));
-            }
 
             for (auto n : inc_range<size_t>(cnt))
             {
@@ -3530,9 +3521,26 @@ namespace wasmgen
             case Instruction::OP_MA2:
             case Instruction::OP_MA3:
             case Instruction::OP_MA4:
-                assert(opval.size() >= 2);
-                binary.append_leb128(uint32_t(opval[1]));
-                binary.append_leb128(uint32_t(opval[0]));
+                {
+                    uint32_t offset = 0;
+                    uint32_t align = 1 << (int(opc) - Instruction::OP_MA0);
+                    switch (opval.size())
+                    {
+                    case 0:
+                        break;
+                    case 2:
+                        align = opval[1];
+                        fallthrough;
+                    case 1:
+                        offset = opval[0];
+                        break;
+                    default:
+                        assert(false);
+                        break;
+                    }
+                    binary.append_leb128(uint32_t(align));
+                    binary.append_leb128(uint32_t(offset));
+                }
                 break;
 
             default:
