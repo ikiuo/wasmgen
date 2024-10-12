@@ -3077,6 +3077,7 @@ namespace wasmgen
         list->retry = false;
         list->offset = 0;
         list->code_end = nullptr;
+        list->block_stack.clear();
         for (CodeLine* line : *list)
         {
             assert(line);
