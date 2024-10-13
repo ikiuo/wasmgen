@@ -658,9 +658,11 @@ namespace wasmgen
         Token* instr = line->instr; assert(instr);
         String* instr_name = instr->text; assert(instr_name);
 
+#if 0
         if (macro_expand.find(*instr_name) != macro_expand.end())
             return parse_error(ErrorCode::NESTED_MACRO_EXPANSION, {instr});
         macro_expand.insert(*instr_name);
+#endif
 
         WASMGEN_DEBUG(2, "MACRO: start=\"", *instr_name ,"\"\n");
 
@@ -713,7 +715,9 @@ namespace wasmgen
         while (tspos < token_stack.size())
             if (!parse_line())
                 break;
+#if 0
         macro_expand.erase(*instr_name);
+#endif
 
         WASMGEN_DEBUG(2, "MACRO: end=\"", *instr_name,"\"\n");
 
