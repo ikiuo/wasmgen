@@ -8,4 +8,5 @@
 #include "leb128.hpp"
 #include "range.hpp"
 #include "stdstr.hpp"
+#include "stdvec.hpp"
 #include "strblk.hpp"

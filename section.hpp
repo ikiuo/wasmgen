@@ -8,6 +8,12 @@
 
 namespace wasmgen
 {
+
+    class MacroData;
+    using MacroDataPtr = Pointer<MacroData>;
+    using MacroDataRef = RefPointer<MacroData>;
+    using NewMacroData = NewPointer<MacroData>;
+
     ///////////////
     // SectionID //
     ///////////////
@@ -43,6 +49,7 @@ namespace wasmgen
         TokenPtr label;
         TokenPtr instr;
         InstrIter instab;
+        MacroDataPtr macro;
         ExpressionListPtr operands;
         int operand_start;
         ByteArray binary;
@@ -87,8 +94,7 @@ namespace wasmgen
         int pass;
         size_t offset;
         CodeLinePtr code_end;
-        StdVector<CodeLinePtr> block_stack;
-        StdVector<Instruction::DataType> stack;
+        ObjectStack<CodeLine> block_stack;
 
     public:
         CodeList();
@@ -132,6 +138,20 @@ namespace wasmgen
     using CodeBlockListPtr = Pointer<CodeBlockList>;
     using CodeBlockListPef = RefPointer<CodeBlockList>;
     using NewCodeBlockList = NewPointer<CodeBlockList>;
+
+    ///////////////
+    // MacroData //
+    ///////////////
+
+    class MacroData : virtual public Object
+    {
+    public:
+        CodeLinePtr line;
+        TokenListList code;
+
+    public:
+        MacroData(CodeLine* line = nullptr);
+    };
 
     /////////////
     // Section //

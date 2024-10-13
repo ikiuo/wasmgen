@@ -54,19 +54,15 @@ namespace wasmgen
 
     void Token::dump()
     {
-        message({
-                text->file_name->c_str(), ":", text->text_pos.line,
+        message(text->file_name->c_str(), ":", text->text_pos.line,
                 ":TokenID=", CSBHex(unsigned(id) & 0xfff, 3, int('x')),
                 ": ", int(id) == int('\n') ? "" : text->c_str(),
-                "\n"
-            });
+                "\n");
 
         if (id == TokenID::NUMBER)
-            message({
-                    "    ivalue: ", CSBHex(ivalue, 16, 'x'), ", ", ivalue, "\n"
+            message("    ivalue: ", CSBHex(ivalue, 16, 'x'), ", ", ivalue, "\n"
                     "    fvalue: ", CSBHex(*(std::uint64_t*)&fvalue, 16, 'x'), ", ", fvalue, "\n",
-                    "    fvalue: ", std::setprecision(80), fvalue, "\n"
-                });
+                    "    fvalue: ", std::setprecision(80), fvalue, "\n");
         else if (id == TokenID::QUOTE)
             message("    quote[", missing_quote, "]: ", quote->c_str(), "\n");
     }

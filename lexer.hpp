@@ -14,7 +14,6 @@ namespace wasmgen
     class Lexer : virtual public Object
     {
     protected:
-        using LineList = StdPtrList<FileString>;
         using TokenStack = ObjectStack<Token>;
         using TokenEntry = void (Lexer::*)(UCharType c);
 
@@ -44,16 +43,22 @@ namespace wasmgen
         };
 
         TextFileReaderPtr freader;
-        TextFileReaderList freader_stack;
+        FileStringListPtr file_line;
+        FileTextPos text_pos;
+        FileTextPos save_pos;
+
+        ObjectStack<TextFileReader> freader_stack;
+        ObjectStack<FileStringList> line_stack;
+        StdVecStack<FileTextPos> pos_stack;
+
+        TokenListPtr token_line;
+        bool token_eol;
 
         TokenStack token_stack;
-        TokenPtr current_token;
         FileStringPtr current_text;
-        StdVector<char> message_buffer;
+        TokenPtr current_token;
 
-        LineList file_line;
-        FileTextPos text_pos;
-        FileTextPos save_text_pos;
+        StdVector<char> message_buffer;
 
         bool nestable_comment;
         bool nested_comments;
@@ -192,18 +197,18 @@ namespace wasmgen
 
     inline UCharType Lexer::getchar() noexcept
     {
-        save_text_pos = text_pos;
+        save_pos = text_pos;
 
-        assert(text_pos.line < file_line.size());
+        assert(text_pos.line < file_line->size());
 
-        FileString *curr = file_line[text_pos.line];
+        FileString *curr = (*file_line)[text_pos.line];
 
         return UCharType(curr->at(text_pos.column++));
     }
 
     inline void Lexer::rewindchar() noexcept
     {
-        text_pos = save_text_pos;
+        text_pos = save_pos;
     }
 
     template <typename T>

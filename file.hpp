@@ -81,6 +81,16 @@ namespace wasmgen
     using FileStringRef = RefPointer<FileString>;
     using NewFileString = NewPointer<FileString>;
 
+    ////////////////////
+    // FileStringList //
+    ////////////////////
+
+    using FileStringList = PointerArray<FileString>;
+
+    using FileStringListPtr = Pointer<FileStringList>;
+    using FileStringListRef = RefPointer<FileStringList>;
+    using NewFileStringList = NewPointer<FileStringList>;
+
     //////////////
     // FileData //
     //////////////
@@ -193,16 +203,6 @@ namespace wasmgen
     using TextFileReaderPtr = Pointer<TextFileReader>;
     using TextFileReaderRef = RefPointer<TextFileReader>;
     using NewTextFileReader = NewPointer<TextFileReader>;
-
-    ////////////////////////
-    // TextFileReaderList //
-    ////////////////////////
-
-    using TextFileReaderList = PointerArray<TextFileReader>;
-
-    using TextFileReaderListPtr = Pointer<TextFileReaderList>;
-    using TextFileReaderListRef = RefPointer<TextFileReaderList>;
-    using NewTextFileReaderList = NewPointer<TextFileReaderList>;
 
     ////////////////
     // FileWriter //

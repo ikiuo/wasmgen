@@ -35,6 +35,17 @@ namespace wasmgen
         /*NOOP*/
     }
 
+    ///////////////
+    // MacroData //
+    ///////////////
+
+    MacroData::MacroData(CodeLine* line)
+        : line(line)
+        , code()
+    {
+        /*NOOP*/
+    }
+
     /////////////
     // Section //
     /////////////

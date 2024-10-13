@@ -185,6 +185,9 @@ namespace wasmgen
             PSEUDO_MESSAGE,
             PSEUDO_OPTION,
 
+            PSEUDO_MACRO_BEGIN,
+            PSEUDO_MACRO_END,
+
             PSEUDO_ALIAS,
 
             PSEUDO_EMPTY,

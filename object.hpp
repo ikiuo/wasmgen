@@ -83,6 +83,7 @@ namespace wasmgen
 
         void clear() noexcept;
         T* release() noexcept;
+        self& replace(T* object) noexcept;
 
     protected:
         static void incref(T* object) noexcept;
@@ -149,13 +150,6 @@ namespace wasmgen
         Singleton(T* pointer) noexcept;
     };
 
-    ///////////////////
-    // StdPtrList //
-    ///////////////////
-
-    template <typename T>
-    using StdPtrList = StdVector<Pointer<T>>;
-
     /////////////////
     // ObjectStack //
     /////////////////
@@ -163,11 +157,11 @@ namespace wasmgen
     template <typename T>
     class ObjectStack
         : virtual public Object
-        , public StdPtrList<T>
+        , public StdVector<Pointer<T>>
     {
         using self = ObjectStack<T>;
     public:
-        using stack = StdPtrList<T>;
+        using stack = StdVector<Pointer<T>>;
 
     public:
         ObjectStack();
@@ -417,6 +411,14 @@ namespace wasmgen
     }
 
     template <typename T>
+    inline Pointer<T>& Pointer<T>::replace(T* pointer) noexcept
+    {
+        decref();
+        object = pointer;
+        return *this;
+    }
+
+    template <typename T>
     inline void Pointer<T>::incref() const noexcept
     {
         incref(object);
@@ -481,8 +483,7 @@ namespace wasmgen
     template <typename T>
     inline RefPointer<T>& RefPointer<T>::operator =(T* object) noexcept
     {
-        super::decref();
-        super::object = object;
+        super::replace(object);
         return *this;
     }
 
@@ -557,7 +558,7 @@ namespace wasmgen
     }
 
     template <typename T>
-    inline T* ObjectStack<T>::pop()
+    inline T *ObjectStack<T>::pop()
     {
         if (stack::empty())
             return NULL;

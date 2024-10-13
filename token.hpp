@@ -343,7 +343,29 @@ namespace wasmgen
     using TokenRef = RefPointer<Token>;
     using NewToken = NewPointer<Token>;
 
-    /**/
+    ///////////////
+    // TokenList //
+    ///////////////
+
+    using TokenList = PointerArray<Token>;
+
+    using TokenListPtr = Pointer<TokenList>;
+    using TokenListRef = RefPointer<TokenList>;
+    using NewTokenList = NewPointer<TokenList>;
+
+    ///////////////////
+    // TokenListList //
+    ///////////////////
+
+    using TokenListList = PointerArray<TokenList>;
+
+    using TokenListListPtr = Pointer<TokenListList>;
+    using TokenListListRef = RefPointer<TokenListList>;
+    using NewTokenListList = NewPointer<TokenListList>;
+
+    /*
+     *
+     */
 
     bool Valid(const Token* token) noexcept;
     bool Invalid(const Token* token) noexcept;

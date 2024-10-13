@@ -88,6 +88,14 @@ namespace wasmgen
         children->push_back(fval);
     }
 
+    Expression::Expression(Token* op, ExpressionList* list) noexcept
+        : mode(LIST)
+        , token(op)
+        , children(list)
+    {
+        /*NOOP*/
+    }
+
     /**/
 
     void Expression::dump(int indent)
@@ -107,30 +115,30 @@ namespace wasmgen
             {
             case TokenID::NUMBER:
                 if (token->isfloat)
-                    message({"VALUE=", token->fvalue});
+                    message("VALUE=", token->fvalue);
                 else
-                    message({"VALUE=", token->ivalue});
-                message({" : \"", GetCStr(token), "\"\n"});
+                    message("VALUE=", token->ivalue);
+                message(" : \"", GetCStr(token), "\"\n");
                 break;
             case TokenID::NAME:
-                message({"NAME: \"", GetCStr(token), "\"\n"});
+                message("NAME: \"", GetCStr(token), "\"\n");
                 break;
             case TokenID::QUOTE:
-                message({"QUOTE: ", GetCStr(token), "\n"});
+                message("QUOTE: ", GetCStr(token), "\n");
                 break;
             default:
-                message({"<UNKNOWN:", int(token->id), "> : \"", GetCStr(token), "\"\n"});
+                message("<UNKNOWN:", int(token->id), "> : \"", GetCStr(token), "\"\n");
                 break;
             }
             break;
 
         case UNARY:
-            message({"UNARY='", GetCStr(token), "'\n"});
+            message("UNARY='", GetCStr(token), "'\n");
             n = 1;
             break;
 
         case BINARY:
-            message({"BINARY='", GetCStr(token), "'\n"});
+            message("BINARY='", GetCStr(token), "'\n");
             n = 2;
             break;
 
@@ -141,7 +149,7 @@ namespace wasmgen
 
         case LIST:
             n = children->size();
-            message("LIST[", n, "]:", GetCStr(token), "\n");
+            message("LIST[", n, "]: '", GetCStr(token), "'\n");
             break;
         }
 

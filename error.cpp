@@ -20,6 +20,13 @@ namespace wasmgen
         {ErrorCode::NO_ASSEMBLY_SWITCH_IF, {{-1,0},{" に対する @if がありません。"}}},
         {ErrorCode::INVALID_ASSEMBLY_SWITCH_ELIF, {{0},{"@else 後に @elif は配置できません。"}}},
         /**/
+        {ErrorCode::NO_MACRO_LABEL, {{-1,0},{" のラベルがありません。"}}},
+        {ErrorCode::EXIST_MACRO_NAME, {{0,-1,1},{"マクロ ", " は既に定義されています。"}}},
+        {ErrorCode::NESTED_MACRO_DEFINITIONS, {{0},{"マクロ定義が入れ子になっています。"}}},
+        {ErrorCode::NO_MACRO_ARGUMENT_NAME, {{0}, {"マクロ定義に引数名がありません。"}}},
+        {ErrorCode::LABEL_REPLACEMENT_FAILED, {{0}, {"ラベル名のマクロ展開に失敗しました。"}}},
+        {ErrorCode::NESTED_MACRO_EXPANSION, {{0},{"マクロ展開が入れ子になっています。"}}},
+        /**/
         {ErrorCode::INVALID_ESCAPE_SEQUENCE, {{0},{"無効なエスケープ シーケンスです。"}}},
         {ErrorCode::INVALID_OCTAL_CODE, {{0},{"無効な文字コードです。"}}},
         {ErrorCode::INVALID_NUMBER_FORMAT, {{0},{"無効な数値表現です。"}}},
@@ -119,6 +126,9 @@ namespace wasmgen
         {ErrorCode::ASSEMBLE_SWITCH_NO_ENDIF, {{-1,0},{" に対応する @endif がありません。"}}},
         {ErrorCode::ASSEMBLE_SWITCH_NO_SET, {{0},{"@set 項目がありません"}}},
         {ErrorCode::ASSEMBLE_SWITCH_NO_UNSET, {{0},{"@unset 項目がありません"}}},
+        /**/
+        {ErrorCode::IGNORE_MACRO_LABEL, {{0,-1,1},{"ラベル(",")は無視されます。"}}},
+        {ErrorCode::NO_MACRO_END, {{0},{"マクロ定義の終端がありません。"}}},
     };
 
 } // wasmgen

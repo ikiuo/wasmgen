@@ -14,6 +14,7 @@ namespace wasmgen
     class Parser : public Lexer
     {
     protected:
+        using MacroDataDict = StdStringMap<MacroDataPtr>;
         using SectionNameDict = StdStringMap<int8_t>;
         using ElementModeDict = StdStringMap<ElementMode>;
         using InstrMacroDict = StdStringMap<Instruction::MacroCode>;
@@ -77,7 +78,7 @@ namespace wasmgen
             ASMSWFlag() noexcept;
         };
 
-        using ASMSWStack = StdVector<ASMSWFlag>;
+        using ASMSWStack = StdVecStack<ASMSWFlag>;
 
     public:
         struct Option
@@ -104,6 +105,8 @@ namespace wasmgen
         static SingletonString ins_if;
         static SingletonString ins_loop;
 
+        static SingletonString ins_defmacro;
+
         static SingletonString ins_br_if;
         static SingletonString ins_return;
 
@@ -124,6 +127,8 @@ namespace wasmgen
 
         static InstrIter instr_end;
         static InstrIter instr_if;
+
+        static InstrIter instr_defmacro;
 
         static InstrIter instr_br_if;
         static InstrIter instr_return;
@@ -147,13 +152,19 @@ namespace wasmgen
         ASMSWStack asmsw_stack;
         ASMSWFlag asmsw_flag;
 
+        MacroDataDict macro_dict;
+        MacroDataPtr define_macro;
+        StdSet<StdString> macro_expand;
+
         CodeLinePtr code_line;
         CodeListPtr code_list;
-        SectionListPtr section_list;
         SectionPtr current_section;
         StringPtr current_module_name;
+
         InstructionEntry instruction_entry;
         PseudoDataEntry pseudo_data_entry;
+
+        SectionListPtr section_list;
 
         IdentifierPtr boolean_name;
         IdentifierListPtr predefined_name;
@@ -162,7 +173,9 @@ namespace wasmgen
         IdentifierPtr option_name;
         IdentifierListPtr asmsw_name;
 
+        IdentifierPtr macro_name;
         IdentifierPtr alias_name;
+
         IdentifierListPtr global_name;
         IdentifierListPtr typeidx_name;
         IdentifierListPtr funcidx_name;
@@ -201,6 +214,9 @@ namespace wasmgen
         bool parse_file(String* curdir, TextFileReader* reader);
         bool parse_line();
 
+        bool parse_macro();
+        bool parse_macro_append();
+
         bool parse_operands();
         Expression* parse_expression();
         Expression* parse_expr_assignment();
@@ -223,6 +239,9 @@ namespace wasmgen
         void parse_pseudo_include();
         void parse_pseudo_message();
         void parse_pseudo_option();
+        /*-*/
+        void parse_pseudo_macro_begin();
+        void parse_pseudo_macro_end();
         /**/
         void parse_pseudo_alias();
         /**/

@@ -61,6 +61,14 @@ namespace wasmgen
         NO_ASSEMBLY_SWITCH_IF,
         INVALID_ASSEMBLY_SWITCH_ELIF,
 
+        _MACRO_ = 1140,
+        NO_MACRO_LABEL,
+        EXIST_MACRO_NAME,
+        NESTED_MACRO_DEFINITIONS,
+        NO_MACRO_ARGUMENT_NAME,
+        LABEL_REPLACEMENT_FAILED,
+        NESTED_MACRO_EXPANSION,
+
         /**/
 
         _TOKEN = 1900,
@@ -204,6 +212,10 @@ namespace wasmgen
         ASSEMBLE_SWITCH_NO_ENDIF,
         ASSEMBLE_SWITCH_NO_SET,
         ASSEMBLE_SWITCH_NO_UNSET,
+
+        _WARNING_MACRO = 3200,
+        IGNORE_MACRO_LABEL,
+        NO_MACRO_END,
     };
 
     struct ErrorMessageData

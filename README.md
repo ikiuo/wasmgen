@@ -149,10 +149,50 @@ numtype と vectype では同型で符号の扱いが存在する表現があり
 # 疑似命令
 
 
+## <code>.defmacro</code>および<code>.endmacro</code>疑似命令
+
+```
+name        .defmacro       arg1, arg2, ...
+            ;# この行から
+            ;#    @で始まる疑似命令を除く
+            ;#    .endmacro の直前行までを
+            ;#    <name> 命令として展開する
+            ;#       オペランド <arg1>,<arg2>,... は置換される情報
+            ;# この行まで
+            .endmacro       ;# マクロ定義終わり
+```
+
+<code>name</code>名で<code>.defmacro</code>の次の行から<code>.endmacro</code>直前の行までをマクロを登録します。
+
+
+### マクロ定義・使用例
+
+```
+$i32.inc    .defmacro       labelidx
+            local.get       labelidx
+            i32.const       1
+            i32.add
+            local.set       labelidx
+            .endmacro
+
+func1       .code
+n           .local          i32
+            ;# ...
+            $i32.inc        n
+            ;# ここに
+            ;#   local.get  n
+            ;#   i32.const  1
+            ;#   i32.add
+            ;#   local.set  n
+            ;# が展開される
+            ;# ...
+```
+
+
 ## <code>.alias</code>疑似命令
 
 ```
-name    .alias          value
+name        .alias          value
 ```
 
 <code>name</code>を<code>value</code>として扱います。

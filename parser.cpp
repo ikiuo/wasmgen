@@ -117,7 +117,11 @@ namespace wasmgen
         &Parser::parse_pseudo_message,
         &Parser::parse_pseudo_option,
         /**/
+        &Parser::parse_pseudo_macro_begin,
+        &Parser::parse_pseudo_macro_end,
+        /**/
         &Parser::parse_pseudo_alias,
+        /**/
         /**/
         &Parser::parse_pseudo_empty,
         &Parser::parse_pseudo_binary,
@@ -154,6 +158,8 @@ namespace wasmgen
     SingletonString Parser::ins_if("if");
     SingletonString Parser::ins_loop("loop");
 
+    SingletonString Parser::ins_defmacro("defmacro");
+
     SingletonString Parser::ins_br_if("br_if");
     SingletonString Parser::ins_return("return");
 
@@ -179,6 +185,8 @@ namespace wasmgen
     InstrIter Parser::instr_end;
     InstrIter Parser::instr_if;
 
+    InstrIter Parser::instr_defmacro;
+
     InstrIter Parser::instr_br_if;
     InstrIter Parser::instr_return;
 
@@ -198,6 +206,8 @@ namespace wasmgen
 
         instr_end = Instruction::table.find(*ins_end);
         instr_if = Instruction::table.find(*ins_if);
+
+        instr_defmacro = Instruction::table.find(*ins_defmacro);
 
         instr_br_if = Instruction::table.find(*ins_br_if);
         instr_return = Instruction::table.find(*ins_return);
@@ -223,10 +233,11 @@ namespace wasmgen
         , expr_nest()
           /**/
         , code_line()
-        , section_list(new SectionList)
           /**/
         , instruction_entry(&Parser::parse_invalid_line)
         , pseudo_data_entry(&Parser::parse_invalid_line)
+          /**/
+        , section_list(new SectionList)
           /**/
         , boolean_name(new Identifier)
         , predefined_name(new IdentifierList)
@@ -235,7 +246,9 @@ namespace wasmgen
         , option_name(new Identifier)
         , asmsw_name(new IdentifierList)
           /**/
+        , macro_name(new Identifier)
         , alias_name(new Identifier)
+          /**/
         , global_name(new IdentifierList)
         , typeidx_name(new IdentifierList)
         , funcidx_name(new IdentifierList)
@@ -424,6 +437,9 @@ namespace wasmgen
     {
         while (parse_line())
             ; /*NOOP*/
+
+        if (define_macro)
+            define_macro = nullptr;
         return !error_count;
     }
 
@@ -445,6 +461,9 @@ namespace wasmgen
     {
         auto eit = Instruction::table.end();
         auto it = eit;
+
+        auto meit = macro_dict.end();
+        auto mit = meit;
 
         asmsw_skip = asmsw_flag.skip;
         code_line = new CodeLine;
@@ -469,8 +488,15 @@ namespace wasmgen
             return Valid(rt = feed_eol());
         }
 
+        bool instr = false;
+
         it = Instruction::table.find(rt->text);
-        if (it == eit)
+        if (!(instr = it != eit))
+        {
+            mit = macro_dict.find(rt->text);
+            instr = mit != meit;
+        }
+        if (!instr)
         {
             if (asmsw_skip)
                 return Valid(rt = feed_eol());
@@ -480,9 +506,16 @@ namespace wasmgen
             if (Valid(rt) && (*rt == ':'))
                 rt = next_token();
             if (Valid(rt) && *rt == TokenID::NAME)
+            {
                 it = Instruction::table.find(rt->text);
+                if (!(instr = it != eit))
+                {
+                    mit = macro_dict.find(rt->text);
+                    instr = mit != meit;
+                }
+            }
         }
-        if (it != eit)
+        if (instr)
         {
             if (asmsw_skip)
             {
@@ -494,15 +527,23 @@ namespace wasmgen
             }
 
             code_line->instr = rt;
+            if (it == eit)
+                it = instr_defmacro;
             code_line->instab = it;
+            if (mit != meit)
+                code_line->macro = mit->second;
             if (!parse_operands())
                 return false;
             rt = next_token();
         }
         if (Valid(rt) && *rt != TokenID::EOL)
         {
+            TokenRef eol = feed_eol();
+
+            if (define_macro)
+                return parse_macro_append();
             parse_error(ErrorCode::SYNTAX_ERROR, {rt});
-            return Valid(rt = feed_eol());
+            return Valid(eol);
         }
 
         /**/
@@ -517,11 +558,9 @@ namespace wasmgen
                 Token* ltoken = code_line->label; assert(ltoken);
                 FileString* ltext = ltoken->text; assert(ltext);
 
-                message({
-                        ltext->file_name->c_str(), ":",
+                message(ltext->file_name->c_str(), ":",
                         ltext->text_pos.line, ": label=\"",
-                        ltext->c_str(), "\"",
-                    });
+                        ltext->c_str(), "\"");
                 fname = true;
             }
             if (code_line->instr)
@@ -530,20 +569,18 @@ namespace wasmgen
                 FileString* itext = itoken->text; assert(itext);
 
                 if (!fname)
-                    message({
-                            itext->file_name->c_str(), ":",
-                            itext->text_pos.line, ": "
-                        });
+                    message(itext->file_name->c_str(), ":",
+                            itext->text_pos.line, ": ");
                 else
                     message(", ");
-                message({ "instr=\"", itext->c_str(), "\"" });
+                message("instr=\"", itext->c_str(), "\"");
             }
             message("\n");
             if (ops->size())
             {
                 for (auto i : inc_range<size_t>(ops->size()))
                 {
-                    message({"    operand[", i, "]:\n"});
+                    message("    operand[", i, "]:\n");
                     (*ops)[i]->dump(2);
                 }
             }
@@ -559,24 +596,150 @@ namespace wasmgen
             code_line->instr = Transfer(current_token);
             code_line->instab = it = instr_dummy;
         }
-        assert(it != eit);
+        if (it != eit)
+        {
+            auto& operation = it->second.operation;
+            Instruction::PseudoCode pcode(operation);
 
-        Instruction::PseudoCode pcode(it->second.operation);
+            if (define_macro)
+            {
+                switch (pcode)
+                {
+                case Instruction::PSEUDO_ASSMBLE_SWITCH:
+                case Instruction::PSEUDO_INCLUDE:
+                case Instruction::PSEUDO_MESSAGE:
+                case Instruction::PSEUDO_OPTION:
+                case Instruction::PSEUDO_MACRO_BEGIN:
+                case Instruction::PSEUDO_MACRO_END:
+                    break;
+                default:
+                    return parse_macro_append();
+                }
+            }
+            (this->*pseudo_entry[pcode])();
+            return true;
+        }
 
-        (this->*pseudo_entry[pcode])();
-        return true;
+        assert(mit != meit);
+        return parse_macro();
+    }
+
+    bool Parser::parse_macro_append()
+    {
+        assert(define_macro);
+
+        if (!token_line->size())
+            return false;
+
+        Token* et = &token_line->back(); assert(et);
+        bool newline = (et->id == TokenID::EOL);
+
+        if (!newline)
+        {
+            parse_warning(ErrorCode::NO_MACRO_END, {et});
+
+            FileString* text = new FileString;
+            Token* eol = new Token(TokenID::EOL, text);
+
+            text->file_name = et->text->file_name;
+            text->text_pos = et->text->text_pos;
+
+            token_line->push_back(eol);
+        }
+        define_macro->code.push_back(token_line);
+        if (!newline)
+            define_macro = nullptr;
+        return newline;
+    }
+
+    bool Parser::parse_macro()
+    {
+        CodeLinePtr line = code_line;
+        Token* instr = line->instr; assert(instr);
+        String* instr_name = instr->text; assert(instr_name);
+
+        if (macro_expand.find(*instr_name) != macro_expand.end())
+            return parse_error(ErrorCode::NESTED_MACRO_EXPANSION, {instr});
+        macro_expand.insert(*instr_name);
+
+        WASMGEN_DEBUG(2, "MACRO: start=\"", *instr_name ,"\"\n");
+
+        MacroData* macro = line->macro; assert(macro);
+        CodeLine* mline = macro->line; assert(mline);
+        ExpressionList* mops = mline->operands; assert(mops);
+        ExpressionList* ops = line->operands; assert(ops);
+
+        if (!check_operands(line, mops->size(), mops->size()))
+            return false;
+
+        NewIdentifier idmap;
+
+        for (auto n : inc_range<size_t>(mops->size()))
+        {
+            Expression* mop = (*mops)[n];
+            Expression* op = (*ops)[n];
+            String* name = mop->getname();
+
+            if (!name)
+                return parse_error(ErrorCode::NO_MACRO_ARGUMENT_NAME, {mop->token});
+            (*idmap)[*name] = op;
+        }
+
+        auto& mcode = macro->code;
+        size_t tspos = token_stack.size();
+
+        for (auto rl = mcode.rbegin(); rl != mcode.rend(); ++rl)
+        {
+            auto& cline = *rl;
+
+            for (auto rc = cline->rbegin(); rc != cline->rend(); ++rc)
+            {
+                Token* token = *rc; assert(token);
+                Expression* expr = idmap->getexpr(token->text);
+
+                if (!expr)
+                {
+                    puttoken(token);
+                    continue;
+                }
+
+                TokenList* tlist = expr->token_list; assert(tlist);
+
+                for (auto rt = tlist->rbegin(); rt != tlist->rend(); ++rt)
+                    puttoken(*rt);
+            }
+        }
+
+        while (tspos < token_stack.size())
+            if (!parse_line())
+                break;
+        macro_expand.erase(*instr_name);
+
+        WASMGEN_DEBUG(2, "MACRO: end=\"", *instr_name,"\"\n");
+
+        if (error_count)
+            parse_message(instr, " ここでマクロを展開しています。\n");
+        return !error_count;
     }
 
     /**/
 
     bool Parser::parse_operands()
     {
+        bool success = true;
+
         for (;;)
         {
+            size_t xbeg = token_line->size();
             ExpressionRef expr(parse_expression());
+            size_t xend = token_line->size();
 
             if (!expr)
                 break;
+
+            auto tbeg = token_line->begin();
+
+            expr->token_list = new TokenList(tbeg + xbeg, tbeg + xend);
 
             ExpressionList* ops = code_line->operands; assert(ops);
 
@@ -585,14 +748,17 @@ namespace wasmgen
             TokenRef rt = next_token();
 
             if (Invalid(rt))
-                return false;
+            {
+                success = false;
+                break;
+            }
             if (*rt != TokenID::CHAR_COMMA)
             {
                 puttoken(rt);
-                return true;
+                break;
             }
         }
-        return true;
+        return success;
     }
 
     /*
@@ -1020,8 +1186,7 @@ namespace wasmgen
                 parse_error(ErrorCode::NO_ASSEMBLY_SWITCH_IF, {line->instr});
                 return;
             }
-            asmsw_flag = asmsw_stack.back();
-            asmsw_stack.pop_back();
+            asmsw_flag = asmsw_stack.pop();
 
             WASMGEN_DEBUG(2, "@endif (nest=", asmsw_stack.size(), ")\n");
             break;
@@ -1169,6 +1334,56 @@ namespace wasmgen
         update_option();
     }
 
+    void Parser::parse_pseudo_macro_begin()
+    {
+        WASMGEN_DEBUG(2, "DEFMACRO: start\n");
+
+        auto& line = code_line;
+        Token* label = line->label;
+
+        if (define_macro)
+        {
+            parse_error(ErrorCode::NESTED_MACRO_DEFINITIONS, {label});
+            return;
+        }
+        if (!label)
+        {
+            parse_error(ErrorCode::NO_MACRO_LABEL, {line->instr});
+            return;
+        }
+
+        String* name = label->text; assert(name);
+
+        if (macro_name->has(*name))
+        {
+            parse_error(ErrorCode::EXIST_MACRO_NAME, {label});
+            return;
+        }
+
+        ExpressionList* ops = line->operands; assert(ops);
+
+        (*macro_name)[*name] = new Expression(label, ops);
+
+        define_macro = new MacroData(line);
+        define_macro->line = line;
+
+        macro_dict[*name] = define_macro;
+    }
+
+    void Parser::parse_pseudo_macro_end()
+    {
+        WASMGEN_DEBUG(2, "DEFMACRO: end\n");
+
+        auto& line = code_line;
+        Token* label = line->label;
+
+        if (label)
+            parse_warning(ErrorCode::IGNORE_CODE_LABEL, {label});
+        check_operands(line, 0, 0);
+
+        define_macro = nullptr;
+    }
+
     void Parser::parse_pseudo_alias()
     {
         auto& line = code_line;
@@ -1250,7 +1465,8 @@ namespace wasmgen
 
             if (freader->valid())
             {
-                parse_file((*dnf)[0], freader);
+                if (!parse_file((*dnf)[0], freader))
+                    parse_message(tname, " ここからインクルードしています。\n");
                 return;
             }
         }
@@ -1261,7 +1477,8 @@ namespace wasmgen
 
             if (freader->valid())
             {
-                parse_file((*dnf)[0], freader);
+                if (!parse_file((*dnf)[0], freader))
+                    parse_message(tname, " ここからインクルードしています。\n");
                 return;
             }
         }
@@ -3152,17 +3369,13 @@ namespace wasmgen
                 list->code_end = line;
             else
             {
-                if (!list->pass)
-                {
-                    CodeLine* sline = list->block_stack.back();
+                CodeLineRef sline = list->block_stack.pop();
 
-                    if (!sline->label)
-                    {
-                        sline->label = label;
-                        use_label = true;
-                    }
+                if (!list->pass && !sline->label)
+                {
+                    sline->label = label;
+                    use_label = true;
                 }
-                list->block_stack.pop_back();
             }
             if (!update_br_idx(list))
                 return false;

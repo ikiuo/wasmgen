@@ -1147,6 +1147,9 @@ namespace wasmgen
             /**/
             PSEUDO(".memidx", DPC_MEMIDX),
             /*-*/
+            PSEUDO(".defmacro", PSEUDO_MACRO_BEGIN),
+            PSEUDO(".endmacro", PSEUDO_MACRO_END),
+            /*-*/
             PSEUDO(".alias", PSEUDO_ALIAS),
             /*-*/
             PSEUDO("@if",    ASW_IF),

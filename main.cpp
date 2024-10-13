@@ -5,9 +5,9 @@
 #include "wmain.hpp"
 
 #define WASMGEN_VERSION_MAJOR    0
-#define WASMGEN_VERSION_MINOR    1
-#define WASMGEN_VERSION_RELEASE  4
-#define WASMGEN_VERSION_STRING   "0.1.4"
+#define WASMGEN_VERSION_MINOR    2
+#define WASMGEN_VERSION_RELEASE  0
+#define WASMGEN_VERSION_STRING   "0.2.0"
 
 using namespace wasmgen;
 using StrKeyValue = StdStringMap<StringPtr>;
@@ -40,7 +40,7 @@ static void get_wasmgen_include()
 
     if (senv)
     {
-        message({"senv:", senv->c_str(), "\n"});
+        message("senv:", senv->c_str(), "\n");
 
         StringListRef ienv(senv->split(WASMGEN_TARGET_WINDOWS ? ';' : ':'));
 
@@ -479,7 +479,7 @@ int main(int argc, char** argv, char** envp)
 
     if (!freader->valid())
     {
-        message({"open failed: ", freader->c_path(), "\n"});
+        message("open failed: ", freader->c_path(), "\n");
         return 2;
     }
     freader->show_info();
@@ -509,13 +509,13 @@ int main(int argc, char** argv, char** envp)
 
     output = new String(argv[1]);
 
-    verbose({ "Output: ", output->c_str(), "\n" });
+    verbose("Output: ", output->c_str(), "\n");
 
     NewFileWriter fwriter(&output);
 
     if (!fwriter->write(binary))
     {
-        message({"Write error: ", output->c_str(), "\n"});
+        message("Write error: ", output->c_str(), "\n");
         return 2;
     }
     return 0;

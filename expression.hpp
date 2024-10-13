@@ -49,6 +49,7 @@ namespace wasmgen
         Mode mode;
         TokenPtr token;
         ExpressionListPtr children;
+        TokenListPtr token_list;
 
     public:
         Expression() noexcept;
@@ -57,6 +58,7 @@ namespace wasmgen
         Expression(Token* op, Expression* value) noexcept;
         Expression(Token* op, Expression* lhs, Expression* rhs) noexcept;
         Expression(Token* op, Expression* cval, Expression* tval, Expression* fval) noexcept;
+        Expression(Token* op, ExpressionList* list) noexcept;
 
         operator Token*() noexcept;
         operator const Token*() const noexcept;

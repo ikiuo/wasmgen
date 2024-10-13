@@ -28,7 +28,10 @@ namespace wasmgen
     Lexer::Lexer(TextFileReader* reader) noexcept
         : freader()
         , text_pos(0, 0)
-        , save_text_pos(0, 0)
+        , save_pos(0, 0)
+          /**/
+        , token_eol(false)
+          /**/
         , nestable_comment(false)
         , nested_comments(false)
         , asmsw_skip(false)
@@ -63,8 +66,8 @@ namespace wasmgen
 
     bool Lexer::fetchar()
     {
-        assert(text_pos.line <= file_line.size());
-        if (text_pos.line >= file_line.size())
+        assert(text_pos.line <= file_line->size());
+        if (text_pos.line >= file_line->size())
         {
             FileStringRef line = freader->readline();
             CharType LF = '\n';
@@ -74,11 +77,11 @@ namespace wasmgen
 
             if (line->back() != LF)
                 line->push_back(LF);
-            file_line.push_back(line);
+            file_line->push_back(line);
             text_pos.column = 0;
             return true;
         }
-        if (text_pos.column < file_line[text_pos.line]->size())
+        if (text_pos.column < (*file_line)[text_pos.line]->size())
             return true;
         ++text_pos.line;
         return fetchar();
@@ -93,26 +96,43 @@ namespace wasmgen
         if (token_stack)
             return token_stack.pop();
         if (!fetchar())
+        {
+            token_eol = true;
             return nullptr;
+        }
+        if (token_eol)
+        {
+            token_line = new TokenList;
+            token_eol = false;
+        }
+
         prepare_token();
 
         UCharType c = getchar();
 
         (this->*token_entry[c])(c);
-        return Finish(current_token);
+
+        Token* token = Finish(current_token);
+
+        assert(token_line);
+        token_line->push_back(token);
+
+        token_eol = token->id == TokenID::EOL;
+        return token;
     }
 
     /**/
 
     void Lexer::prepare_token()
     {
-        current_text = new FileString("");
-        current_token = new Token(TokenID::UNDEF, current_text);
+        FileString *line = (*file_line)[text_pos.line];
+        NewFileString text("");
 
-        FileString *line = file_line[text_pos.line];
+        text->file_name = freader->path();
+        text->text_pos.set(line->text_pos.line, text_pos.column);
 
-        current_text->file_name = freader->path();
-        current_text->text_pos.set(line->text_pos.line, text_pos.column);
+        current_token = new Token(TokenID::UNDEF, text);
+        current_text = Transfer(text);
     }
 
     void Lexer::gettoken_char(UCharType c)
@@ -638,17 +658,25 @@ namespace wasmgen
     {
         assert(reader);
         if (freader)
+        {
             freader_stack.push_back(freader);
+            line_stack.push_back(file_line);
+            pos_stack.push_back(text_pos);
+        }
         freader = reader;
+        file_line = new FileStringList;
+        token_line = new TokenList;
+        text_pos.clear();
     }
 
     void Lexer::pop_reader()
     {
-        if (freader_stack.size())
-        {
-            freader = freader_stack.back();
-            freader_stack.pop_back();
-        }
+        if (freader_stack)
+            freader.replace(freader_stack.pop());
+        if (line_stack)
+            file_line.replace(line_stack.pop());
+        if (pos_stack)
+            text_pos = pos_stack.pop();
     }
 
     //////////////
