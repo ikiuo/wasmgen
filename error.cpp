@@ -25,7 +25,7 @@ namespace wasmgen
         {ErrorCode::NESTED_MACRO_DEFINITIONS, {{0},{"マクロ定義が入れ子になっています。"}}},
         {ErrorCode::NO_MACRO_ARGUMENT_NAME, {{0}, {"マクロ定義に引数名がありません。"}}},
         {ErrorCode::LABEL_REPLACEMENT_FAILED, {{0}, {"ラベル名のマクロ展開に失敗しました。"}}},
-        {ErrorCode::NESTED_MACRO_EXPANSION, {{0},{"マクロ展開が入れ子になっています。"}}},
+        {ErrorCode::NESTED_MACRO_EXPANSION, {{0,-1,1},{"マクロ \"","\" 展開が入れ子になっています。"}}},
         /**/
         {ErrorCode::INVALID_ESCAPE_SEQUENCE, {{0},{"無効なエスケープ シーケンスです。"}}},
         {ErrorCode::INVALID_OCTAL_CODE, {{0},{"無効な文字コードです。"}}},

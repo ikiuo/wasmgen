@@ -317,6 +317,8 @@ namespace wasmgen
         bool missing_quote;
         StringPtr quote;
 
+        size_t line_index;
+
     public:
         Token() noexcept;
         Token(TokenID id) noexcept;

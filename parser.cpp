@@ -232,7 +232,7 @@ namespace wasmgen
         , expr_error()
         , expr_nest()
           /**/
-        , code_line()
+        , macro_file(new TextFileReader(new FileData))
           /**/
         , instruction_entry(&Parser::parse_invalid_line)
         , pseudo_data_entry(&Parser::parse_invalid_line)
@@ -656,15 +656,14 @@ namespace wasmgen
     {
         CodeLinePtr line = code_line;
         Token* instr = line->instr; assert(instr);
-        String* instr_name = instr->text; assert(instr_name);
+        String* instr_text = instr->text; assert(instr_text);
+        StdString& name = *instr_text;
 
-#if 0
-        if (macro_expand.find(*instr_name) != macro_expand.end())
+        WASMGEN_DEBUG(2, "MACRO: start=\"", name ,"\"\n");
+
+        if (macro_expand.find(name) != macro_expand.end())
             return parse_error(ErrorCode::NESTED_MACRO_EXPANSION, {instr});
-        macro_expand.insert(*instr_name);
-#endif
-
-        WASMGEN_DEBUG(2, "MACRO: start=\"", *instr_name ,"\"\n");
+        macro_expand.insert(name);
 
         MacroData* macro = line->macro; assert(macro);
         CodeLine* mline = macro->line; assert(mline);
@@ -687,9 +686,11 @@ namespace wasmgen
             (*idmap)[*name] = op;
         }
 
-        auto& mcode = macro->code;
-        size_t tspos = token_stack.size();
+        assert(!token_stack.size());
 
+        auto& mcode = macro->code;
+
+        push_reader(macro_file);
         for (auto rl = mcode.rbegin(); rl != mcode.rend(); ++rl)
         {
             auto& cline = *rl;
@@ -701,28 +702,27 @@ namespace wasmgen
 
                 if (!expr)
                 {
-                    puttoken(token);
+                    puttoken(token, true);
                     continue;
                 }
 
-                TokenList* tlist = expr->token_list; assert(tlist);
+                NewTokenList tlist;
 
+                expr->gettokenlist(tlist);
                 for (auto rt = tlist->rbegin(); rt != tlist->rend(); ++rt)
-                    puttoken(*rt);
+                    puttoken(*rt, true);
             }
         }
-
-        while (tspos < token_stack.size())
-            if (!parse_line())
-                break;
-#if 0
-        macro_expand.erase(*instr_name);
-#endif
-
-        WASMGEN_DEBUG(2, "MACRO: end=\"", *instr_name,"\"\n");
+        while (parse_line())
+            ;
+        pop_reader();
 
         if (error_count)
             parse_message(instr, " ここでマクロを展開しています。\n");
+        macro_expand.erase(name);
+
+        WASMGEN_DEBUG(2, "MACRO: end=\"", name,"\"\n");
+
         return !error_count;
     }
 
@@ -734,16 +734,10 @@ namespace wasmgen
 
         for (;;)
         {
-            size_t xbeg = token_line->size();
             ExpressionRef expr(parse_expression());
-            size_t xend = token_line->size();
 
             if (!expr)
                 break;
-
-            auto tbeg = token_line->begin();
-
-            expr->token_list = new TokenList(tbeg + xbeg, tbeg + xend);
 
             ExpressionList* ops = code_line->operands; assert(ops);
 
@@ -807,11 +801,13 @@ namespace wasmgen
 
         ExpressionRef val = parse_expression();
 
-        if (val)
-            return NewRef<Expression>(op, new Expression(sym), val);
+        if (!val)
+        {
+            parse_error(ErrorCode::SYNTAX_ERROR, {op});
+            return nullptr;
+        }
 
-        parse_error(ErrorCode::SYNTAX_ERROR, {op});
-        return nullptr;
+        return NewRef<Expression>(op, new Expression(sym), val);
     }
 
     Expression* Parser::parse_expr_conditional()
@@ -853,7 +849,13 @@ namespace wasmgen
             return Finish(res ? op2 : op3);
         }
 
-        return NewRef<Expression>(sym1, op1, op2, op3);
+        NewExpression expr(sym1, op1, op2, op3);
+        NewTokenList xtlist;
+
+        xtlist->push_back(sym1);
+        xtlist->push_back(sym2);
+        expr->token_list = Transfer(xtlist);
+        return Finish(expr);
     }
 
     Expression* Parser::parse_expr_binary(int pop)
@@ -951,7 +953,13 @@ namespace wasmgen
                 if (!value)
                     break;
                 if (value->children->size() == 1)
-                    value = Transfer((*value->children)[0]);
+                {
+                    auto& child = (*value->children)[0];
+
+                    value->paren_open = child->paren_open;
+                    value->paren_close = child->paren_close;
+                    value = Transfer(child);
+                }
                 return Finish(value);
             }
             break;
@@ -976,9 +984,11 @@ namespace wasmgen
     Expression* Parser::parse_expr_list(TokenID cid, Token* st)
     {
         NewExpression expr(Expression::LIST);
+        NewTokenList xtlist;
         TokenPtr rt = st;
 
         expr->token = st;
+        expr->paren_open = st;
         for (;;)
         {
             rt = next_token();
@@ -996,9 +1006,14 @@ namespace wasmgen
             if (Invalid(rt))
                 break;
             if (*rt == cid)
+            {
+                expr->token_list = Transfer(xtlist);
+                expr->paren_close = rt;
                 return Finish(expr);
+            }
             if (*rt != TokenID(','))
                 break;
+            xtlist->push_back(rt);
         }
         parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
         return nullptr;

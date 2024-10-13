@@ -98,6 +98,62 @@ namespace wasmgen
 
     /**/
 
+    void Expression::gettokenlist(TokenList* list)
+    {
+        if (paren_open)
+            list->push_back(paren_open);
+        switch (mode)
+        {
+        case EMPTY:
+            break;
+        case VALUE:
+            list->push_back(token);
+            break;
+
+        case UNARY:
+            list->push_back(token);
+            (*children)[0]->gettokenlist(list);
+            break;
+
+        case BINARY:
+            (*children)[0]->gettokenlist(list);
+            list->push_back(token);
+            (*children)[1]->gettokenlist(list);
+            break;
+
+        case CONDITIONAL:
+            (*children)[0]->gettokenlist(list);
+            list->push_back((*token_list)[0]);
+            (*children)[1]->gettokenlist(list);
+            list->push_back((*token_list)[1]);
+            (*children)[2]->gettokenlist(list);
+            break;
+
+        case LIST:
+            {
+                size_t csz = children->size();
+                size_t tsz = token_list->size();
+                size_t nsz = std::min<size_t>(csz, tsz);
+
+                for (auto n : inc_range<size_t>(nsz))
+                {
+                    (*children)[n]->gettokenlist(list);
+                    list->push_back((*token_list)[n]);
+                }
+                if (tsz < csz)
+                {
+                    assert(csz == (tsz + 1));
+                    (*children)[tsz]->gettokenlist(list);
+                }
+            }
+            break;
+        }
+        if (paren_close)
+            list->push_back(paren_close);
+    }
+
+    /**/
+
     void Expression::dump(int indent)
     {
         String padding(indent++ * 4, ' ');

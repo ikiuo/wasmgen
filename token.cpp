@@ -46,6 +46,7 @@ namespace wasmgen
         , ivalue(0)
         , fvalue(0)
         , missing_quote(false)
+        , line_index(0)
     {
         /*NOOP*/
     }

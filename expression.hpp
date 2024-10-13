@@ -50,6 +50,8 @@ namespace wasmgen
         TokenPtr token;
         ExpressionListPtr children;
         TokenListPtr token_list;
+        TokenPtr paren_open;
+        TokenPtr paren_close;
 
     public:
         Expression() noexcept;
@@ -76,6 +78,8 @@ namespace wasmgen
         const char *gettokencstr() noexcept;
         const char *getnamecstr() noexcept;
         const char *getstrcstr() noexcept;
+
+        void gettokenlist(TokenList* list);
 
         void dump(int indent = 0);
 

@@ -95,17 +95,14 @@ namespace wasmgen
             return nullptr;
         if (token_stack)
             return token_stack.pop();
+        if (alt_token_stack)
+            return alt_token_stack.pop();
         if (!fetchar())
         {
             token_eol = true;
             return nullptr;
         }
-        if (token_eol)
-        {
-            token_line = new TokenList;
-            token_eol = false;
-        }
-
+        update_token_line();
         prepare_token();
 
         UCharType c = getchar();
@@ -115,6 +112,7 @@ namespace wasmgen
         Token* token = Finish(current_token);
 
         assert(token_line);
+        token->line_index = token_line->size();
         token_line->push_back(token);
 
         token_eol = token->id == TokenID::EOL;

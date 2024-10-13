@@ -55,6 +55,7 @@ namespace wasmgen
         bool token_eol;
 
         TokenStack token_stack;
+        TokenStack alt_token_stack;
         FileStringPtr current_text;
         TokenPtr current_token;
 
@@ -73,7 +74,7 @@ namespace wasmgen
         Lexer(TextFileReader* reader) noexcept;
 
         Token* gettoken();
-        void puttoken(Token* token) noexcept;
+        void puttoken(Token* token, bool alt = false) noexcept;
 
     protected:
         void prepare(const CharSet& cs, TokenEntry entry) noexcept;
@@ -88,6 +89,7 @@ namespace wasmgen
         bool fetchar();
         UCharType getchar() noexcept;
         void rewindchar() noexcept;
+        void update_token_line();
 
         void prepare_token();
 
@@ -161,9 +163,9 @@ namespace wasmgen
 
     /**/
 
-    inline void Lexer::puttoken(Token* token) noexcept
+    inline void Lexer::puttoken(Token* token, bool alt) noexcept
     {
-        token_stack.push(token);
+        (!alt ? token_stack : alt_token_stack).push(token);
     }
 
     /**/
@@ -209,6 +211,15 @@ namespace wasmgen
     inline void Lexer::rewindchar() noexcept
     {
         text_pos = save_pos;
+    }
+
+    inline void Lexer::update_token_line()
+    {
+        if (token_eol)
+        {
+            token_line = new TokenList;
+            token_eol = false;
+        }
     }
 
     template <typename T>

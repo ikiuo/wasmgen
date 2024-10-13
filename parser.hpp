@@ -155,6 +155,7 @@ namespace wasmgen
         MacroDataDict macro_dict;
         MacroDataPtr define_macro;
         StdSet<StdString> macro_expand;
+        TextFileReaderPtr macro_file;
 
         CodeLinePtr code_line;
         CodeListPtr code_list;
