@@ -386,7 +386,9 @@ namespace wasmgen
 
         StdString make_error_message(ErrorCode ecode, const char* prefix, const PTokenList& token_list);
 
-        void parse_message(const Token* token, const char* msg);
+        void parse_message(const Token* token, const StringBlock& msg);
+        template <typename ...Args> void parse_message(const Token* token, Args... args);
+
         bool parse_error(ErrorCode code, const PTokenList& token_list);
         bool parse_expr_error(ErrorCode code, const PTokenList& token_list);
         void parse_warning(ErrorCode code, const PTokenList& token_list);
@@ -587,9 +589,15 @@ namespace wasmgen
      *
      */
 
-    inline void Parser::parse_message(const Token* token, const char* msg)
+    inline void Parser::parse_message(const Token* token, const StringBlock& msg)
     {
         token_message(token, msg);
+    }
+
+    template <typename ...Args>
+    inline void Parser::parse_message(const Token* token, Args... args)
+    {
+        token_message(token, args...);
     }
 
     inline void Parser::parse_warning_too_many_operands(CodeLine* line, ExpressionList* ops, size_t n)

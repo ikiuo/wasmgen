@@ -126,6 +126,8 @@ namespace wasmgen
 
         void token_message(const Token* token, const char* msg);
         void token_message(const Token* token, const StringBlock &msg);
+        template <typename ...Args> void token_message(const Token* token, Args... args);
+
         void token_error(ErrorCode code);
 
         void push_reader(TextFileReader* reader);
@@ -272,6 +274,12 @@ namespace wasmgen
     inline void Lexer::token_message(const Token* token, const StringBlock &msg)
     {
         token_message(token, msg.c_str());
+    }
+
+    template <typename ...Args>
+    inline void Lexer::token_message(const Token* token, Args... args)
+    {
+        token_message(token, StringBlock{args...});
     }
 
 } // wasmgen
