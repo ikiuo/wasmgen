@@ -20,7 +20,7 @@ namespace wasmgen
         size_t line;
         size_t column;
 
-        FileTextPos() noexcept = default;
+        FileTextPos() noexcept;
         constexpr FileTextPos(size_t line, size_t column) noexcept;
 
         constexpr void clear() noexcept;
@@ -288,6 +288,9 @@ namespace wasmgen
     /////////////////
     // FileTextPos //
     ////////////////
+
+    inline FileTextPos::FileTextPos() noexcept
+        : FileTextPos(0, 0) {}
 
     inline constexpr FileTextPos::FileTextPos(size_t l, size_t c) noexcept
         : line(l)

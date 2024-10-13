@@ -561,7 +561,7 @@ namespace wasmgen
     inline T *ObjectStack<T>::pop()
     {
         if (stack::empty())
-            return NULL;
+            return nullptr;
 
         T* object = Finish(stack::back());
 

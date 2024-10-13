@@ -688,8 +688,10 @@ namespace wasmgen
 
         assert(!token_stack.size());
 
+        TokenStack save_token_stack = alt_token_stack;
         auto& mcode = macro->code;
 
+        alt_token_stack.clear();
         push_reader(macro_file);
         for (auto rl = mcode.rbegin(); rl != mcode.rend(); ++rl)
         {
@@ -716,6 +718,7 @@ namespace wasmgen
         while (parse_line())
             ;
         pop_reader();
+        static_cast<TokenStack::stack&>(alt_token_stack) = save_token_stack;
 
         if (error_count)
             parse_message(instr, " ここでマクロを展開しています。\n");
