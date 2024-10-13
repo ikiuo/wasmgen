@@ -621,6 +621,8 @@ namespace wasmgen
         }
 
         assert(mit != meit);
+        if (define_macro)
+            return parse_macro_append();
         return parse_macro();
     }
 
