@@ -14,7 +14,6 @@ namespace wasmgen
     class Lexer : virtual public Object
     {
     protected:
-        using TokenStack = ObjectStack<Token>;
         using TokenEntry = void (Lexer::*)(UCharType c);
 
         enum
@@ -55,7 +54,7 @@ namespace wasmgen
         bool token_eol;
 
         TokenStack token_stack;
-        TokenStack alt_token_stack;
+        TokenStackPtr alt_token_stack;
         FileStringPtr current_text;
         TokenPtr current_token;
 
@@ -165,7 +164,7 @@ namespace wasmgen
 
     inline void Lexer::puttoken(Token* token, bool alt) noexcept
     {
-        (!alt ? token_stack : alt_token_stack).push(token);
+        (!alt ? token_stack : *alt_token_stack).push(token);
     }
 
     /**/

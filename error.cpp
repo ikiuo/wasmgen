@@ -31,7 +31,7 @@ namespace wasmgen
         {ErrorCode::INVALID_OCTAL_CODE, {{0},{"無効な文字コードです。"}}},
         {ErrorCode::INVALID_NUMBER_FORMAT, {{0},{"無効な数値表現です。"}}},
         /**/
-        {ErrorCode::SYNTAX_ERROR, {{0,-1,1},{"\"", "\": 未知の文法です。"}}},
+        {ErrorCode::SYNTAX_ERROR, {{0,-1,1},{"\"", "\" は未知の文法です。"}}},
         {ErrorCode::DIVISION_BY_ZERO, {{0,-1,1},{"ゼロ(", ")除算エラー。"}}},
         {ErrorCode::INFINITE_LOOP, {{0,-1,1},{"無限ループ(", ")を検出しました。"}}},
         {ErrorCode::CANNOT_BE_INLINED, {{-1,0},{"はインライン展開できません。"}}},

@@ -365,6 +365,26 @@ namespace wasmgen
     using TokenListListRef = RefPointer<TokenListList>;
     using NewTokenListList = NewPointer<TokenListList>;
 
+    ////////////////
+    // TokenStack //
+    ////////////////
+
+    using TokenStack = ObjectStack<Token>;
+
+    using TokenStackPtr = Pointer<TokenStack>;
+    using TokenStackRef = RefPointer<TokenStack>;
+    using NewTokenStack = NewPointer<TokenStack>;
+
+    ////////////////////
+    // TokenStackList //
+    ////////////////////
+
+    using TokenStackList = PointerArray<TokenStack>;
+
+    using TokenStackListPtr = Pointer<TokenStackList>;
+    using TokenStackListRef = RefPointer<TokenStackList>;
+    using NewTokenStackList = NewPointer<TokenStackList>;
+
     /*
      *
      */

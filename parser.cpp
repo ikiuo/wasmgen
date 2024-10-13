@@ -543,6 +543,8 @@ namespace wasmgen
             if (define_macro)
                 return parse_macro_append();
             parse_error(ErrorCode::SYNTAX_ERROR, {rt});
+            if (code_line->label)
+                parse_message(rt, StringBlock{" \"", GetCStr(code_line->label), "\" を確認してください。\n"});
             return Valid(eol);
         }
 
@@ -690,10 +692,10 @@ namespace wasmgen
 
         assert(!token_stack.size());
 
-        TokenStack save_token_stack = alt_token_stack;
+        TokenStackPtr save_token_stack = alt_token_stack;
         auto& mcode = macro->code;
 
-        alt_token_stack.clear();
+        alt_token_stack = new TokenStack;
         push_reader(macro_file);
         for (auto rl = mcode.rbegin(); rl != mcode.rend(); ++rl)
         {
@@ -720,10 +722,10 @@ namespace wasmgen
         while (parse_line())
             ;
         pop_reader();
-        static_cast<TokenStack::stack&>(alt_token_stack) = save_token_stack;
+        alt_token_stack = save_token_stack;
 
         if (error_count)
-            parse_message(instr, " ここでマクロを展開しています。\n");
+            parse_message(instr, StringBlock{" ここでマクロ \"", GetCStr(instr), "\" を展開しています。\n"});
         macro_expand.erase(name);
 
         WASMGEN_DEBUG(2, "MACRO: end=\"", name,"\"\n");

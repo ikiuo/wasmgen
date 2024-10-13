@@ -32,6 +32,8 @@ namespace wasmgen
           /**/
         , token_eol(false)
           /**/
+        , alt_token_stack(new TokenStack)
+          /**/
         , nestable_comment(false)
         , nested_comments(false)
         , asmsw_skip(false)
@@ -95,8 +97,8 @@ namespace wasmgen
             return nullptr;
         if (token_stack)
             return token_stack.pop();
-        if (alt_token_stack)
-            return alt_token_stack.pop();
+        if (*alt_token_stack)
+            return alt_token_stack->pop();
         if (!fetchar())
         {
             token_eol = true;
