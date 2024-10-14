@@ -187,6 +187,7 @@ namespace wasmgen
 
             PSEUDO_MACRO_BEGIN,
             PSEUDO_MACRO_END,
+            PSEUDO_MACRO_DELETE,
 
             PSEUDO_ALIAS,
 

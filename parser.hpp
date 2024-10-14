@@ -243,6 +243,7 @@ namespace wasmgen
         /*-*/
         void parse_pseudo_macro_begin();
         void parse_pseudo_macro_end();
+        void parse_pseudo_macro_delete();
         /**/
         void parse_pseudo_alias();
         /**/

@@ -1149,6 +1149,7 @@ namespace wasmgen
             /*-*/
             PSEUDO(".defmacro", PSEUDO_MACRO_BEGIN),
             PSEUDO(".endmacro", PSEUDO_MACRO_END),
+            PSEUDO(".delmacro", PSEUDO_MACRO_DELETE),
             /*-*/
             PSEUDO(".alias", PSEUDO_ALIAS),
             /*-*/

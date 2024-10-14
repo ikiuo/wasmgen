@@ -26,6 +26,8 @@ namespace wasmgen
         {ErrorCode::NO_MACRO_ARGUMENT_NAME, {{0}, {"マクロ定義に引数名がありません。"}}},
         {ErrorCode::LABEL_REPLACEMENT_FAILED, {{0}, {"ラベル名のマクロ展開に失敗しました。"}}},
         {ErrorCode::NESTED_MACRO_EXPANSION, {{0,-1,1},{"マクロ \"","\" 展開が入れ子になっています。"}}},
+        {ErrorCode::INVALID_MACRO_NAME, {{0},{"無効なマクロ名です。"}}},
+        {ErrorCode::CAN_NOT_DELETE_MACRO, {{0},{"マクロ定義中は削除できません。"}}},
         /**/
         {ErrorCode::INVALID_ESCAPE_SEQUENCE, {{0},{"無効なエスケープ シーケンスです。"}}},
         {ErrorCode::INVALID_OCTAL_CODE, {{0},{"無効な文字コードです。"}}},
@@ -34,7 +36,7 @@ namespace wasmgen
         {ErrorCode::SYNTAX_ERROR, {{0,-1,1},{"\"", "\" は未知の文法です。"}}},
         {ErrorCode::DIVISION_BY_ZERO, {{0,-1,1},{"ゼロ(", ")除算エラー。"}}},
         {ErrorCode::INFINITE_LOOP, {{0,-1,1},{"無限ループ(", ")を検出しました。"}}},
-        {ErrorCode::CANNOT_BE_INLINED, {{-1,0},{"はインライン展開できません。"}}},
+        {ErrorCode::CAN_NOT_BE_INLINED, {{-1,0},{"はインライン展開できません。"}}},
         /**/
         {ErrorCode::NOT_VALUE, {{-1,0},{" を数値化できません。"}}},
         {ErrorCode::NOT_STRING, {{-1,0},{" を文字列化できません。"}}},
@@ -129,6 +131,8 @@ namespace wasmgen
         /**/
         {ErrorCode::IGNORE_MACRO_LABEL, {{0,-1,1},{"ラベル(",")は無視されます。"}}},
         {ErrorCode::NO_MACRO_END, {{0},{"マクロ定義の終端がありません。"}}},
+        {ErrorCode::NO_MACRO_DEFINITION, {{0}, {"対応する .defmacro がありません。"}}},
+        {ErrorCode::MACRO_NOT_DEFINED, {{0,-1,1},{"マクロ名 \"","\" は定義されてません。"}}},
     };
 
 } // wasmgen

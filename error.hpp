@@ -68,6 +68,8 @@ namespace wasmgen
         NO_MACRO_ARGUMENT_NAME,
         LABEL_REPLACEMENT_FAILED,
         NESTED_MACRO_EXPANSION,
+        INVALID_MACRO_NAME,
+        CAN_NOT_DELETE_MACRO,
 
         /**/
 
@@ -82,7 +84,7 @@ namespace wasmgen
         SYNTAX_ERROR,
         DIVISION_BY_ZERO,
         INFINITE_LOOP,
-        CANNOT_BE_INLINED,
+        CAN_NOT_BE_INLINED,
 
         /**/
 
@@ -216,6 +218,8 @@ namespace wasmgen
         _WARNING_MACRO = 3200,
         IGNORE_MACRO_LABEL,
         NO_MACRO_END,
+        NO_MACRO_DEFINITION,
+        MACRO_NOT_DEFINED,
     };
 
     struct ErrorMessageData

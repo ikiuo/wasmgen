@@ -149,31 +149,46 @@ numtype と vectype では同型で符号の扱いが存在する表現があり
 # 疑似命令
 
 
-## <code>.defmacro</code>および<code>.endmacro</code>疑似命令
+## マクロ疑似命令
+
+### <code>.defmacro</code>および<code>.endmacro</code>疑似命令
 
 ```
-name        .defmacro       arg1, arg2, ...
-            ;# この行から
-            ;#    @で始まる疑似命令を除く
-            ;#    .endmacro の直前行までを
-            ;#    <name> 命令として展開する
-            ;#       オペランド <arg1>,<arg2>,... は置換される情報
-            ;# この行まで
-            .endmacro       ;# マクロ定義終わり
+マクロ名        .defmacro       引数1, 引数2, ...
+　　　　        ;# この行から
+　　　　        ;#    .endmacro の直前行までを
+　　　　        ;#       (@で始まる疑似命令やマクロ疑似命令を除く)
+　　　　        ;#    <マクロ名> 命令として展開する
+　　　　        ;#    <引数1>,<引数2>,... は置換される情報
+　　　　        ;# この行まで
+　　　　        .endmacro       ;# マクロ定義終わり
 ```
 
-<code>name</code>名で<code>.defmacro</code>の次の行から<code>.endmacro</code>直前の行までをマクロを登録します。
+<code>マクロ名</code>で<code>.defmacro</code>の次の行から<code>.endmacro</code>直前の行までをマクロを登録します。
 
 
-### マクロ定義・使用例
+### <code>.delmacro</code>疑似命令
 
 ```
+            .delmacro       マクロ名
+```
+
+登録されている<code>マクロ名</code>を削除します。
+
+
+### 使用例
+
+```
+;# マクロ定義
+
 $i32.inc    .defmacro       labelidx
             local.get       labelidx
             i32.const       1
             i32.add
             local.set       labelidx
             .endmacro
+
+;# マクロ使用
 
 func1       .code
 n           .local          i32
@@ -185,6 +200,30 @@ n           .local          i32
             ;#   i32.add
             ;#   local.set  n
             ;# が展開される
+            ;# ...
+
+;# マクロ削除
+
+            .delmacro       $i32.inc
+            ;# 以下では $i32.inc は使用できない
+
+            ;# マクロ削除では以下のパターンに注意
+            ;# 1) .defmacro で引数なしを定義
+            ;# 2) .delmacro で削除
+            ;# 3) 削除されたマクロ名のみの行を記述
+
+mtest       .defmacro
+            ;# ...
+            .endmacro
+
+            ;# ...
+            mtest           ;# これはマクロ展開される
+            ;# ...
+
+            .delmacro       mtest
+
+            ;# ...
+            mtest           ;# これはラベル扱い
             ;# ...
 ```
 

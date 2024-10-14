@@ -119,6 +119,7 @@ namespace wasmgen
         /**/
         &Parser::parse_pseudo_macro_begin,
         &Parser::parse_pseudo_macro_end,
+        &Parser::parse_pseudo_macro_delete,
         /**/
         &Parser::parse_pseudo_alias,
         /**/
@@ -392,7 +393,7 @@ namespace wasmgen
 
     bool Parser::check_operands(CodeLine* line, size_t min, size_t max) noexcept
     {
-        ExpressionList* ops = line->operands;
+        ExpressionList* ops = line->operands; assert(ops);
 
         if (ops->size() < min)
             return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
@@ -613,6 +614,7 @@ namespace wasmgen
                 case Instruction::PSEUDO_OPTION:
                 case Instruction::PSEUDO_MACRO_BEGIN:
                 case Instruction::PSEUDO_MACRO_END:
+                case Instruction::PSEUDO_MACRO_DELETE:
                     break;
                 default:
                     return parse_macro_append();
@@ -1407,7 +1409,54 @@ namespace wasmgen
             parse_warning(ErrorCode::IGNORE_CODE_LABEL, {label});
         check_operands(line, 0, 0);
 
+        if (!define_macro)
+            parse_warning(ErrorCode::NO_MACRO_DEFINITION, {line->instr});
         define_macro = nullptr;
+    }
+
+    void Parser::parse_pseudo_macro_delete()
+    {
+        WASMGEN_DEBUG(2, "DEFMACRO: delete\n");
+
+        auto& line = code_line;
+        Token* label = line->label;
+
+        if (label)
+            parse_warning(ErrorCode::IGNORE_CODE_LABEL, {label});
+        if (!check_operands(line, 1, 2))
+            return;
+
+        if (define_macro)
+        {
+            parse_error(ErrorCode::CAN_NOT_DELETE_MACRO, {line->instr});
+            return;
+        }
+
+        ExpressionList* ops = line->operands; assert(ops);
+
+        Expression* op0 = (*ops)[0]; assert(op0);
+        bool op0_name = op0->isname();
+
+        if (!op0_name)
+        {
+            parse_error(ErrorCode::INVALID_MACRO_NAME, {line->instr});
+            return;
+        }
+
+        String* name = op0->getname();
+        auto dit = macro_dict.find(*name);
+        auto nit = macro_name->find(*name);
+
+        if (dit == macro_dict.end() || nit == macro_name->end())
+        {
+            assert(dit == macro_dict.end());
+            assert(nit == macro_name->end());
+            parse_warning(ErrorCode::MACRO_NOT_DEFINED, {*op0});
+            return;
+        }
+
+        macro_dict.erase(dit);
+        macro_name->erase(nit);
     }
 
     void Parser::parse_pseudo_alias()
@@ -2512,7 +2561,7 @@ namespace wasmgen
             auto instab = Instruction::table.find(instr);
 
             if (!make_expr(expr, sline->instr, instr, instab, 1, ops->begin() + 1, ops->end()))
-                return parse_error(ErrorCode::CANNOT_BE_INLINED, {*op0});
+                return parse_error(ErrorCode::CAN_NOT_BE_INLINED, {*op0});
         }
 
         NewGlobalData data;
@@ -2775,7 +2824,7 @@ namespace wasmgen
 
             elem->offset_expr = new CodeList;
             if (!make_expr(elem->offset_expr, sline->instr, ValType::I32, int(opp - sops->begin()), opp, ope))
-                return parse_error(ErrorCode::CANNOT_BE_INLINED, {**opp});
+                return parse_error(ErrorCode::CAN_NOT_BE_INLINED, {**opp});
             add_symbol(SectionID::ELEMENT, elem->offset_expr);
 
             WASMGEN_DEBUG(2, "  offset=", (*opp)->gettokencstr(), "\n");
@@ -2897,7 +2946,7 @@ namespace wasmgen
                     if (ops->size())
                     {
                         if (!make_expr(elem->offset_expr, sline->instr, ValType::I32, 0, ops->begin(), ops->end()))
-                            return parse_error(ErrorCode::CANNOT_BE_INLINED, {*(*ops)[0]});
+                            return parse_error(ErrorCode::CAN_NOT_BE_INLINED, {*(*ops)[0]});
                         cepc = Instruction::EPC_FUNCIDX;
                     }
                 }
@@ -3021,7 +3070,7 @@ namespace wasmgen
 
             data->offset_expr = new CodeList;
             if (!make_expr(data->offset_expr, sline->instr, ValType::I32, int(opp - sops->begin()), opp, ope))
-                return parse_error(ErrorCode::CANNOT_BE_INLINED, {**opp});
+                return parse_error(ErrorCode::CAN_NOT_BE_INLINED, {**opp});
             add_symbol(SectionID::ELEMENT, data->offset_expr);
 
             WASMGEN_DEBUG(2, "  offset=", (*opp)->gettokencstr(), "\n");
@@ -3112,7 +3161,7 @@ namespace wasmgen
                     if (ops->size())
                     {
                         if (!make_expr(data->offset_expr, sline->instr, ValType::I32, 0, ops->begin(), ops->end()))
-                            return parse_error(ErrorCode::CANNOT_BE_INLINED, {*(*ops)[0]});
+                            return parse_error(ErrorCode::CAN_NOT_BE_INLINED, {*(*ops)[0]});
                         active = true;
                         cdpc = Instruction::DPC_NONE;
                     }
