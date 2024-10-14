@@ -9,6 +9,11 @@ namespace wasmgen
     // Expression //
     ////////////////
 
+    const Expression::UnaryOperator Expression::unary_operator {
+        TokenID::BNOT, TokenID::NOT,
+        TokenID::ADD, TokenID::SUB,
+    };
+
     const Expression::OperatorPriority Expression::binary_operator_priority {
         { TokenID::MUL, 1 },  // "*"
         { TokenID::DIV, 1 },  // "/"

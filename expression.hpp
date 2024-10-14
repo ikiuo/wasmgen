@@ -43,6 +43,9 @@ namespace wasmgen
 
     protected:
         using OperatorPriority = StdMap<TokenID, int>;
+        using UnaryOperator = StdSet<TokenID>;
+
+        static const UnaryOperator unary_operator;
         static const OperatorPriority binary_operator_priority;
 
     public:
@@ -187,8 +190,7 @@ namespace wasmgen
 
     inline bool Expression::is_unary_operator(TokenID id) noexcept
     {
-        return (id == TokenID('!') || id == TokenID('~') ||
-                id == TokenID('+') || id == TokenID('-'));
+        return unary_operator.find(id) != unary_operator.end();
     }
 
     inline int Expression::priority(TokenID id) noexcept
