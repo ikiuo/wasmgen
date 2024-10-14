@@ -37,6 +37,23 @@ VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてくださ�
 <code>ラベル</code>は<code>命令</code>に応じて値が設定されます。ラベル直後に<code>:</code>を置く事ができます。<code>命令</code>には、実行命令と疑似命令があります。<code>オペランド</code>は<code>命令</code>に応じた内容を記述します。コンマ(<code>,</code>)区切りです。
 
 
+### 行の結合
+
+行末が<code>\\</code>ならば改行文字を空白とします。これにより次の行を結合した一行として処理されます。
+
+#### 行末が<code>\\</code>文字の例
+
+```
+label:  operator    operand1, operand2,\
+                    operand3, operand4
+```
+
+```
+;# コメント \
+   この行もコメント
+```
+
+
 ## コメント
 
 <code>#</code>, <code>;</code>, <code>//</code> から行末まで無視されます。

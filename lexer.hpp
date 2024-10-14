@@ -120,8 +120,10 @@ namespace wasmgen
         void gettoken_quote_escape_xchar(UCharType c);
         void gettoken_quote_escape_xchar_sub(UCharType c, bool ucs);
 
+        void gettoken_escape(UCharType c);
+
         void token_id(TokenID id) noexcept;
-        void token_id(TokenID id, UCharType c) noexcept;
+        void token_id(TokenID id, UCharType c);
         void token_append(UCharType c);
 
         void token_message(const Token* token, const char* msg);
@@ -258,7 +260,7 @@ namespace wasmgen
         current_token->id = id;
     }
 
-    inline void Lexer::token_id(TokenID id, UCharType c) noexcept
+    inline void Lexer::token_id(TokenID id, UCharType c)
     {
         token_id(id);
         token_append(c);

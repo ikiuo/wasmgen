@@ -58,6 +58,7 @@ namespace wasmgen
         token_entry[size_t(';')] = &Lexer::gettoken_comment;
         token_entry[size_t('.')] = &Lexer::gettoken_number;
         token_entry[size_t('/')] = &Lexer::gettoken_comment_start;
+        token_entry[size_t('\\')] = &Lexer::gettoken_escape;
 
         for (auto i : inc_range<size_t>(token_entry_size))
             if (token_scan_tree.code[i].next)
@@ -170,16 +171,21 @@ namespace wasmgen
 
     void Lexer::gettoken_comment(UCharType c)
     {
+        UCharType p = 0;
+
         token_id(TokenID::COMMENT, c);
         while (fetchar())
         {
             c = getchar();
-            if (c == '\n')
+            if (c == '\r')
+                continue;
+            if (c == '\n' && p != '\\')
             {
                 rewindchar();
                 break;
             }
             token_append(c);
+            p = c;
         }
     }
 
@@ -252,17 +258,16 @@ namespace wasmgen
     void Lexer::gettoken_cr(UCharType c)
     {
         token_id(TokenID::CONTROL, c);
-        if (fetchar())
-        {
-            c = getchar();
-            if (c == '\n')
-            {
-                token_id(TokenID::EOL, c);
-                return;
-            }
-        }
-        rewindchar();
+        if (!fetchar())
+            return;
+        c = getchar();
+        if (c == '\n')
+            token_id(TokenID::EOL, c);
+        else
+            rewindchar();
     }
+
+    /**/
 
     void Lexer::gettoken_quote(UCharType c)
     {
@@ -394,6 +399,8 @@ namespace wasmgen
         else
             qs->push_back(CharType(value));
     }
+
+    /**/
 
     void Lexer::gettoken_number(UCharType c)
     {
@@ -589,7 +596,7 @@ namespace wasmgen
 
     void Lexer::gettoken_scan_tree(UCharType c)
     {
-        FileTextPos save_pos = text_pos;
+        FileTextPos rewind_pos = text_pos;
         TokenID save_id = TokenID(c);
         size_t pending_pos = 0;
 
@@ -613,7 +620,7 @@ namespace wasmgen
             pending_char[pending_count++] = c;
             if (code.id != TokenID::UNDEF)
             {
-                save_pos = text_pos;
+                rewind_pos = text_pos;
                 save_id = code.id;
                 pending_pos = pending_count;
             }
@@ -624,8 +631,37 @@ namespace wasmgen
         for (auto i : inc_range<size_t>(pending_pos))
             token_append(pending_char[i]);
 
-        text_pos = save_pos;
+        text_pos = rewind_pos;
         token_id(save_id);
+    }
+
+    /**/
+
+    void Lexer::gettoken_escape(UCharType c)
+    {
+        FileTextPos rewind_pos = text_pos;
+
+        token_id(TokenID(c), c);
+        if (!fetchar())
+            return;
+        c = getchar();
+        switch (c)
+        {
+        case '\r':
+            if (!fetchar())
+                break;
+            c = getchar();
+            if (c != '\n')
+                break;
+            fallthrough;
+        case '\n':
+            token_id(TokenID::SPACE, c);
+            return;
+
+        default:
+            break;
+        }
+        rewind_pos = text_pos;
     }
 
     /**/
