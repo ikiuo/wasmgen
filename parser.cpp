@@ -470,6 +470,18 @@ namespace wasmgen
         asmsw_skip = asmsw_flag.skip;
         code_line = new CodeLine;
 
+        if (flag_debug >= 3 && alt_token_stack->size())
+        {
+            StdString mtext;
+
+            for (auto sit = alt_token_stack->rbegin();
+                 sit != alt_token_stack->rend() &&
+                     (*sit)->id != TokenID::EOL;
+                 ++sit)
+                mtext += *(*sit)->text;
+            message("MACRO-EXPAND: ", mtext, "\n");
+        }
+
         /**/
 
         TokenRef rt;
@@ -532,7 +544,7 @@ namespace wasmgen
             if (it == eit)
                 it = instr_defmacro;
             code_line->instab = it;
-            if (mit != meit)
+            if (!(expr_optimize = mit == meit))
                 code_line->macro = mit->second;
             if (!parse_operands())
                 return false;
@@ -740,7 +752,7 @@ namespace wasmgen
 
     bool Parser::parse_operands()
     {
-        bool success = true;
+        ExpressionList* ops = code_line->operands; assert(ops);
 
         for (;;)
         {
@@ -748,25 +760,69 @@ namespace wasmgen
 
             if (!expr)
                 break;
-
-            ExpressionList* ops = code_line->operands; assert(ops);
-
             ops->push_back(Transfer(expr));
 
             TokenRef rt = next_token();
 
             if (Invalid(rt))
-            {
-                success = false;
-                break;
-            }
+                return false;
             if (*rt != TokenID::CHAR_COMMA)
             {
                 puttoken(rt);
                 break;
             }
         }
-        return success;
+        return parse_expr_unpack(ops);
+    }
+
+    bool Parser::parse_expr_unpack(ExpressionList* list)
+    {
+        auto it = list->begin();
+
+        while (it != list->end())
+        {
+            Expression* expr = *it; assert(expr);
+            Token* token = expr->token; assert(token);
+            ExpressionList* children = expr->children; assert(children);
+            bool unary = false;
+
+            switch (expr->mode)
+            {
+            case Expression::UNARY:
+                if (token->id != TokenID::MUL)
+                    break;
+                assert(children->size() == 1);
+                expr = (*children)[0];
+                if (expr->mode != Expression::LIST)
+                {
+                    if (expr->mode != Expression::VALUE)
+                        break;
+                    if (!expr->paren_open)
+                        break;
+                    *it = expr;
+                    break;
+                }
+                children = expr->children; assert(children);
+                unary = true;
+                fallthrough;
+            case Expression::LIST:
+                if (!parse_expr_unpack(children))
+                    return false;
+                if (!unary)
+                    break;
+                {
+                    ExpressionListPtr p = children;
+
+                    it = list->insert(list->erase(it), p->begin(), p->end());
+                }
+                continue;
+
+            default:
+                break;
+            }
+            ++it;
+        }
+        return true;
     }
 
     /*
@@ -934,17 +990,17 @@ namespace wasmgen
             parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
             return nullptr;
         }
-        if (!expr_optimize)
-            return NewRef<Expression>(rt, value);
 
         NewExpression expr(rt, value);
 
-        if (!value->isnumber())
+        if (!expr_optimize || !value->isnumber())
             return Finish(expr);
 
         Token* vt = expr->gettoken(); assert(vt);
-        auto res = getvalue(expr); assert(res.isnumber());
+        auto res = getvalue(expr);
 
+        if (!res.isnumber())
+            return nullptr;
         return res.isfloat()
             ? make_value(vt, res.fvalue)
             : make_value(vt, res.ivalue);
@@ -968,8 +1024,8 @@ namespace wasmgen
                 {
                     auto& child = (*value->children)[0];
 
-                    value->paren_open = child->paren_open;
-                    value->paren_close = child->paren_close;
+                    child->paren_open = value->paren_open;
+                    child->paren_close = value->paren_close;
                     value = Transfer(child);
                 }
                 return Finish(value);
@@ -4278,6 +4334,16 @@ namespace wasmgen
 
                 switch (et->id)
                 {
+                case TokenID::BNOT:
+                    if (v0.isnumber())
+                        return ExprValue(!bool(v0));
+                    break;
+
+                case TokenID::NOT:
+                    if (v0.isnumber())
+                        return ExprValue(~int64_t(v0));
+                    break;
+
                 case TokenID::ADD:
                     return v0;
 
@@ -4288,14 +4354,8 @@ namespace wasmgen
                         return ExprValue(-double(v0));
                     break;
 
-                case TokenID::NOT:
-                    if (v0.isnumber())
-                        return ExprValue(~int64_t(v0));
-                    break;
-
-                case TokenID::BNOT:
-                    if (v0.isnumber())
-                        return ExprValue(!bool(v0));
+                case TokenID::MUL:
+                    parse_error(ErrorCode::SYNTAX_ERROR, {et});
                     break;
 
                 default:

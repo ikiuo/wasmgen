@@ -11,7 +11,7 @@ namespace wasmgen
 
     const Expression::UnaryOperator Expression::unary_operator {
         TokenID::BNOT, TokenID::NOT,
-        TokenID::ADD, TokenID::SUB,
+        TokenID::ADD, TokenID::SUB, TokenID::MUL,
     };
 
     const Expression::OperatorPriority Expression::binary_operator_priority {

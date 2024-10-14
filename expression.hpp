@@ -7,15 +7,15 @@
 
 namespace wasmgen
 {
-    ////////////////
-    // Expression //
-    ////////////////
-
     class Expression;
 
     using ExpressionPtr = Pointer<Expression>;
     using ExpressionRef = RefPointer<Expression>;
     using NewExpression = NewPointer<Expression>;
+
+    ////////////////////
+    // ExpressionList //
+    ////////////////////
 
     using ExpressionList = PointerArray<Expression>;
 
@@ -26,7 +26,9 @@ namespace wasmgen
     using ExprIter = ExpressionList::iterator;
     using ExprConstIter = ExpressionList::const_iterator;
 
-    /**/
+    ////////////////
+    // Expression //
+    ////////////////
 
     class Expression : virtual public Object
     {

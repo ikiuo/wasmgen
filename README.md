@@ -68,6 +68,9 @@ VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてくださ�
 
 ## 演算子
 
+
+### 数値用演算子
+
 | 種類 | 演算子 | 例 |
 |:-:|:-:|:--|
 | 単項 | <code>+</code> <br/> <code>-</code> <br/> <code>!</code> <br/> <code>~</code> | <code>+</code> value <br/> <code>-</code> value <br/> <code>!</code> value <br/> <code>~</code> value |
@@ -79,6 +82,29 @@ VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてくださ�
 | 二項(論理) | <code>&amp;</code> <br/> <code>\|</code> <br/> <code>^</code> | val1 <code>&amp;</code> val2 <br/> val1 <code>\|</code> val2 <br/> val1 <code>^</code> val2 |
 | 二項(真偽) | <code>&amp;&amp;</code> <br/> <code>\|\|</code> | val1 <code>&amp;&amp;</code> val2 <br/> val1 <code>\|\|</code> val2 |
 | 三項(選択) | <code>? :</code> | val1 <code>?</code> val2 <code>:</code> val3 |
+
+
+### リスト
+
+括弧<code>(),[],{}</code>の間に情報を<code>,</code>区切りで記述します。
+
+**例**
+
+```
+(1,2,3)
+[a,b,c]
+{x,y,z}
+```
+
+### リストの内部展開
+
+リスト内で、リストの前に<code>*</code>を記述すると、単一項から親リストの要素列に展開されます。オペランドは括弧なしのリストになっています。
+
+**例**
+
+```
+(1,*(2,3)) → (1,2,3)
+```
 
 
 ## 文字列
