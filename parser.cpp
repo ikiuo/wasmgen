@@ -232,6 +232,7 @@ namespace wasmgen
           /**/
         , expr_error()
         , expr_nest()
+        , expr_optimize()
           /**/
         , macro_file(new TextFileReader(new FileData))
           /**/
@@ -895,7 +896,7 @@ namespace wasmgen
 
             NewExpression expr(ct, lhs, rhs);
 
-            if (lhs->isnumber() && rhs->isnumber())
+            if (expr_optimize && lhs->isnumber() && rhs->isnumber())
             {
                 Token* vt = expr->gettoken(); assert(vt);
                 auto res = getvalue(expr); assert(res.isnumber());
@@ -933,6 +934,8 @@ namespace wasmgen
             parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
             return nullptr;
         }
+        if (!expr_optimize)
+            return NewRef<Expression>(rt, value);
 
         NewExpression expr(rt, value);
 

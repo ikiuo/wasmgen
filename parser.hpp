@@ -148,6 +148,7 @@ namespace wasmgen
         bool retry;
         bool expr_error;
         int expr_nest;
+        bool expr_optimize;
 
         ASMSWStack asmsw_stack;
         ASMSWFlag asmsw_flag;
