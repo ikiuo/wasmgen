@@ -155,9 +155,10 @@ namespace wasmgen
     SingletonString Parser::ins_dummy("");
 
     SingletonString Parser::ins_block("block");
-    SingletonString Parser::ins_end("end");
-    SingletonString Parser::ins_if("if");
     SingletonString Parser::ins_loop("loop");
+    SingletonString Parser::ins_if("if");
+    SingletonString Parser::ins_else("else");
+    SingletonString Parser::ins_end("end");
 
     SingletonString Parser::ins_defmacro("defmacro");
 
@@ -183,8 +184,11 @@ namespace wasmgen
 
     InstrIter Parser::instr_dummy;
 
-    InstrIter Parser::instr_end;
+    InstrIter Parser::instr_block;
+    InstrIter Parser::instr_loop;
     InstrIter Parser::instr_if;
+    InstrIter Parser::instr_else;
+    InstrIter Parser::instr_end;
 
     InstrIter Parser::instr_defmacro;
 
@@ -205,8 +209,11 @@ namespace wasmgen
     {
         instr_dummy = Instruction::table.find(*ins_dummy);
 
-        instr_end = Instruction::table.find(*ins_end);
+        instr_block = Instruction::table.find(*ins_block);
+        instr_loop = Instruction::table.find(*ins_loop);
         instr_if = Instruction::table.find(*ins_if);
+        instr_else = Instruction::table.find(*ins_else);
+        instr_end = Instruction::table.find(*ins_end);
 
         instr_defmacro = Instruction::table.find(*ins_defmacro);
 
@@ -3490,27 +3497,59 @@ namespace wasmgen
         auto& binary = line->binary;
         auto& ins = instab->second;
         auto& instr = ins.operation;
+        auto stm = instr.stack();
         bool use_label = false;
 
-        switch (instr.stack())
+        switch (stm)
         {
         case Instruction::ST_NONE:
             break;
 
+        case Instruction::ST_LEAVE_BLOCK:
+        case Instruction::ST_LEAVE_LOOP:
+        case Instruction::ST_LEAVE_IF:
         case Instruction::ST_LEAVE:
             check_operands(line, 0, 0);
             if (!list->block_stack.size())
+            {
+                if (!list->pass && stm != Instruction::ST_LEAVE)
+                    parse_warning(ErrorCode::UNINTENTIONAL_END, {line->instr});
                 list->code_end = line;
-            else
+            }
+            else do
             {
                 CodeLineRef sline = list->block_stack.pop();
 
-                if (!list->pass && !sline->label)
+                if (list->pass)
+                    break;
+                if (!sline->label)
                 {
                     sline->label = label;
                     use_label = true;
                 }
-            }
+
+                auto& sinstab = sline->instab;
+                bool br_type = true;
+
+                switch (stm)
+                {
+                case Instruction::ST_LEAVE_BLOCK:
+                    br_type = sinstab == instr_block;
+                    break;
+                case Instruction::ST_LEAVE_LOOP:
+                    br_type = sinstab == instr_loop;
+                    break;
+                case Instruction::ST_LEAVE_IF:
+                    br_type = sinstab == instr_if || sinstab == instr_else;
+                    break;
+                default: // case Instruction::ST_LEAVE:
+                    break;
+                }
+                if (br_type)
+                    break;
+                parse_warning(ErrorCode::UNINTENTIONAL_END, {line->instr});
+            } while (false);
+
             if (!update_br_idx(list))
                 return false;
             break;

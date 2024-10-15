@@ -37,24 +37,7 @@ VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてくださ�
 <code>ラベル</code>は<code>命令</code>に応じて値が設定されます。ラベル直後に<code>:</code>を置く事ができます。<code>命令</code>には、実行命令と疑似命令があります。<code>オペランド</code>は<code>命令</code>に応じた内容を記述します。コンマ(<code>,</code>)区切りです。
 
 
-### 行の結合
-
-行末が<code>\\</code>ならば改行文字を空白とします。これにより次の行を結合した一行として処理されます。
-
-#### 行末が<code>\\</code>文字の例
-
-```
-label:  operator    operand1, operand2,\
-                    operand3, operand4
-```
-
-```
-;# コメント \
-   この行もコメント
-```
-
-
-## コメント
+### コメント
 
 <code>#</code>, <code>;</code>, <code>//</code> から行末まで無視されます。
 
@@ -68,6 +51,38 @@ label:  operator    operand1, operand2,\
 
 ```
 ... /* コメント */ ...
+```
+
+
+### 行の結合
+
+行末が<code>\\</code>ならば改行文字を空白とします。これにより次の行を結合した一行として処理されます。
+
+#### 行末が<code>\\</code>文字の例(その1)
+
+```
+label:  operator    operand1, operand2,\↲
+                    operand3, operand4↲
+```
+
+改行が空白になるので、次の表記と同じ扱いになります。
+
+```
+label:  operator    operand1, operand2,                     operand3, operand4↲
+```
+
+
+#### 行末が<code>\\</code>文字の例(その2)
+
+```
+;# コメント\↲
+   この行もコメント↲
+```
+
+改行が空白になるので、次の表記と同じ扱いになります。
+
+```
+;# コメント    この行もコメント↲
 ```
 
 
@@ -2226,7 +2241,7 @@ $exit:      end
 | <code>?</code> | | <code>loop</code> | <code>blocktype</code> | ループ・ブロックの開始 |
 | <code>1</code> | | <code>if</code> | <code>blocktype</code> | <code>if</code>ブロックの開始 |
 | <code>0</code> | | <code>else</code> | | <code>else</code>ブロックの開始 |
-| <code>?</code> | | <code>end</code> | | ブロックまたはコードの終端 |
+| <code>?</code> | | <code>end</code><br/><code>end.block</code><br/><code>end.loop</code><br/><code>end.if</code> | | ブロックまたはコードの終端 <br/>(別名は入れ子対応表記用)<br/>&nbsp;<br/>&nbsp; |
 | | | | | |
 | <code>0</code> | | <code>br</code> | <code>labelidx</code> | ブロックからの脱出<br/><code>labelidx</code>は<code>ブロック段数-1</code></code> |
 | <code>1</code> | | <code>br\_if</code> | <code>labelidx</code> | <code><var>p1</var><sub>i32</sub></code>が真なら<br/>&nbsp;&nbsp;&nbsp;&nbsp;<code>br  labelidx</code><br/>が実行される |

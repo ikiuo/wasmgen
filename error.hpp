@@ -195,6 +195,7 @@ namespace wasmgen
 
         _WARNING_CODE_LIST = 3080,
         NO_END,
+        UNINTENTIONAL_END,
 
         _WARNING_SECTION = 3100,
         IGNORE_CODE_LABEL,

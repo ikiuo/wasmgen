@@ -115,6 +115,7 @@ namespace wasmgen
         {ErrorCode::TRUNCATED_VALUE, {{0,-1,1},{"値(", ")は切り捨てられます。"}}},
         /**/
         {ErrorCode::NO_END, {{0},{"対応する end がありません。"}}},
+        {ErrorCode::UNINTENTIONAL_END, {{0},{"意図した end の種類ではありません。"}}},
         /**/
         {ErrorCode::IGNORE_CODE_LABEL, {{0,-1,1},{"ラベル(",")は無視されます。"}}},
         /**/

@@ -1070,7 +1070,9 @@ namespace wasmgen
             /*-*/
             {"",{Operation(PSEUDO_EMPTY),Operand(0),0,{0}}},
             /*-*/
-#define EXINS(name, code)  {name,{Operation(code),Operand(0),0,{0}}}
+            {"end.block",{Operation(0,0,0,0,0,4),Operand(0,0,0,0),1,{11}}},
+            {"end.loop",{Operation(0,0,0,0,0,5),Operand(0,0,0,0),1,{11}}},
+            {"end.if",{Operation(0,0,0,0,0,6),Operand(0,0,0,0),1,{11}}},
             /*-*/
 #define PSEUDO(name, code)  {name,{Operation(code),Operand(0),0,{0}}}
             PSEUDO(".align",   BD_ALIGN),

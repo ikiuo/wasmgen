@@ -125,8 +125,11 @@ namespace wasmgen
 
         static InstrIter instr_dummy;
 
-        static InstrIter instr_end;
+        static InstrIter instr_block;
+        static InstrIter instr_loop;
         static InstrIter instr_if;
+        static InstrIter instr_else;
+        static InstrIter instr_end;
 
         static InstrIter instr_defmacro;
 

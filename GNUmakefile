@@ -68,7 +68,7 @@ PROGRAM       = wasmgen
 
 RM            = rm
 RMFLAGS       = -f
-RMFILES       = $(PROGRAM) $(OBJS) *.[dos] *~
+RMFILES       = $(PROGRAM) $(OBJS) *.[dos] *.o.tmp *~
 
 # --------------
 

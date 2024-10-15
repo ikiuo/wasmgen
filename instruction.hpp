@@ -71,6 +71,10 @@ namespace wasmgen
             ST_LEAVE,
             ST_ENTER,
             ST_ELSE,
+
+            ST_LEAVE_BLOCK,
+            ST_LEAVE_LOOP,
+            ST_LEAVE_IF,
         };
 
         enum MacroCode
@@ -274,7 +278,7 @@ namespace wasmgen
             size_t count() const noexcept;
             DataType param(int n) const noexcept;
             DataType result() const noexcept;
-            int stack() const noexcept;
+            StackMode stack() const noexcept;
         };
 
         /////////////
@@ -475,9 +479,9 @@ namespace wasmgen
             return DataType((value >> 16) & 15);
         }
 
-        inline int Operation::stack() const noexcept
+        inline StackMode Operation::stack() const noexcept
         {
-            return DataType((value >> 20) & 15);
+            return StackMode((value >> 20) & 15);
         }
 
         /////////////
