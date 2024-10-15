@@ -404,7 +404,7 @@ namespace wasmgen
         ExpressionList* ops = line->operands; assert(ops);
 
         if (ops->size() < min)
-            return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+            return parse_error_too_few_operands(line);
         if (ops->size() > max)
             parse_warning_too_many_operands(line, ops, max);
         return true;
@@ -2127,7 +2127,7 @@ namespace wasmgen
         WASMGEN_DEBUG(2, "  mod=\"", mod->c_str(), "\"\n");
 
         if (opp == ope)
-            return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+            return parse_error_too_few_operands(line);
 
         Expression* op_name = *opp++;
         String* name = getstring(op_name);
@@ -2139,7 +2139,7 @@ namespace wasmgen
         WASMGEN_DEBUG(2, "  name=\"", name->c_str(), "\"\n");
 
         if (opp == ope)
-            return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+            return parse_error_too_few_operands(line);
 
         int mut = 0;
         bool minmax = false;
@@ -2245,7 +2245,7 @@ namespace wasmgen
         if (minmax)
         {
             if (opp == ope)
-                return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+                return parse_error_too_few_operands(line);
             if (!getlimits(impdat->limits, line, opp - ops->begin()))
                 return false;
             opp += impdat->limits.mode + 1;
@@ -2605,7 +2605,7 @@ namespace wasmgen
         ExpressionList* ops = sline->operands; assert(ops);
 
         if (ops->size() < 1)
-            return parse_error(ErrorCode::TOO_FEW_OPERANDS, {sline->instr});
+            return parse_error_too_few_operands(sline);
 
         Expression* op0 = (*ops)[0]; assert(op0);
         auto gtres = gettype(valtype_dict, op0);
@@ -3665,7 +3665,7 @@ namespace wasmgen
 
             case Instruction::OP_REF:
                 if (!oplen)
-                    return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+                    return parse_error_too_few_operands(line);
                 {
                     GetTypeRes res;
 
@@ -3745,7 +3745,7 @@ namespace wasmgen
             }
 
             if (oplen < cnt)
-                return parse_error(ErrorCode::TOO_FEW_OPERANDS, {line->instr});
+                return parse_error_too_few_operands(line);
 
             for (auto n : inc_range<size_t>(cnt))
             {
@@ -4297,7 +4297,7 @@ namespace wasmgen
                 String* name = label->text; assert(name);
 
                 if (idmap->has(*name))
-                    return parse_error(ErrorCode::TOO_FEW_OPERANDS, {label});
+                    return parse_error_too_few_operands(label);
                 append_index(idmap, label, index);
             }
         }

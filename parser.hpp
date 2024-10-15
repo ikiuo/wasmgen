@@ -397,6 +397,8 @@ namespace wasmgen
 
         bool parse_error(ErrorCode code, const PTokenList& token_list);
         bool parse_expr_error(ErrorCode code, const PTokenList& token_list);
+        bool parse_error_too_few_operands(Token* token);
+        bool parse_error_too_few_operands(CodeLine* line);
         void parse_warning(ErrorCode code, const PTokenList& token_list);
         void parse_warning_too_many_operands(CodeLine* line, Token* token, size_t n);
         void parse_warning_too_many_operands(CodeLine* line, ExpressionList* ops, size_t n);
@@ -604,6 +606,16 @@ namespace wasmgen
     inline void Parser::parse_message(const Token* token, Args... args)
     {
         token_message(token, args...);
+    }
+
+    inline bool Parser::parse_error_too_few_operands(Token* token)
+    {
+        return parse_error(ErrorCode::TOO_FEW_OPERANDS, {token});
+    }
+
+    inline bool Parser::parse_error_too_few_operands(CodeLine* line)
+    {
+        return parse_error_too_few_operands(line->instr);
     }
 
     inline void Parser::parse_warning_too_many_operands(CodeLine* line, ExpressionList* ops, size_t n)
