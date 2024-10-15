@@ -52,6 +52,7 @@ namespace wasmgen
 
         TokenListPtr token_line;
         bool token_eol;
+        bool skip_eol;
 
         TokenStack token_stack;
         TokenStackPtr alt_token_stack;

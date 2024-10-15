@@ -1102,6 +1102,15 @@ x           .param      i32
 ```
 
 
+### オプション <code>paren.multiline</code>
+
+括弧<code>(),[],{}</code>の間の改行許可を指定します。
+
+```
+@option paren.multiline = <bool>   ;# 既定=false
+```
+
+
 ### オプション <code>section.datacount</code>
 
 .wasm ファイルへの Data Count Section 出力を制御します。

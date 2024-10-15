@@ -16,6 +16,23 @@ namespace wasmgen
     template <typename T> StdSet<T> operator + (const StdSet<T>& lhs, const StdSet<T>& rhs);
     template <typename T> StdSet<T> operator - (const StdSet<T>& lhs, const StdSet<T>& rhs);
 
+    ////////////////
+    // AutoRewind //
+    ////////////////
+
+    template <typename T>
+    class AutoRewind
+    {
+    protected:
+        T& data;
+        T value;
+
+    public:
+        AutoRewind(T& data) noexcept;
+        AutoRewind(T& data, T value) noexcept;
+        ~AutoRewind() noexcept;
+    };
+
 } // wasmgen
 
 /*
@@ -56,6 +73,32 @@ namespace wasmgen
             if (rhs.find(d) == rhs.end())
                 rs.insert(d);
         return rs;
+    }
+
+    ////////////////
+    // AutoRewind //
+    ////////////////
+
+    template <typename T>
+    inline AutoRewind<T>::AutoRewind(T& data) noexcept
+        : data(data)
+        , value(data)
+    {
+        /*NOOP*/
+    }
+
+    template <typename T>
+    inline AutoRewind<T>::AutoRewind(T& data, T newval) noexcept
+        : data(data)
+        , value(data)
+    {
+        data = newval;
+    }
+
+    template <typename T>
+    inline AutoRewind<T>::~AutoRewind() noexcept
+    {
+        data = value;
     }
 
 } // wasmgen

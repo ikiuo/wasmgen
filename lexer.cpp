@@ -31,6 +31,7 @@ namespace wasmgen
         , save_pos(0, 0)
           /**/
         , token_eol(false)
+        , skip_eol(false)
           /**/
         , alt_token_stack(new TokenStack)
           /**/
@@ -118,7 +119,7 @@ namespace wasmgen
         token->line_index = token_line->size();
         token_line->push_back(token);
 
-        token_eol = token->id == TokenID::EOL;
+        token_eol = token->id == TokenID::EOL && !skip_eol;
         return token;
     }
 

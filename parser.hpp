@@ -85,6 +85,7 @@ namespace wasmgen
         {
             int include_depth;
             bool comment_nest;
+            bool paren_multiline;
             bool section_datacount;
             bool type_unique;
 
@@ -118,6 +119,7 @@ namespace wasmgen
 
         static SingletonString optname_include_depth;
         static SingletonString optname_comment_nest;
+        static SingletonString optname_paren_multiline;
         static SingletonString optname_section_datacount;
         static SingletonString optname_type_unique;
 

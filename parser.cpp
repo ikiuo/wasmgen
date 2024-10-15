@@ -174,6 +174,7 @@ namespace wasmgen
     /**/
 
     SingletonString Parser::optname_include_depth("include.depth");
+    SingletonString Parser::optname_paren_multiline("paren.multiline");
     SingletonString Parser::optname_comment_nest("comment.nest");
     SingletonString Parser::optname_section_datacount("section.datacount");
     SingletonString Parser::optname_type_unique("type.unique");
@@ -340,17 +341,22 @@ namespace wasmgen
 
             switch (rt->id)
             {
-            default:
-                if (IsSpace(rt))
-                    break;
-                fallthrough;
             case TokenID::EOL:
-                return Finish(rt);
+                if (!skip_eol)
+                    return Finish(rt);
+                break;
+
             case TokenID::COMMENT:
                 return feed_eol();
+
             case TokenID::COMMENT_SPAN:
                 if (nested_comments && !nestable_comment)
                     parse_warning(ErrorCode::NESTED_COMMENTS, {rt});
+                break;
+
+            default:
+                if (!IsSpace(rt))
+                    return Finish(rt);
                 break;
             }
         }
@@ -502,7 +508,7 @@ namespace wasmgen
                 break;
         }
 
-        if (*rt != TokenID::NAME)
+        if (rt->id != TokenID::NAME)
         {
             if (!asmsw_skip)
                 return parse_error(ErrorCode::SYNTAX_ERROR, {rt});
@@ -524,9 +530,9 @@ namespace wasmgen
 
             code_line->label = rt;
             rt = next_token();
-            if (Valid(rt) && (*rt == ':'))
+            if (Valid(rt) && rt->id == TokenID(':'))
                 rt = next_token();
-            if (Valid(rt) && *rt == TokenID::NAME)
+            if (Valid(rt) && rt->id == TokenID::NAME)
             {
                 it = Instruction::table.find(rt->text);
                 if (!(instr = it != eit))
@@ -557,7 +563,7 @@ namespace wasmgen
                 return false;
             rt = next_token();
         }
-        if (Valid(rt) && *rt != TokenID::EOL)
+        if (Valid(rt) && rt->id != TokenID::EOL)
         {
             TokenRef eol = feed_eol();
 
@@ -773,7 +779,7 @@ namespace wasmgen
 
             if (Invalid(rt))
                 return false;
-            if (*rt != TokenID::CHAR_COMMA)
+            if (rt->id != TokenID::CHAR_COMMA)
             {
                 puttoken(rt);
                 break;
@@ -877,7 +883,7 @@ namespace wasmgen
             puttoken(sym);
             return parse_expr_conditional();
         }
-        if (*op != TokenID('='))
+        if (op->id != TokenID('='))
         {
             puttoken(op);
             puttoken(sym);
@@ -1070,6 +1076,9 @@ namespace wasmgen
 
     Expression* Parser::parse_expr_list(TokenID cid, Token* st)
     {
+        AutoRewind<decltype(skip_eol)>
+            multiline(skip_eol, option.paren_multiline);
+
         NewExpression expr(Expression::LIST);
         NewTokenList xtlist;
         TokenPtr rt = st;
@@ -1079,6 +1088,8 @@ namespace wasmgen
         for (;;)
         {
             rt = next_token();
+            if (Invalid(rt))
+                break;
             if (*rt == cid)
                 return Finish(expr);
             puttoken(rt);
@@ -1092,13 +1103,13 @@ namespace wasmgen
             rt = next_token();
             if (Invalid(rt))
                 break;
-            if (*rt == cid)
+            if (rt->id == cid)
             {
                 expr->token_list = Transfer(xtlist);
                 expr->paren_close = rt;
                 return Finish(expr);
             }
-            if (*rt != TokenID(','))
+            if (rt->id != TokenID(','))
                 break;
             xtlist->push_back(rt);
         }
@@ -1433,6 +1444,7 @@ namespace wasmgen
         if (!(false ||
               update_option(name, tname, res, op, optname_include_depth, option.include_depth, 0, 100) ||
               update_option(name, tname, res, op, optname_comment_nest, option.comment_nest) ||
+              update_option(name, tname, res, op, optname_paren_multiline, option.paren_multiline) ||
               update_option(name, tname, res, op, optname_section_datacount, option.section_datacount) ||
               update_option(name, tname, res, op, optname_type_unique, option.type_unique) ||
               false))
@@ -4705,8 +4717,10 @@ namespace wasmgen
     {
         assert(expr);
 
-        if (expr->mode != Expression::LIST || **expr != TokenID('{'))
-            return parse_error(ErrorCode::SYNTAX_ERROR, {*expr});
+        Token* token = expr->token; assert(token);
+
+        if (expr->mode != Expression::LIST || token->id != TokenID('{'))
+            return parse_error(ErrorCode::SYNTAX_ERROR, {token});
 
         ExpressionList* children = expr->children; assert(children);
 
@@ -4726,11 +4740,13 @@ namespace wasmgen
     {
         assert(expr);
 
+        Token* token = expr->token; assert(token);
+
         res.clear();
         if (expr->mode == Expression::LIST)
         {
-            if (**expr != TokenID('['))
-                return parse_error(ErrorCode::SYNTAX_ERROR, {*expr});
+            if (token->id != TokenID('['))
+                return parse_error(ErrorCode::SYNTAX_ERROR, {token});
             if (!getvaltypes(res, expr->children))
                 return false;
         }
@@ -4751,11 +4767,12 @@ namespace wasmgen
 
     bool Parser::getequal(GetEqualRes& res, Expression* expr, IdentifierList* table)
     {
-        res.name = nullptr;
+        Token* token = expr->token; assert(token);
 
-        if (*expr->token != TokenID('='))
+        res.name = nullptr;
+        if (token->id != TokenID('='))
         {
-            parse_error(ErrorCode::SYNTAX_ERROR, {expr->token});
+            parse_error(ErrorCode::SYNTAX_ERROR, {token});
             return false;
         }
         assert(expr->children->size() == 2);
@@ -4764,7 +4781,7 @@ namespace wasmgen
         Expression* op_value = (*expr->children)[1]; assert(op_name);
         Token* tname = op_name->token; assert(tname);
 
-        if (*tname != TokenID::NAME)
+        if (tname->id != TokenID::NAME)
         {
             parse_error(ErrorCode::SYNTAX_ERROR, {tname});
             return false;
@@ -5378,6 +5395,7 @@ namespace wasmgen
     {
         include_depth = 10;
         comment_nest = false;
+        paren_multiline = false;
         section_datacount = false;
         type_unique = false;
     }
