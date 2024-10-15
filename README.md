@@ -289,10 +289,10 @@ mtest       .defmacro
 ## <code>.alias</code>疑似命令
 
 ```
-name        .alias          value
+name        .alias          value...
 ```
 
-<code>name</code>を<code>value</code>として扱います。
+<code>name</code>を<code>value...</code>として扱います。
 
 
 ## セクション用疑似命令

@@ -779,57 +779,69 @@ namespace wasmgen
                 break;
             }
         }
-        return parse_expr_unpack(ops);
+
+        ops = parse_expr_unpack(ops);
+        if (!ops)
+            return false;
+        code_line->operands = ops;
+        return true;
     }
 
-    bool Parser::parse_expr_unpack(ExpressionList* list)
+    ExpressionList* Parser::parse_expr_unpack(Expression* expr)
     {
-        auto it = list->begin();
+        assert(expr);
+        if (expr->mode != Expression::UNARY)
+            return nullptr;
 
-        while (it != list->end())
+        Token* token = expr->token; assert(token);
+
+        if (token->id != TokenID::MUL)
+            return nullptr;
+
+        ExpressionList* children = expr->children; assert(children && children->size() == 1);
+        Expression* childexpr = (*children)[0]; assert(childexpr);
+        Token* childtoken = childexpr->token; assert(childtoken);
+
+        children = childexpr->children; assert(children);
+        switch (childexpr->mode)
         {
-            Expression* expr = *it; assert(expr);
-            Token* token = expr->token; assert(token);
-            ExpressionList* children = expr->children; assert(children);
-            bool unary = false;
-
-            switch (expr->mode)
+        case Expression::VALUE:
+            if (childexpr->paren_open)
+                return children;
             {
-            case Expression::UNARY:
-                if (token->id != TokenID::MUL)
-                    break;
-                assert(children->size() == 1);
-                expr = (*children)[0];
-                if (expr->mode != Expression::LIST)
-                {
-                    if (expr->mode != Expression::VALUE)
-                        break;
-                    if (!expr->paren_open)
-                        break;
-                    *it = expr;
-                    break;
-                }
-                children = expr->children; assert(children);
-                unary = true;
-                fallthrough;
-            case Expression::LIST:
-                if (!parse_expr_unpack(children))
-                    return false;
-                if (!unary)
-                    break;
-                {
-                    ExpressionListPtr p = children;
+                Identifier* idmap = alias_name; assert(idmap);
+                Expression* symexpr = idmap->getexpr(childtoken->text);
 
-                    it = list->insert(list->erase(it), p->begin(), p->end());
-                }
-                continue;
-
-            default:
-                break;
+                if (!symexpr)
+                    return nullptr;
+                if (symexpr->mode != Expression::LIST)
+                    return nullptr;
+                children = symexpr->children;
             }
-            ++it;
+            fallthrough;
+        case Expression::LIST:
+            return parse_expr_unpack(children);
+
+        default:
+            break;
         }
-        return true;
+        return nullptr;
+    }
+
+    ExpressionList *Parser::parse_expr_unpack(ExpressionList* list)
+    {
+        ExpressionList *rlist = new ExpressionList;
+
+        for (Expression* expr : *list)
+        {
+            ExpressionList* children = parse_expr_unpack(expr);
+
+            if (!children)
+                rlist->push_back(expr);
+            else
+                rlist->insert(rlist->end(), children->begin(), children->end());
+        }
+        return rlist;
     }
 
     /*
@@ -1536,12 +1548,21 @@ namespace wasmgen
             parse_error(ErrorCode::EXIST_ALIAS_NAME, {label});
             return;
         }
-        if (!check_operands(line, 1, 1))
-            return;
 
         ExpressionList* ops = line->operands; assert(ops);
 
-        (*alias_name)[*name] = (*ops)[0];
+        switch (ops->size())
+        {
+        case 0:
+            parse_error_too_few_operands(line);
+            break;
+        case 1:
+            (*alias_name)[*name] = (*ops)[0];
+            break;
+        default:
+            (*alias_name)[*name] = new Expression(label, ops);
+            break;
+        }
     }
 
     void Parser::parse_pseudo_include()
