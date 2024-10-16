@@ -26,6 +26,8 @@ namespace wasmgen
         using PseudoDataEntry = InstructionEntry;
         using CloseSectionEntry = InstructionEntry;
 
+        using MacroDataDictIter = MacroDataDict::iterator;
+
         struct OpLT { template <typename L, typename R> inline bool op(L l, R r) { return l < r; } };
         struct OpLE { template <typename L, typename R> inline bool op(L l, R r) { return l <= r; } };
         struct OpEQ { template <typename L, typename R> inline bool op(L l, R r) { return l == r; } };
@@ -40,6 +42,13 @@ namespace wasmgen
         struct OpMod { template <typename L, typename R> inline auto op(L l, R r) { return l % r; } };
 
         using Int64List = StdVector<int64_t>;
+
+        struct InstrRes
+        {
+            InstrIter instr;
+            MacroDataDictIter macro;
+            bool find;
+        };
 
         struct GetTypeRes
         {
@@ -216,6 +225,8 @@ namespace wasmgen
         void next_section(SectionID id);
 
         bool check_operands(CodeLine* line, size_t min, size_t max) noexcept;
+
+        InstrRes find_instr(String* name, bool noalias = false) noexcept;
 
         bool parse_file();
         bool parse_file(String* curdir, TextFileReader* reader);

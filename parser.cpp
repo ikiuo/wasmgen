@@ -416,6 +416,46 @@ namespace wasmgen
         return true;
     }
 
+    Parser::InstrRes Parser::find_instr(String* name, bool noalias) noexcept
+    {
+        InstrRes res {
+            Instruction::table.end(),
+            macro_dict.end(),
+            false,
+        };
+
+        res.instr = Instruction::table.find(*name);
+        if (res.instr != Instruction::table.end())
+        {
+            res.find = true;
+            return res;
+        }
+        res.macro = macro_dict.find(*name);
+        if (res.macro != macro_dict.end())
+        {
+            res.find = true;
+            return res;
+        }
+        if (noalias)
+            return res;
+
+        auto it = alias_name->find(*name);
+
+        if (it == alias_name->end())
+            return res;
+
+        Expression* expr = it->second; assert(expr);
+
+        if (expr->mode != Expression::VALUE)
+            return res;
+
+        Token* et = expr->token; assert(et);
+
+        if (et->id != TokenID::NAME)
+            return res;
+        return find_instr(et->text, true);
+    }
+
     /*
      *
      */
@@ -475,10 +515,7 @@ namespace wasmgen
     bool Parser::parse_line()
     {
         auto eit = Instruction::table.end();
-        auto it = eit;
-
         auto meit = macro_dict.end();
-        auto mit = meit;
 
         asmsw_skip = asmsw_flag.skip;
         code_line = new CodeLine;
@@ -515,15 +552,9 @@ namespace wasmgen
             return Valid(rt = feed_eol());
         }
 
-        bool instr = false;
+        InstrRes insres = find_instr(rt->text);
 
-        it = Instruction::table.find(rt->text);
-        if (!(instr = it != eit))
-        {
-            mit = macro_dict.find(rt->text);
-            instr = mit != meit;
-        }
-        if (!instr)
+        if (!insres.find)
         {
             if (asmsw_skip)
                 return Valid(rt = feed_eol());
@@ -533,16 +564,13 @@ namespace wasmgen
             if (Valid(rt) && rt->id == TokenID(':'))
                 rt = next_token();
             if (Valid(rt) && rt->id == TokenID::NAME)
-            {
-                it = Instruction::table.find(rt->text);
-                if (!(instr = it != eit))
-                {
-                    mit = macro_dict.find(rt->text);
-                    instr = mit != meit;
-                }
-            }
+                insres = find_instr(rt->text);
         }
-        if (instr)
+
+        auto it = insres.instr;
+        auto mit = insres.macro;
+
+        if (insres.find)
         {
             if (asmsw_skip)
             {
