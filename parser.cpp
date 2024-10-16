@@ -796,8 +796,16 @@ namespace wasmgen
     ExpressionList* Parser::parse_expr_unpack(Expression* expr)
     {
         assert(expr);
-        if (expr->mode != Expression::UNARY)
+
+        switch (expr->mode)
+        {
+        case Expression::UNARY:
+            break;
+        case Expression::BINARY:
+            return parse_expr_unpack_binary(expr);
+        default:
             return nullptr;
+        }
 
         Token* token = expr->token; assert(token);
 
@@ -808,7 +816,7 @@ namespace wasmgen
         Expression* childexpr = (*children)[0]; assert(childexpr);
         Token* childtoken = childexpr->token; assert(childtoken);
 
-        children = childexpr->children; assert(children);
+        ExpressionList* grandchildren = childexpr->children; assert(grandchildren);
         switch (childexpr->mode)
         {
         case Expression::VALUE:
@@ -822,11 +830,96 @@ namespace wasmgen
                     return nullptr;
                 if (symexpr->mode != Expression::LIST)
                     return nullptr;
-                children = symexpr->children;
+                grandchildren = symexpr->children;
             }
             fallthrough;
         case Expression::LIST:
-            return parse_expr_unpack(children);
+            return parse_expr_unpack(grandchildren);
+
+        case Expression::BINARY:
+            return parse_expr_unpack_binary(childexpr);
+
+        default:
+            break;
+        }
+        return nullptr;
+    }
+
+    ExpressionList *Parser::parse_expr_unpack_binary(Expression *expr)
+    {
+        assert(expr && expr->mode == Expression::BINARY);
+
+        Token* token = expr->token; assert(token);
+        ExpressionList* children = expr->children; assert(children);
+        Expression* op0 = (*children)[0]; assert(op0);
+        Expression* op1 = (*children)[1]; assert(op1);
+
+        switch (token->id)
+        {
+        case TokenID::ADD:
+            if (op0->mode != op1->mode)
+                break;
+            switch (op0->mode)
+            {
+            case Expression::VALUE:
+                {
+                    if (!op0->isstring() || !op1->isstring())
+                        break;
+                    token->id = TokenID::QUOTE;
+                    token->quote = new String(*op0->getstring() + *op1->getstring());
+                    expr = new Expression(token);
+                    children = new ExpressionList;
+                    children->push_back(expr);
+                    return children;
+                }
+
+            case Expression::LIST:
+                {
+                    ExpressionList* op0_list = op0->children; assert(op0_list);
+                    ExpressionList* op1_list = op1->children; assert(op1_list);
+
+                    children = new ExpressionList;
+                    children->insert(children->end(), op0_list->begin(), op0_list->end());
+                    children->insert(children->end(), op1_list->begin(), op1_list->end());
+                    return children;
+                }
+
+            default:
+                break;
+            }
+            break;
+
+        case TokenID::MUL:
+            if (op1->isnumber())
+            {
+                auto res = getvalue(op1);
+
+                if (!res.isint())
+                    break;
+                if (op0->isstring())
+                {
+                    String* op0s = op0->getstring();
+
+                    token->id = TokenID::QUOTE;
+                    token->quote = new String;
+                    for (int n = res, i = 0; i < n; ++i)
+                        *token->quote += *op0s;
+                    expr = new Expression(token);
+                    children = new ExpressionList;
+                    children->push_back(expr);
+                    return children;
+                }
+                if (op0->mode == Expression::LIST)
+                {
+                    ExpressionList* op0_list = op0->children; assert(op0_list);
+
+                    children = new ExpressionList;
+                    for (int n = res, i = 0; i < n; ++i)
+                        children->insert(children->end(), op0_list->begin(), op0_list->end());
+                    return children;
+                }
+            }
+            break;
 
         default:
             break;
@@ -894,7 +987,7 @@ namespace wasmgen
 
         if (!val)
         {
-            parse_error(ErrorCode::SYNTAX_ERROR, {op});
+            parse_expr_error(ErrorCode::SYNTAX_ERROR, {op});
             return nullptr;
         }
 
@@ -911,7 +1004,7 @@ namespace wasmgen
         sym1 = next_token();
         if (Invalid(sym1))
             return Finish(op1);
-        if (*sym1 != '?')
+        if (*sym1 != TokenID('?'))
         {
             puttoken(sym1);
             return Finish(op1);
@@ -922,9 +1015,9 @@ namespace wasmgen
             return nullptr;
         }
         sym2 = next_token();
-        if (Invalid(sym2) || *sym2 != ':')
+        if (Invalid(sym2) || *sym2 != TokenID(':'))
         {
-            parse_expr_error(ErrorCode::SYNTAX_ERROR, {sym2});
+            parse_expr_error(ErrorCode::SYNTAX_ERROR, {sym2 ? sym2 : op2->token});
             return nullptr;
         }
         if (!(op3 = parse_expr_binary()))
@@ -1045,7 +1138,8 @@ namespace wasmgen
 
                 if (!value)
                     break;
-                if (value->children->size() == 1)
+                if (value->children->size() == 1 &&
+                    (!value->token_list || !value->token_list->size()))
                 {
                     auto& child = (*value->children)[0];
 
@@ -1082,39 +1176,49 @@ namespace wasmgen
         NewExpression expr(Expression::LIST);
         NewTokenList xtlist;
         TokenPtr rt = st;
+        Token* pt = nullptr;
 
         expr->token = st;
         expr->paren_open = st;
         for (;;)
         {
+            pt = rt;
             rt = next_token();
             if (Invalid(rt))
+            {
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {pt});
+                return nullptr;
+            }
+            if (rt->id == cid)
                 break;
-            if (*rt == cid)
-                return Finish(expr);
             puttoken(rt);
 
             ExpressionRef value = parse_expression();
 
             if (!value)
-                break;
+            {
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
+                return nullptr;
+            }
             expr->children->push_back(Transfer(value));
 
+            pt = rt;
             rt = next_token();
             if (Invalid(rt))
-                break;
-            if (rt->id == cid)
             {
-                expr->token_list = Transfer(xtlist);
-                expr->paren_close = rt;
-                return Finish(expr);
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {pt});
+                return nullptr;
             }
-            if (rt->id != TokenID(','))
+            if (rt->id == cid)
+                break;
+            if (rt->id != TokenID::CHAR_COMMA)
                 break;
             xtlist->push_back(rt);
         }
-        parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
-        return nullptr;
+
+        expr->token_list = Transfer(xtlist);
+        expr->paren_close = rt;
+        return Finish(expr);
     }
 
     /*
@@ -4920,6 +5024,7 @@ namespace wasmgen
         const Token* token = token_list.size() ? token_list[0] : nullptr;
         StdString message = make_error_message(code, "error:E", token_list);
 
+        assert(token);
         parse_message(token, message.c_str());
         ++error_count;
         return false;

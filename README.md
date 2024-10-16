@@ -128,6 +128,7 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 {x,y,z}
 ```
 
+
 ### リストの内部展開
 
 リスト内で、リストの前に<code>*</code>を記述すると、単一項から親リストの要素列に展開されます。オペランドは括弧なしのリストになっています。
@@ -136,6 +137,25 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 
 ```
 (1,*(2,3)) → (1,2,3)
+```
+
+
+### リスト演算
+
+リストとリストの結合を演算子<code>+</code>で行うことができます。
+
+**例**
+
+```
+[1,2,3] + [4,5,6] → [1,2,3,4,5,6]
+```
+
+リストの繰り返し複製を演算子<code>\*</code>で行うことができます。
+
+**例**
+
+```
+[1,2]*3 → [1,2,1,2,1,2]
 ```
 
 
@@ -150,6 +170,25 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 16進コード | 最大2桁(8bit) : <code>\\x</code>HH |
 | UCSコード | 最大6桁(24bit) : <code>\\u</code>HHHHHH |
 | 上記以外 | <code>\\</code> の直後の文字が有効 <br/> 例: <code>\\\\</code> → <code>\\</code>  |
+
+
+### 文字列演算
+
+文字列と文字列の結合を演算子<code>+</code>で行うことができます。
+
+**例**
+
+```
+"abc" + "def" → "abcdef"
+```
+
+文字列の繰り返し複製を演算子<code>\*</code>で行うことができます。
+
+**例**
+
+```
+"ab"*3 → "ababab"
+```
 
 
 ## 識別子

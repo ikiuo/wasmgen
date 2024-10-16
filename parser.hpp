@@ -226,6 +226,7 @@ namespace wasmgen
 
         bool parse_operands();
         ExpressionList *parse_expr_unpack(Expression *expr);
+        ExpressionList *parse_expr_unpack_binary(Expression *expr);
         ExpressionList *parse_expr_unpack(ExpressionList *list);
         Expression* parse_expression();
         Expression* parse_expr_assignment();
