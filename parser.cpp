@@ -3774,18 +3774,18 @@ namespace wasmgen
                 break;
 
             case Instruction::OP_VI08:
-                cnt = 16;
+                cnt = clamp<size_t>(1, oplen, 16);
                 break;
             case Instruction::OP_VI16:
-                cnt = 8;
+                cnt = clamp<size_t>(1, oplen, 8);
                 break;
             case Instruction::OP_VI32:
             case Instruction::OP_VF32:
-                cnt = 4;
+                cnt = clamp<size_t>(1, oplen, 4);
                 break;
             case Instruction::OP_VI64:
             case Instruction::OP_VF64:
-                cnt = 2;
+                cnt = clamp<size_t>(1, oplen, 2);
                 break;
 
             case Instruction::OP_VL:
@@ -3999,41 +3999,35 @@ namespace wasmgen
                 binary.append_object(float64le_t(double(opval[0])));
                 break;
 
-            case Instruction::OP_VI08:
             case Instruction::OP_VLT:
                 assert(opval.size() >= 16);
                 for (auto n : inc_range<size_t>(16))
                     binary.push_back(uint8_t(opval[n]));
                 break;
 
+            case Instruction::OP_VI08:
+                assert(opval.size() >= 1);
+                binary.append_operands<uint8le_t>(opval, 16);
+                break;
             case Instruction::OP_VI16:
-                assert(opval.size() >= 8);
-                for (auto n : inc_range<size_t>(8))
-                    binary.append_object(uint16le_t(opval[n]));
+                assert(opval.size() >= 1);
+                binary.append_operands<uint16le_t>(opval, 8);
                 break;
-
             case Instruction::OP_VI32:
-                assert(opval.size() >= 4);
-                for (auto n : inc_range<size_t>(4))
-                    binary.append_object(uint32le_t(opval[n]));
+                assert(opval.size() >= 1);
+                binary.append_operands<uint32le_t>(opval, 4);
                 break;
-
             case Instruction::OP_VI64:
-                assert(opval.size() >= 2);
-                for (auto n : inc_range<size_t>(2))
-                    binary.append_object(uint64le_t(opval[n]));
+                assert(opval.size() >= 1);
+                binary.append_operands<uint64le_t>(opval, 2);
                 break;
-
             case Instruction::OP_VF32:
-                assert(opval.size() >= 4);
-                for (auto n : inc_range<size_t>(4))
-                    binary.append_object(float32le_t(float(opval[n])));
+                assert(opval.size() >= 1);
+                binary.append_operands<float32le_t>(opval, 4);
                 break;
-
             case Instruction::OP_VF64:
-                assert(opval.size() >= 2);
-                for (auto n : inc_range<size_t>(2))
-                    binary.append_object(float64le_t(double(opval[n])));
+                assert(opval.size() >= 1);
+                binary.append_operands<float64le_t>(opval, 2);
                 break;
 
             case Instruction::OP_DID:

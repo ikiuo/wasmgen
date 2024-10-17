@@ -1311,6 +1311,7 @@ $exit:      end
 
 <code>&lt;cmp&gt;</code>にオペランドを記述すると分岐処理も追加します。
 
+
 ### オペランドに <code>&lt;labelidx&gt;</code> を記述
 
 ```
@@ -1323,6 +1324,7 @@ $exit:      end
             <cmp>
             br_if       <labelidx>
 ```
+
 
 ### オペランドに <code>return</code> を記述
 
@@ -1342,7 +1344,7 @@ $exit:      end
 
 ## <code>v128.const</code>代替命令
 
-以下の命令は、<code>v128.const</code>の別名として処理します。
+以下の命令は<code>v128.const</code>の別名とし、オペランドは2番目以降を省略すると<code>0</code>として処理します。
 
 | 命令 | 例 |
 |:-:|:--|
@@ -1353,6 +1355,9 @@ $exit:      end
 | <code>i62x2.const</code> | <code>i64x2.const  0x0706050403020100,0x0f0e0d0c0b0a0908</code> |
 | <code>f32x4.const</code> | <code>f32x4.const  1.0, 2.0, 3.0, 4.0</code> |
 | <code>f62x2.const</code> | <code>f64x2.const  0.5, 0.25</code> |
+| | |
+| <code>v128.const</code> | <code>v128.const   0    ;# 2番目以降も 0 |
+
 
 ## メモリ命令
 
@@ -1376,6 +1381,7 @@ $exit:      end
 
 
 # 命令表
+
 
 ### [仕様書](https://webassembly.github.io/spec/core/exec/instructions.html)にある配列の略記
 
@@ -1485,10 +1491,10 @@ $exit:      end
 | <code>0</code> | <code>f64</code> | <code>f64\.const</code> | <code>f64</code> | <code><var>r</var><sub>f64</sub> ← <var>f64</var></code> |
 | <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i8x16\.const</code><br/><code>s8x16\.const</code><br/><code>u8x16\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
 | <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i16x8\.const</code><br/><code>s16x8\.const</code><br/><code>u16x8\.const</code> | <code>i16<sub>1</sub>,i16<sub>2</sub>,...,i16<sub>8</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
-| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.const</code><br/><code>s32x4\.const</code><br/><code>u32x4\.const</code> | <code>i32,i32,i32,i32</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
-| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.const</code><br/><code>s64x2\.const</code><br/><code>u64x2\.const</code> | <code>i64,i64</code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
-| <code>0</code> | <code>v128</code> | <code>f32x4\.const</code> | <code>f32,f32,f32,f32</code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
-| <code>0</code> | <code>v128</code> | <code>f64x2\.const</code> | <code>f64,f64</code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i32x4\.const</code><br/><code>s32x4\.const</code><br/><code>u32x4\.const</code> | <code>i32<sub>1</sub>,i32<sub>2</sub>,i32<sub>3</sub>,i32<sub>4</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code><br/>&nbsp;<br/>&nbsp; | <code>v128</code><br/>&nbsp;<br/>&nbsp; | <code>i64x2\.const</code><br/><code>s64x2\.const</code><br/><code>u64x2\.const</code> | <code>i64<sub>1</sub>,i64<sub>2</sub></code><br/>&nbsp;<br/>&nbsp; | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> <br/>&nbsp;<br/>&nbsp; |
+| <code>0</code> | <code>v128</code> | <code>f32x4\.const</code> | <code>f32<sub>1</sub>,f32<sub>2</sub>,f32<sub>3</sub>,f32<sub>4</sub></code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
+| <code>0</code> | <code>v128</code> | <code>f64x2\.const</code> | <code>f64<sub>1</sub>,f64<sub>2</sub></code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
 | <code>0</code> | <code>v128</code> | <code>v128\.const</code> | <code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code> | <code><var>r</var><sub>v128</sub> ← <var>v128</var></code> |
 
 

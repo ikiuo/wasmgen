@@ -39,6 +39,21 @@ namespace wasmgen
         UNDEFINED = -1,
     };
 
+    ////////////////
+    // CodeBinary //
+    ////////////////
+
+    class CodeBinary : public ByteArray
+    {
+    private:
+        using super = ByteArray;
+
+    public:
+        using super::super;
+
+        template <typename T> void append_operands(ExprValueList& ops, size_t max);
+    };
+
     //////////////
     // CodeLine //
     //////////////
@@ -52,7 +67,7 @@ namespace wasmgen
         MacroDataPtr macro;
         ExpressionListPtr operands;
         int operand_start;
-        ByteArray binary;
+        CodeBinary binary;
 
     public:
         CodeLine();
@@ -776,6 +791,23 @@ namespace wasmgen
     inline TypeData::operator FuncType&() noexcept
     {
         return type;
+    }
+
+    ////////////////
+    // CodeBinary //
+    ////////////////
+
+    template <typename T>
+    void CodeBinary::append_operands(ExprValueList& opval, size_t max)
+    {
+        size_t ops = opval.size();
+
+        if (ops)
+            for (auto n : inc_range<size_t>(ops))
+                append_object(T(opval[n]));
+        if (ops < max)
+            for (auto n : inc_range<size_t>(max - ops))
+                append_object(T(0)), (void)n;
     }
 
     //////////////
