@@ -2568,11 +2568,12 @@ namespace wasmgen
 
         assert(func);
 
+        StdVector<CodeLine*> pending;
         TypeData* type = func->type; assert(type);
         Identifier* args = &type->arg;
         valtypemap vtmap;
 
-        for (auto line : locals)
+        for (CodeLine* line : locals)
         {
             GetNameValTypeRes res;
 
@@ -2586,7 +2587,10 @@ namespace wasmgen
             if (!name)
                 return parse_error(ErrorCode::NO_PARAM_LABEL, {line->instr});
             if (valtype == ValType::NONE)
-                return parse_error(ErrorCode::NOT_VALTYPE, {*line->getop(0)});
+            {
+                pending.push_back(line);
+                continue;
+            }
             vtmap[valtype].push_back(label);
         }
 
@@ -2612,6 +2616,22 @@ namespace wasmgen
 
                 WASMGEN_DEBUG(2, "    name[", index, "]=\"", GetCStr(label), "\"\n");
             }
+        }
+
+        for (CodeLine* line : pending)
+        {
+            assert(line);
+
+            Token* label = line->label; assert(label);
+            ExpressionList* ops = line->operands; assert(ops); assert(ops->size() >= 1);
+            Expression* op = (*ops)[0]; assert(op);
+            Token* op_token = op->token; assert(op_token);
+            String* name = op_token->text; assert(name);
+            Expression* expr = lid->getexpr(*name);
+
+            if (!expr)
+                return parse_error(ErrorCode::NOT_VALTYPE, {op_token});
+            (*lid)[label->text] = expr;
         }
 
         CodeList* clist = func->code; assert(clist);

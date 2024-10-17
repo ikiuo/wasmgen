@@ -6,8 +6,8 @@
 
 #define WASMGEN_VERSION_MAJOR    0
 #define WASMGEN_VERSION_MINOR    2
-#define WASMGEN_VERSION_RELEASE  6
-#define WASMGEN_VERSION_STRING   "0.2.6"
+#define WASMGEN_VERSION_RELEASE  7
+#define WASMGEN_VERSION_STRING   "0.2.7"
 
 using namespace wasmgen;
 using StrKeyValue = StdStringMap<StringPtr>;

@@ -961,10 +961,11 @@ Type Section の<code>.param</code>疑似命令と同じです。
 ### <code>.local</code>疑似命令
 
 ```
-ローカル名  .local      <変数型:valtype>
+ローカル名1 .local      <変数型:valtype>
+ローカル名2 .local      <ローカル名?>    ;# ローカルの別名を定義
 ```
 
-<code>ローカル名</code>は名前空間<code>関数名</code>の<code>localidx</code>に序数として登録され、<code>localidx</code>を指定する場面で参照できます。ローカルの序数は、型(<code>valtype</code>)の種類で纏められるので順序が前後することがあります。
+<code>ローカル名1</code>は名前空間<code>関数名</code>の<code>localidx</code>に序数として登録され、<code>localidx</code>を指定する場面で参照できます。<code>ローカル名2</code>は別の<code>ローカル名?</code>と同じ<codel>lcoalidx</code>になります。ローカルの序数は型(<code>valtype</code>)の種類で纏められるので順序が前後することがあります。
 
 
 ### <code>.code</code>例
