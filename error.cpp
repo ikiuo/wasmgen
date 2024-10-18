@@ -41,6 +41,9 @@ namespace wasmgen
         {ErrorCode::NOT_VALUE, {{-1,0},{" を数値化できません。"}}},
         {ErrorCode::NOT_STRING, {{-1,0},{" を文字列化できません。"}}},
         /**/
+        {ErrorCode::UNMATCHED_LIST_SIZES, {{0},{"リストのサイズが一致しません。"}}},
+        {ErrorCode::LIST_INDEX_OVERFLOW, {{0},{"リスト要素のインデックスが大きすぎます。"}}},
+        /**/
         {ErrorCode::NO_SECTION_LABEL, {{-1,0},{" のラベルがありません。"}}},
         {ErrorCode::INVALID_SECTION_ID, {{0,-1,1},{"無効なセクション番号(",")です。"}}},
         {ErrorCode::INVALID_SECTION_NAME, {{0,-1,1},{"未知のセクション名(",")です。"}}},

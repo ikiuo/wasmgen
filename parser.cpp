@@ -814,14 +814,33 @@ namespace wasmgen
             }
         }
 
-        ops = parse_expr_unpack(ops);
-        if (!ops)
+        ExpressionListRef nops = parse_expr_unpack(ops);
+
+        if (!nops)
             return false;
-        code_line->operands = ops;
+        code_line->operands = Transfer(nops);
         return true;
     }
 
-    ExpressionList* Parser::parse_expr_unpack(Expression* expr)
+    ExpressionList *Parser::parse_expr_unpack(ExpressionList* list)
+    {
+        assert(list);
+
+        NewExpressionList rlist;
+
+        for (Expression* expr : *list)
+        {
+            ExpressionListRef children = parse_expr_unpack_list(expr);
+
+            if (!children)
+                rlist->push_back(expr);
+            else
+                rlist->insert(rlist->end(), children->begin(), children->end());
+        }
+        return Finish(rlist);
+    }
+
+    ExpressionList* Parser::parse_expr_unpack_list(Expression* expr)
     {
         assert(expr);
 
@@ -843,13 +862,13 @@ namespace wasmgen
         ExpressionList* children = expr->children; assert(children && children->size() == 1);
         Expression* childexpr = (*children)[0]; assert(childexpr);
         Token* childtoken = childexpr->token; assert(childtoken);
-
         ExpressionList* grandchildren = childexpr->children; assert(grandchildren);
+
         switch (childexpr->mode)
         {
         case Expression::VALUE:
             if (childexpr->paren_open)
-                return children;
+                return NewRef(children);
             {
                 Identifier* idmap = alias_name; assert(idmap);
                 Expression* symexpr = idmap->getexpr(childtoken->text);
@@ -895,21 +914,23 @@ namespace wasmgen
                         break;
                     token->id = TokenID::QUOTE;
                     token->quote = new String(*op0->getstring() + *op1->getstring());
-                    expr = new Expression(token);
-                    children = new ExpressionList;
-                    children->push_back(expr);
-                    return children;
+
+                    NewExpressionList children;
+
+                    children->push_back(new Expression(token));
+                    return Finish(children);
                 }
 
             case Expression::LIST:
                 {
-                    ExpressionList* op0_list = op0->children; assert(op0_list);
-                    ExpressionList* op1_list = op1->children; assert(op1_list);
+                    ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
+                    ExpressionList* op1_list = parse_expr_unpack(op1->children); assert(op1_list);
 
-                    children = new ExpressionList;
+                    NewExpressionList children;
+
                     children->insert(children->end(), op0_list->begin(), op0_list->end());
                     children->insert(children->end(), op1_list->begin(), op1_list->end());
-                    return children;
+                    return Finish(children);
                 }
 
             default:
@@ -932,20 +953,56 @@ namespace wasmgen
                     token->quote = new String;
                     for (int n = res, i = 0; i < n; ++i)
                         *token->quote += *op0s;
-                    expr = new Expression(token);
-                    children = new ExpressionList;
-                    children->push_back(expr);
-                    return children;
+
+                    NewExpressionList children;
+
+                    children->push_back(new Expression(token));
+                    return Finish(children);
                 }
                 if (op0->mode == Expression::LIST)
                 {
-                    ExpressionList* op0_list = op0->children; assert(op0_list);
+                    ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
+                    NewExpressionList children;
 
-                    children = new ExpressionList;
                     for (int n = res, i = 0; i < n; ++i)
                         children->insert(children->end(), op0_list->begin(), op0_list->end());
-                    return children;
+                    return Finish(children);
                 }
+            }
+            break;
+
+        case TokenID::VADD:
+        case TokenID::VSUB:
+        case TokenID::VMUL:
+        case TokenID::VDIV:
+        case TokenID::VMOD:
+            if (op0->mode == Expression::LIST &&
+                op1->mode == Expression::LIST)
+            {
+                ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
+                ExpressionList* op1_list = parse_expr_unpack(op1->children); assert(op1_list);
+                size_t size = op0_list->size();
+
+                if (size != op1_list->size())
+                {
+                    parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
+                    break;
+                }
+                switch (token->id)
+                {
+                case TokenID::VADD: token->id = TokenID::ADD; break;
+                case TokenID::VSUB: token->id = TokenID::SUB; break;
+                case TokenID::VMUL: token->id = TokenID::MUL; break;
+                case TokenID::VDIV: token->id = TokenID::DIV; break;
+                case TokenID::VMOD: token->id = TokenID::MOD; break;
+                default: break;
+                }
+
+                NewExpressionList children;
+
+                for (auto n : inc_range<size_t>(size))
+                    children->push_back(new Expression(token, (*op0_list)[n], (*op1_list)[n]));
+                return Finish(children);
             }
             break;
 
@@ -953,22 +1010,6 @@ namespace wasmgen
             break;
         }
         return nullptr;
-    }
-
-    ExpressionList *Parser::parse_expr_unpack(ExpressionList* list)
-    {
-        ExpressionList *rlist = new ExpressionList;
-
-        for (Expression* expr : *list)
-        {
-            ExpressionList* children = parse_expr_unpack(expr);
-
-            if (!children)
-                rlist->push_back(expr);
-            else
-                rlist->insert(rlist->end(), children->begin(), children->end());
-        }
-        return rlist;
     }
 
     /*
@@ -1154,6 +1195,32 @@ namespace wasmgen
 
     Expression* Parser::parse_expr_value()
     {
+        ExpressionRef lhs, rhs;
+        TokenRef ct;
+
+        lhs = parse_expr_value_list();
+        if (!lhs)
+            return nullptr;
+        for (;;)
+        {
+            ct = next_token();
+            if (Invalid(ct))
+                break;
+
+            bool item = ct->id == TokenID('[');
+
+            puttoken(ct);
+            if (!item)
+                break;
+            if (!(rhs = parse_expr_value_list()))
+                break;
+            lhs = NewExpression(ct, lhs, rhs, Expression::ITEM);
+        }
+        return Finish(lhs);
+    }
+
+    Expression* Parser::parse_expr_value_list()
+    {
         TokenRef rt = next_token();
 
         if (Invalid(rt))
@@ -1240,7 +1307,10 @@ namespace wasmgen
             if (rt->id == cid)
                 break;
             if (rt->id != TokenID::CHAR_COMMA)
-                break;
+            {
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {pt});
+                return nullptr;
+            }
             xtlist->push_back(rt);
         }
 
@@ -4499,6 +4569,8 @@ namespace wasmgen
 
     ExprValue Parser::getvalue(StdStringSet& nest, Expression* expr, IdentifierList* label)
     {
+        assert(expr && expr->children);
+
         auto& children = *expr->children;
         Token* et = expr->token; assert(et);
 
@@ -4545,6 +4617,8 @@ namespace wasmgen
 
         case Expression::UNARY:
             {
+                assert(children.size() >= 1);
+
                 auto v0 = getvalue(nest, children[0], label);
 
                 if (!v0.isnumber())
@@ -4584,6 +4658,8 @@ namespace wasmgen
 
         case Expression::BINARY:
             {
+                assert(children.size() >= 2);
+
                 Expression* expr0 = children[0];
                 auto v0 = getvalue(nest, expr0, label);
 
@@ -4655,6 +4731,25 @@ namespace wasmgen
                 case TokenID::MUL:
                     if (v0.isnumber() && v1.isnumber())
                         return binary_operator(v0, v1, OpMul());
+                    if (v0.islist() && v1.isnumber())
+                    {
+                        auto& vl = v0.list;
+
+                        if (vl.size() != 1)
+                            break;
+
+                        auto& ve = vl[0];
+                        ExprValue r(ExprValue::ST_LIST);
+                        auto& rl = r.list;
+
+                        for (auto n : inc_range<size_t>(uint64_t(v1)))
+                        {
+                            UNUSED(n);
+
+                            rl.push_back(ve);
+                        }
+                        return r;
+                    }
                     {
                         int64_t n = -1;
                         String* q = nullptr;
@@ -4722,6 +4817,8 @@ namespace wasmgen
                         return ExprValue(int64_t(v0) << int64_t(v1));
                     break;
 
+                    /**/
+
                 case TokenID::RSHIFT:
                     if (v0.isnumber() && v1.isnumber())
                         return ExprValue(int64_t(v0) >> int64_t(v1));
@@ -4732,6 +4829,8 @@ namespace wasmgen
                         return ExprValue(int64_t(uint64_t(int64_t(v0)) >> int64_t(v1)));
                     break;
 
+                    /**/
+
                 case TokenID::BAND:
                     if (v0.isnumber() && v1.isnumber())
                         return ExprValue(bool(v0) && bool(v1));
@@ -4741,6 +4840,30 @@ namespace wasmgen
                     if (v0.isnumber() && v1.isnumber())
                         return ExprValue(bool(v0) || bool(v1));
                     break;
+
+                    /**/
+
+                case TokenID::VADD:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpAdd(), et);
+                    break;
+
+                case TokenID::VSUB:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpSub(), et);
+                    break;
+
+                case TokenID::VMUL:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpMul(), et);
+                    break;
+
+                case TokenID::VDIV:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpDiv(), et);
+                    break;
+
+                    /**/
 
                 case TokenID::EQUAL:
                     parse_error(ErrorCode::SYNTAX_ERROR, {et});
@@ -4754,10 +4877,68 @@ namespace wasmgen
 
         case Expression::CONDITIONAL:
             {
+                assert(children.size() >= 3);
+
                 auto v0 = getvalue(nest, children[0], label);
 
                 if (v0.isnumber())
                     return getvalue(nest, children[bool(v0) ? 1 : 2], label);
+            }
+            break;
+
+        case Expression::LIST:
+            {
+                ExprValue r(ExprValue::ST_LIST);
+                ExprValueList& rl = r.list;
+
+                for (Expression* op : children)
+                {
+                    assert(op);
+
+                    auto v = getvalue(nest, op, label);
+
+                    if (!v.isvalid())
+                        return ExprValue();
+                    rl.push_back(v);
+                }
+                return r;
+            }
+            break;
+
+        case Expression::ITEM:
+            {
+                assert(children.size() >= 2);
+
+                Expression* op0 = children[0]; assert(op0);
+
+                auto v1 = getvalue(nest, children[1], label);
+
+                if (!v1.islist())
+                    break;
+                if (v1.list.size() != 1)
+                    break;
+
+                auto& vp = v1.list[0];
+
+                if (!vp.isnumber())
+                    break;
+
+                int64_t pos(vp);
+                auto v0 = getvalue(nest, children[0], label);
+
+                if (v0.islist())
+                {
+                    auto& vl = v0.list;
+
+                    if (pos < 0)
+                        pos += int64_t(vl.size());
+                    if (pos < 0 || int64_t(vl.size()) <= pos)
+                    {
+                        parse_error(ErrorCode::LIST_INDEX_OVERFLOW, {et});
+                        break;
+                    }
+                    return vl[size_t(pos)];
+                }
             }
             break;
 

@@ -92,6 +92,10 @@ namespace wasmgen
         NOT_VALUE,
         NOT_STRING,
 
+        _LIST = 2040,
+        UNMATCHED_LIST_SIZES,
+        LIST_INDEX_OVERFLOW,
+
         /**/
 
         _SECTION = 2100,

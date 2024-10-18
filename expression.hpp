@@ -41,6 +41,7 @@ namespace wasmgen
             BINARY,
             CONDITIONAL,
             LIST,
+            ITEM,
         };
 
     protected:
@@ -63,7 +64,7 @@ namespace wasmgen
         Expression(Mode mode) noexcept;
         Expression(Token* value) noexcept;
         Expression(Token* op, Expression* value) noexcept;
-        Expression(Token* op, Expression* lhs, Expression* rhs) noexcept;
+        Expression(Token* op, Expression* lhs, Expression* rhs, Mode mode = BINARY) noexcept;
         Expression(Token* op, Expression* cval, Expression* tval, Expression* fval) noexcept;
         Expression(Token* op, ExpressionList* list) noexcept;
 
@@ -138,8 +139,16 @@ namespace wasmgen
 
     inline Token* Expression::gettoken() noexcept
     {
-        return (mode == BINARY || mode == CONDITIONAL)
-            ? (*children)[0]->gettoken() : &token;
+        switch (mode)
+        {
+        case BINARY:
+        case CONDITIONAL:
+        case ITEM:
+            return (*children)[0]->gettoken();
+        default:
+            break;
+        }
+        return token;
     }
 
     inline String* Expression::getname() noexcept

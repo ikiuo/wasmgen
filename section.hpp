@@ -806,8 +806,14 @@ namespace wasmgen
             for (auto n : inc_range<size_t>(ops))
                 append_object(T(opval[n]));
         if (ops < max)
+        {
             for (auto n : inc_range<size_t>(max - ops))
-                append_object(T(0)), (void)n;
+            {
+                UNUSED(n);
+
+                append_object(T(0));
+            }
+        }
     }
 
     //////////////

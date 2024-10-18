@@ -236,15 +236,16 @@ namespace wasmgen
         bool parse_macro_append();
 
         bool parse_operands();
-        ExpressionList *parse_expr_unpack(Expression *expr);
-        ExpressionList *parse_expr_unpack_binary(Expression *expr);
         ExpressionList *parse_expr_unpack(ExpressionList *list);
+        ExpressionList *parse_expr_unpack_list(Expression *expr);
+        ExpressionList *parse_expr_unpack_binary(Expression *expr);
         Expression* parse_expression();
         Expression* parse_expr_assignment();
         Expression* parse_expr_conditional();
         Expression* parse_expr_binary(int pop = 0);
         Expression* parse_expr_unary();
         Expression* parse_expr_value();
+        Expression* parse_expr_value_list();
         Expression* parse_expr_list(TokenID cid, Token* st);
 
         void parse_code_line();
@@ -397,7 +398,10 @@ namespace wasmgen
 
         /*-*/
 
+        template <typename F> ExprValue binary_operator(ExprValue& l, ExprValue& r, F op, Token* token);
+
         template <typename F> static ExprValue binary_operator(ExprValue& l, ExprValue& r, F op);
+        template <typename F> static ExprValue binary_operator(ExprValueList& l, ExprValueList& r, F op);
         template <typename T> static Expression* make_value(Token* token, T value);
         template <typename T> static Expression* make_value(FileString* text, T value);
         static Expression* make_string(Token* token, String* quote);
@@ -566,6 +570,21 @@ namespace wasmgen
     /**/
 
     template <typename F>
+    inline ExprValue Parser::binary_operator(ExprValue& l, ExprValue& r, F f, Token* token)
+    {
+        assert(l.islist() && r.islist());
+
+        size_t size = l.list.size();
+
+        if (size == r.list.size())
+            return binary_operator(l.list, r.list, f);
+        parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
+        return ExprValue();
+    }
+
+    /**/
+
+    template <typename F>
     inline ExprValue Parser::binary_operator(ExprValue& l, ExprValue& r, F f)
     {
         assert(l.isnumber() && r.isnumber());
@@ -576,6 +595,18 @@ namespace wasmgen
                 : (!l.isfloat()
                    ? ExprValue(f.op(l.ivalue, r.fvalue))
                    : ExprValue(f.op(l.fvalue, r.fvalue))));
+    }
+
+    template <typename F>
+    inline ExprValue Parser::binary_operator(ExprValueList& l, ExprValueList& r, F f)
+    {
+        assert(l.size() == r.size());
+
+        ExprValue v(ExprValue::ST_LIST);
+
+        for (auto n : inc_range<size_t>(l.size()))
+            v.list.push_back(binary_operator(l[n], r[n], f));
+        return v;
     }
 
     /**/

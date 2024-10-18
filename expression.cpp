@@ -38,8 +38,15 @@ namespace wasmgen
         { TokenID::XOR, 7 },  // "^"
         { TokenID::OR,  8 },  // "|"
 
-        { TokenID::BAND, 9 },  // "&&"
-        { TokenID::BOR, 10 },  // "||"
+        { TokenID::VMUL, 9 },  // "[*]"
+        { TokenID::VDIV, 9 },  // "[/]"
+        { TokenID::VMOD, 9 },  // "[%]"
+
+        { TokenID::VADD, 10 },  // "[+]"
+        { TokenID::VSUB, 10 },  // "[-]"
+
+        { TokenID::BAND, 11 },  // "&&"
+        { TokenID::BOR, 12 },  // "||"
     };
 
     /**/
@@ -74,8 +81,8 @@ namespace wasmgen
         children->push_back(value);
     }
 
-    Expression::Expression(Token* op, Expression* lhs, Expression* rhs) noexcept
-        : mode(BINARY)
+    Expression::Expression(Token* op, Expression* lhs, Expression* rhs, Mode mode) noexcept
+        : mode(mode)
         , token(op)
         , children(new ExpressionList)
     {
@@ -152,6 +159,11 @@ namespace wasmgen
                 }
             }
             break;
+
+        case ITEM:
+            (*children)[0]->gettokenlist(list);
+            (*children)[1]->gettokenlist(list);
+            break;
         }
         if (paren_close)
             list->push_back(paren_close);
@@ -211,6 +223,11 @@ namespace wasmgen
         case LIST:
             n = children->size();
             message("LIST[", n, "]: '", GetCStr(token), "'\n");
+            break;
+
+        case ITEM:
+            message("ITEM:\n");
+            n = children->size();
             break;
         }
 

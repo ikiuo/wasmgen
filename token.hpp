@@ -295,6 +295,12 @@ namespace wasmgen
         BAND,
         BOR,
 
+        VADD,
+        VSUB,
+        VMUL,
+        VDIV,
+        VMOD,
+
         /**/
     };
     static_assert(int(TokenID::EXTEND) == 128, "Bug!!");

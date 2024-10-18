@@ -137,6 +137,10 @@ namespace wasmgen
     // ExprValue //
     ///////////////
 
+    struct ExprValue;
+    using ExprValueList = StdVector<ExprValue>;
+    using ExprValueListList = StdVector<ExprValueList>;
+
     struct ExprValue
     {
         enum Type
@@ -150,12 +154,15 @@ namespace wasmgen
             ST_NULL,
             ST_VALTYPE,
             ST_STRING,
+
+            ST_LIST,
         };
 
         Type type;
         int64_t ivalue;
         double fvalue;
         StringPtr string;
+        ExprValueList list;
 
         ExprValue() noexcept;
         ExprValue(Type type) noexcept;
@@ -176,6 +183,7 @@ namespace wasmgen
         bool isnull() const noexcept;
         bool isvaltype() const noexcept;
         bool isstring() const noexcept;
+        bool islist() const noexcept;
 
         operator bool() const noexcept;
         operator int8_t() const noexcept;
@@ -189,13 +197,11 @@ namespace wasmgen
         operator float() const noexcept;
         operator double() const noexcept;
         operator const String*() const noexcept;
+        operator const ExprValueList*() const noexcept;
 
         StdString str() const;
         StdString dump() const;
     };
-
-    using ExprValueList = StdVector<ExprValue>;
-    using ExprValueListList = StdVector<ExprValueList>;
 
 } // wasmgen
 
@@ -371,6 +377,11 @@ namespace wasmgen
         return type == ST_STRING;
     }
 
+    inline bool ExprValue::islist() const noexcept
+    {
+        return type == ST_LIST;
+    }
+
     /**/
 
     inline ExprValue::operator bool() const noexcept
@@ -458,6 +469,14 @@ namespace wasmgen
     {
         if (isstring())
             return &string;
+        assert(false);
+        return nullptr;
+    }
+
+    inline ExprValue::operator const ExprValueList*() const noexcept
+    {
+        if (islist())
+            return &list;
         assert(false);
         return nullptr;
     }

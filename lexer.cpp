@@ -19,6 +19,11 @@ namespace wasmgen
         { TokenID::CMPNE, "!=" },
         { TokenID::BAND, "&&" },
         { TokenID::BOR, "||" },
+        { TokenID::VADD, "[+]" },
+        { TokenID::VSUB, "[-]" },
+        { TokenID::VMUL, "[*]" },
+        { TokenID::VDIV, "[/]" },
+        { TokenID::VMOD, "[%]" },
     };
 
     const Lexer::ScanTree Lexer::token_scan_tree(token_data);
