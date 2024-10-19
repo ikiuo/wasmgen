@@ -62,7 +62,7 @@ static int opt_setdebug(char* debug)
         message("invalid debug level: ", debug, "\n");
         return 2;
     }
-    flag_debug = level;
+    flag_debug = int(level);
 
     return 0;
 }
@@ -410,7 +410,6 @@ int main(int argc, char** argv, char** envp)
                 case 1: return usage();
                 default: return 2;
                 }
-                continue;
 
             case 'D':
                 {
