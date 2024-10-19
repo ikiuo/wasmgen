@@ -177,6 +177,7 @@ namespace wasmgen
     ////////////////
 
     template <typename T> T* NewRef(T* object) noexcept;
+    template <typename T> T* NewRef(Pointer<T>& pointer) noexcept;
     template <typename T, typename... Args> T* NewRef(Args... args);
 
     template <typename T>
@@ -578,6 +579,12 @@ namespace wasmgen
     {
         object->INCREF();
         return object;
+    }
+
+    template <typename T>
+    inline T* NewRef(Pointer<T>& pointer) noexcept
+    {
+        return NewRef(&pointer);
     }
 
     template <typename T, typename... Args>
