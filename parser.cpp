@@ -813,159 +813,105 @@ namespace wasmgen
                 break;
             }
         }
-
-        ExpressionListRef nops = parse_expr_unpack_list(ops);
-
-        code_line->operands = Transfer(nops);
+        parse_unpack_children(ops);
+        code_line->operands = parse_expr_unpack_list(ops);
         return true;
     }
 
-    ExpressionList *Parser::parse_expr_unpack_list(ExpressionList* list)
+    /**/
+
+    void Parser::parse_unpack_children(ExpressionList* list)
     {
-        assert(list);
-
-        NewExpressionList rlist;
-
-        for (Expression* expr : *list)
-        {
-            ExpressionListRef children = parse_expr_unpack(expr);
-
-            if (children)
-                rlist->insert(rlist->end(), children->begin(), children->end());
-            else
-                rlist->push_back(expr);
-        }
-        return Finish(rlist);
+        for (auto it = list->begin(); it != list->end(); ++it)
+            *it = parse_expr_unpack(*it);
     }
 
-    ExpressionList* Parser::parse_expr_unpack(Expression* expr)
+    Expression* Parser::parse_expr_unpack(Expression* expr)
     {
-        assert(expr);
+        ExpressionList* children = expr->children; assert(children);
 
+        parse_unpack_children(children);
         switch (expr->mode)
         {
+        case Expression::EMPTY:
+            return expr;
+        case Expression::VALUE:
+            return parse_expr_unpack_value(expr);
         case Expression::UNARY:
-            break;
+            return parse_expr_unpack_unary(expr);
         case Expression::BINARY:
             return parse_expr_unpack_binary(expr);
-        default:
-            return nullptr;
-        }
-
-        Token* token = expr->token; assert(token);
-
-        if (token->id != TokenID::MUL)
-            return nullptr;
-
-        ExpressionList* children = expr->children; assert(children && children->size() == 1);
-        Expression* childexpr = (*children)[0]; assert(childexpr);
-        Token* childtoken = childexpr->token; assert(childtoken);
-        ExpressionList* grandchildren = childexpr->children; assert(grandchildren);
-
-        switch (childexpr->mode)
-        {
-        case Expression::VALUE:
-            if (childexpr->paren_open)
-                return NewRef(children);
-            {
-                Identifier* idmap = alias_name; assert(idmap);
-                Expression* symexpr = idmap->getexpr(childtoken->text);
-
-                if (!symexpr)
-                    return nullptr;
-                if (symexpr->mode != Expression::LIST)
-                    return nullptr;
-                grandchildren = symexpr->children;
-            }
-            fallthrough;
         case Expression::LIST:
-            return parse_expr_unpack_list(grandchildren);
-
-        case Expression::BINARY:
-            return parse_expr_unpack_binary(childexpr);
-
-        default:
-            break;
+            return parse_expr_unpack_list(expr);
+        case Expression::CONDITIONAL:
+            return parse_expr_unpack_conditional(expr);
+        case Expression::ITEM:
+            return parse_expr_unpack_item(expr);
         }
-        return nullptr;
     }
 
-    ExpressionList *Parser::parse_expr_unpack_binary(Expression *expr)
+    Expression* Parser::parse_expr_unpack_value(Expression* expr)
     {
-        assert(expr && expr->mode == Expression::BINARY);
-
         Token* token = expr->token; assert(token);
-        ExpressionList* children = expr->children; assert(children);
-        Expression* op0 = (*children)[0]; assert(op0);
-        Expression* op1 = (*children)[1]; assert(op1);
+
+        if (token->id != TokenID::NAME)
+            return expr;
+
+        Identifier* idmap = alias_name; assert(idmap);
+        Expression* symexpr = idmap->getexpr(token->text);
+
+        return symexpr ? parse_expr_unpack(symexpr) : expr;
+    }
+
+    Expression* Parser::parse_expr_unpack_unary(Expression* expr)
+    {
+        Token* token = expr->token; assert(token);
+        ExpressionList* children = expr->children; assert(children && children->size() == 1);
+        Expression* child = (*children)[0];
+
+        return token->id == TokenID::ADD ? child : expr;
+    }
+
+    Expression* Parser::parse_expr_unpack_binary(Expression* expr)
+    {
+        Token* token = expr->token; assert(token);
+        ExpressionList* children = expr->children; assert(children && children->size() == 2);
+        Expression* lhs = (*children)[0]; assert(lhs);
+        Expression* rhs = (*children)[1]; assert(rhs);
+        ExpressionList* lchildren = lhs->children; assert(lchildren);
+        ExpressionList* rchildren = rhs->children; assert(rchildren);
 
         switch (token->id)
         {
         case TokenID::ADD:
-            if (op0->mode != op1->mode)
-                break;
-            switch (op0->mode)
+            if (lhs->mode == Expression::LIST &&
+                rhs->mode == Expression::LIST)
             {
-            case Expression::VALUE:
-                {
-                    if (!op0->isstring() || !op1->isstring())
-                        break;
-                    token->id = TokenID::QUOTE;
-                    token->quote = new String(*op0->getstring() + *op1->getstring());
+                NewExpressionList children;
 
-                    NewExpressionList children;
-
-                    children->push_back(new Expression(token));
-                    return Finish(children);
-                }
-
-            case Expression::LIST:
-                {
-                    ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
-                    ExpressionList* op1_list = parse_expr_unpack_list(op1->children); assert(op1_list);
-
-                    NewExpressionList children;
-
-                    children->insert(children->end(), op0_list->begin(), op0_list->end());
-                    children->insert(children->end(), op1_list->begin(), op1_list->end());
-                    return Finish(children);
-                }
-
-            default:
-                break;
+                children->insert(children->end(), lchildren->begin(), lchildren->end());
+                children->insert(children->end(), rchildren->begin(), rchildren->end());
+                return new Expression(lhs->token, children);
             }
             break;
 
         case TokenID::MUL:
-            if (op1->isnumber())
             {
-                auto res = getvalue(op1);
+                auto res = getvalue(rhs);
 
                 if (!res.isint())
                     break;
-                if (op0->isstring())
-                {
-                    String* op0s = op0->getstring();
+                if (lhs->mode != Expression::LIST)
+                    break;
 
-                    token->id = TokenID::QUOTE;
-                    token->quote = new String;
-                    for (int n = res, i = 0; i < n; ++i)
-                        *token->quote += *op0s;
+                ExpressionList* lchildren = lhs->children; assert(lchildren);
+                auto sit = lchildren->begin();
+                auto eit = lchildren->end();
+                NewExpressionList children;
 
-                    NewExpressionList children;
-
-                    children->push_back(new Expression(token));
-                    return Finish(children);
-                }
-                if (op0->mode == Expression::LIST)
-                {
-                    ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
-                    NewExpressionList children;
-
-                    for (int n = res, i = 0; i < n; ++i)
-                        children->insert(children->end(), op0_list->begin(), op0_list->end());
-                    return Finish(children);
-                }
+                for (int n = res, i = 0; i < n; ++i)
+                    children->insert(children->end(), sit, eit);
+                return new Expression(lhs->token, children);
             }
             break;
 
@@ -974,40 +920,144 @@ namespace wasmgen
         case TokenID::VMUL:
         case TokenID::VDIV:
         case TokenID::VMOD:
-            if (op0->mode == Expression::LIST &&
-                op1->mode == Expression::LIST)
+            if (lhs->mode == Expression::LIST &&
+                rhs->mode == Expression::LIST)
             {
-                ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
-                ExpressionList* op1_list = parse_expr_unpack_list(op1->children); assert(op1_list);
-                size_t size = op0_list->size();
+                size_t size = lchildren->size();
 
-                if (size != op1_list->size())
+                if (size != rchildren->size())
                 {
                     parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
                     break;
                 }
+
+                NewToken ntoken = new Token(*token);
+                NewToken ltoken = new Token(*lhs->token);
+
                 switch (token->id)
                 {
-                case TokenID::VADD: token->id = TokenID::ADD; break;
-                case TokenID::VSUB: token->id = TokenID::SUB; break;
-                case TokenID::VMUL: token->id = TokenID::MUL; break;
-                case TokenID::VDIV: token->id = TokenID::DIV; break;
-                case TokenID::VMOD: token->id = TokenID::MOD; break;
+                case TokenID::VADD: ntoken->id = TokenID::ADD; break;
+                case TokenID::VSUB: ntoken->id = TokenID::SUB; break;
+                case TokenID::VMUL: ntoken->id = TokenID::MUL; break;
+                case TokenID::VDIV: ntoken->id = TokenID::DIV; break;
+                case TokenID::VMOD: ntoken->id = TokenID::MOD; break;
                 default: break;
                 }
 
-                NewExpressionList children;
+                NewExpressionList nchildren;
 
                 for (auto n : inc_range<size_t>(size))
-                    children->push_back(new Expression(token, (*op0_list)[n], (*op1_list)[n]));
-                return Finish(children);
+                {
+                    Expression* lchild = (*lchildren)[n];
+                    Expression* rchild = (*rchildren)[n];
+
+                    nchildren->push_back(new Expression(ntoken, lchild, rchild));
+                }
+                return new Expression(ltoken, nchildren);
             }
             break;
 
         default:
             break;
         }
-        return nullptr;
+        return expr;
+    }
+
+    Expression* Parser::parse_expr_unpack_conditional(Expression* expr)
+    {
+        ExpressionList* children = expr->children; assert(children && children->size() == 3);
+        Expression* cexpr = (*children)[0]; assert(cexpr);
+        Expression* texpr = (*children)[1]; assert(texpr);
+        Expression* fexpr = (*children)[2]; assert(fexpr);
+        auto res = getvalue(cexpr);
+
+        if (res.isnumber())
+            return res ? texpr : fexpr;
+        return expr;
+    }
+
+    Expression* Parser::parse_expr_unpack_list(Expression* expr)
+    {
+        ExpressionList* children = expr->children; assert(children);
+
+        expr->children = parse_expr_unpack_list(children);
+        return expr;
+    }
+
+    ExpressionList* Parser::parse_expr_unpack_list(ExpressionList* list)
+    {
+        ExpressionList* nlist = new ExpressionList;
+
+        for (Expression* expr : *list)
+        {
+            assert(expr);
+
+            if (expr->mode != Expression::UNARY)
+            {
+                nlist->push_back(expr);
+                continue;
+            }
+
+            Token* token = expr->token; assert(token);
+
+            if (token->id != TokenID::MUL)
+            {
+                nlist->push_back(expr);
+                continue;
+            }
+
+            ExpressionList* children = expr->children; assert(children && children->size() == 1);
+            Expression* child = (*children)[0]; assert(child);
+
+            if (child->mode == Expression::LIST)
+            {
+                ExpressionList* grandchildrend = child->children; assert(grandchildrend);
+                auto sit = grandchildrend->begin();
+                auto eit = grandchildrend->end();
+
+                nlist->insert(nlist->end(), sit, eit);
+            }
+            else if (child->mode == Expression::VALUE && child->paren_open)
+                nlist->push_back(child);
+            else
+                nlist->push_back(expr);
+        }
+        return nlist;
+    }
+
+    Expression* Parser::parse_expr_unpack_item(Expression* expr)
+    {
+        ExpressionList* children = expr->children; assert(children && children->size() == 2);
+        Expression* lexpr = (*children)[0]; assert(lexpr);
+        Expression* nexpr = (*children)[1]; assert(nexpr);
+
+        if (lexpr->mode != Expression::LIST ||
+            nexpr->mode != Expression::LIST)
+            return expr;
+
+        ExpressionList* nchildren = nexpr->children; assert(nchildren);
+
+        if (nchildren->size() != 1)
+            return expr;
+
+        Expression* iexpr = (*nchildren)[0]; assert(iexpr);
+        auto res = getvalue(iexpr);
+
+        if (!res.isint())
+            return expr;
+
+        ExpressionList* lchildren = lexpr->children; assert(lchildren);
+        int64_t size = int64_t(lchildren->size());
+        int64_t pos(res);
+
+        if (pos < 0)
+            pos += size;
+        if (pos < 0 || size <= pos)
+        {
+            parse_error(ErrorCode::LIST_INDEX_OVERFLOW, {lexpr->token});
+            return expr;
+        }
+        return (*lchildren)[size_t(pos)];
     }
 
     /*

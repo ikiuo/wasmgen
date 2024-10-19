@@ -206,12 +206,12 @@ namespace wasmgen
             break;
 
         case UNARY:
-            message("UNARY='", GetCStr(token), "'\n");
+            message("UNARY[", int(token->id), "]='", GetCStr(token), "'\n");
             n = 1;
             break;
 
         case BINARY:
-            message("BINARY='", GetCStr(token), "'\n");
+            message("BINARY[", int(token->id), "]='", GetCStr(token), "'\n");
             n = 2;
             break;
 

@@ -392,6 +392,8 @@ namespace wasmgen
             return !!fvalue;
         if (isstring())
             return !!string;
+        if (islist())
+            return !!list.size();
         return false;
     }
 

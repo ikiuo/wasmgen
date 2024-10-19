@@ -241,9 +241,16 @@ namespace wasmgen
         bool parse_macro_append();
 
         bool parse_operands();
+
+        void parse_unpack_children(ExpressionList* list);
+        Expression* parse_expr_unpack(Expression* expr);
+        Expression* parse_expr_unpack_value(Expression* expr);
+        Expression* parse_expr_unpack_unary(Expression* expr);
+        Expression* parse_expr_unpack_binary(Expression* expr);
+        Expression* parse_expr_unpack_list(Expression* expr);
         ExpressionList *parse_expr_unpack_list(ExpressionList* list);
-        ExpressionList *parse_expr_unpack(Expression* expr);
-        ExpressionList *parse_expr_unpack_binary(Expression* expr);
+        Expression* parse_expr_unpack_conditional(Expression* expr);
+        Expression* parse_expr_unpack_item(Expression* expr);
 
         Expression* parse_expression();
         Expression* parse_expr_assignment();
