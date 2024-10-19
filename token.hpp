@@ -329,6 +329,7 @@ namespace wasmgen
         Token() noexcept;
         Token(TokenID id) noexcept;
         Token(TokenID id, FileString* text) noexcept;
+        Token(Token* rhs) noexcept;
 
         bool operator ==(CharType c) const noexcept;
         bool operator !=(CharType c) const noexcept;

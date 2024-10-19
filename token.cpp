@@ -51,6 +51,19 @@ namespace wasmgen
         /*NOOP*/
     }
 
+    Token::Token(Token* rhs) noexcept
+        : id(rhs->id)
+        , text(rhs->text)
+        , overflow(rhs->overflow)
+        , isfloat(rhs->isfloat)
+        , ivalue(rhs->ivalue)
+        , fvalue(rhs->fvalue)
+        , missing_quote(rhs->missing_quote)
+        , line_index(rhs->line_index)
+    {
+        /*NOOP*/
+    }
+
     /**/
 
     void Token::dump()
