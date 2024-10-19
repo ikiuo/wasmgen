@@ -56,9 +56,9 @@ SRCS          = main.cpp wmain.cpp option.cpp error.cpp \
 		lexer.cpp parser.cpp \
 		$(END_SRCS)
 
-DEPS          = $(SRCS:.cpp=.d)
+DEPS          = $(SRCS:%.cpp=%.d)
 
-OBJS          = $(SRCS:.cpp=.o)
+OBJS          = $(SRCS:%.cpp=%.o)
 
 LIBS          =
 
@@ -77,6 +77,8 @@ RMFILES       = $(PROGRAM) $(OBJS) *.[dos] *.o.tmp *~
 
 .SUFFIXES:	.cpp .o .s
 
+.cpp.o:
+		$(CXX) $(CXXFLAGS) -c $<
 .cpp.s:
 		$(CXX) $(CXXFLAGS) -S $<
 

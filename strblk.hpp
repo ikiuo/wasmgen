@@ -284,10 +284,6 @@ namespace wasmgen
         BaseStringBlock(const initializer_list_type& args);
         inline ~BaseStringBlock() { if (finish) finish(buffer); }
 
-#if WASMGEN_COMPILER_CXX17
-    protected:
-#endif /* C++17 */
-
         const BaseStringBlock& operator =(const BaseStringBlock& s) = delete;
 
         inline BaseStringBlock(const BaseStringBlock& s) noexcept // = delete

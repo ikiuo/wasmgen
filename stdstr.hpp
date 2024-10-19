@@ -91,7 +91,7 @@ namespace wasmgen
 #if !WASMGEN_COMPILER_CXX20
         return super::find(key) != super::end();
 #else /* C++20 */
-        return contains(key);
+        return super::contains(key);
 #endif
     }
 
