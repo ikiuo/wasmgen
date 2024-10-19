@@ -814,15 +814,13 @@ namespace wasmgen
             }
         }
 
-        ExpressionListRef nops = parse_expr_unpack(ops);
+        ExpressionListRef nops = parse_expr_unpack_list(ops);
 
-        if (!nops)
-            return false;
         code_line->operands = Transfer(nops);
         return true;
     }
 
-    ExpressionList *Parser::parse_expr_unpack(ExpressionList* list)
+    ExpressionList *Parser::parse_expr_unpack_list(ExpressionList* list)
     {
         assert(list);
 
@@ -830,17 +828,17 @@ namespace wasmgen
 
         for (Expression* expr : *list)
         {
-            ExpressionListRef children = parse_expr_unpack_list(expr);
+            ExpressionListRef children = parse_expr_unpack(expr);
 
-            if (!children)
-                rlist->push_back(expr);
-            else
+            if (children)
                 rlist->insert(rlist->end(), children->begin(), children->end());
+            else
+                rlist->push_back(expr);
         }
         return Finish(rlist);
     }
 
-    ExpressionList* Parser::parse_expr_unpack_list(Expression* expr)
+    ExpressionList* Parser::parse_expr_unpack(Expression* expr)
     {
         assert(expr);
 
@@ -881,7 +879,7 @@ namespace wasmgen
             }
             fallthrough;
         case Expression::LIST:
-            return parse_expr_unpack(grandchildren);
+            return parse_expr_unpack_list(grandchildren);
 
         case Expression::BINARY:
             return parse_expr_unpack_binary(childexpr);
@@ -923,8 +921,8 @@ namespace wasmgen
 
             case Expression::LIST:
                 {
-                    ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
-                    ExpressionList* op1_list = parse_expr_unpack(op1->children); assert(op1_list);
+                    ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
+                    ExpressionList* op1_list = parse_expr_unpack_list(op1->children); assert(op1_list);
 
                     NewExpressionList children;
 
@@ -961,7 +959,7 @@ namespace wasmgen
                 }
                 if (op0->mode == Expression::LIST)
                 {
-                    ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
+                    ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
                     NewExpressionList children;
 
                     for (int n = res, i = 0; i < n; ++i)
@@ -979,8 +977,8 @@ namespace wasmgen
             if (op0->mode == Expression::LIST &&
                 op1->mode == Expression::LIST)
             {
-                ExpressionList* op0_list = parse_expr_unpack(op0->children); assert(op0_list);
-                ExpressionList* op1_list = parse_expr_unpack(op1->children); assert(op1_list);
+                ExpressionList* op0_list = parse_expr_unpack_list(op0->children); assert(op0_list);
+                ExpressionList* op1_list = parse_expr_unpack_list(op1->children); assert(op1_list);
                 size_t size = op0_list->size();
 
                 if (size != op1_list->size())
@@ -4788,9 +4786,7 @@ namespace wasmgen
                     if (v0.isnumber() && v1.isnumber())
                     {
                         if (bool(v1))
-                            return v1.isfloat()
-                                ? ExprValue(std::fmod(double(v0), v1.fvalue))
-                                : ExprValue(int64_t(v0) % v1.ivalue);
+                            return binary_operator(v0, v1, OpMod());
                         parse_error(ErrorCode::DIVISION_BY_ZERO, {*expr1});
                     }
                     break;
@@ -4861,6 +4857,11 @@ namespace wasmgen
                 case TokenID::VDIV:
                     if (v0.islist() && v1.islist())
                         return binary_operator(v0, v1, OpDiv(), et);
+                    break;
+
+                case TokenID::VMOD:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpMod(), et);
                     break;
 
                     /**/

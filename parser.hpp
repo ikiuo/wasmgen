@@ -39,7 +39,12 @@ namespace wasmgen
         struct OpSub { template <typename L, typename R> inline auto op(L l, R r) { return l - r; } };
         struct OpMul { template <typename L, typename R> inline auto op(L l, R r) { return l * r; } };
         struct OpDiv { template <typename L, typename R> inline auto op(L l, R r) { return l / r; } };
-        struct OpMod { template <typename L, typename R> inline auto op(L l, R r) { return l % r; } };
+        struct OpMod {
+            inline auto op(double l, int64_t r) { return int64_t(l) % r; }
+            inline auto op(int64_t l, double r) { return fmod(l, r); }
+            inline auto op(double l, double r) { return fmod(l, r); }
+            template <typename L, typename R> inline auto op(L l, R r) { return l % r; }
+        };
 
         using Int64List = StdVector<int64_t>;
 
@@ -236,9 +241,10 @@ namespace wasmgen
         bool parse_macro_append();
 
         bool parse_operands();
-        ExpressionList *parse_expr_unpack(ExpressionList *list);
-        ExpressionList *parse_expr_unpack_list(Expression *expr);
-        ExpressionList *parse_expr_unpack_binary(Expression *expr);
+        ExpressionList *parse_expr_unpack_list(ExpressionList* list);
+        ExpressionList *parse_expr_unpack(Expression* expr);
+        ExpressionList *parse_expr_unpack_binary(Expression* expr);
+
         Expression* parse_expression();
         Expression* parse_expr_assignment();
         Expression* parse_expr_conditional();
