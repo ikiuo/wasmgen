@@ -4,6 +4,12 @@
 #include "parser.hpp"
 #include "wmain.hpp"
 
+#ifdef USE_ZLIB
+#define WASMGEN_USE_ZLIB  1
+#else
+#define WASMGEN_USE_ZLIB  0
+#endif
+
 #define WASMGEN_VERSION_MAJOR    0
 #define WASMGEN_VERSION_MINOR    2
 #define WASMGEN_VERSION_RELEASE  7
@@ -11,6 +17,19 @@
 
 using namespace wasmgen;
 using StrKeyValue = StdStringMap<StringPtr>;
+
+#if WASMGEN_USE_ZLIB
+
+enum CompressMode
+{
+    WZ_NONE,
+    WZ_GZIP,
+    WZ_DEFLATE,
+};
+
+static ByteArray compress(ByteArray& data, CompressMode mode);
+
+#endif
 
 /**/
 
@@ -267,6 +286,12 @@ static int usage()
         "\n"
         "    -n, --no-output\n"
         "            非出力モード(出力ファイルは無視)\n"
+#if WASMGEN_USE_ZLIB
+        "    --gzip\n"
+        "            gzip 形式による圧縮\n"
+        "    --deflate\n"
+        "            deflate 形式による圧縮\n"
+#endif
         "    -A, --base64\n"
         "            Base64形式モード\n"
         "    --base64+OPTION\n"
@@ -321,6 +346,9 @@ int main(int argc, char** argv, char** envp)
     auto new_argc = 0;
     auto new_argv = argv;
     auto flag_nowrite = false;
+#if WASMGEN_USE_ZLIB
+    CompressMode compress_mode = WZ_NONE;
+#endif
     auto flag_base64 = false;
     StdStringList asmset;
     StringPtr input;
@@ -382,6 +410,18 @@ int main(int argc, char** argv, char** envp)
                 flag_nowrite = true;
                 continue;
             }
+#if WASMGEN_USE_ZLIB
+            if (!strcmp(arg, "--gzip"))
+            {
+                compress_mode = WZ_GZIP;
+                continue;
+            }
+            if (!strcmp(arg, "--deflate"))
+            {
+                compress_mode = WZ_DEFLATE;
+                continue;
+            }
+#endif
             if (!strncmp(arg, opt_base64_name, opt_base64_name_len))
             {
                 flag_base64 = true;
@@ -478,7 +518,7 @@ int main(int argc, char** argv, char** envp)
 
     if (!freader->valid())
     {
-        message("open failed: ", freader->c_path(), "\n");
+        message("読み込み失敗: ", freader->c_path(), "\n");
         return 2;
     }
     freader->show_info();
@@ -503,6 +543,11 @@ int main(int argc, char** argv, char** envp)
     if (flag_nowrite)
         return 0;
 
+#if WASMGEN_USE_ZLIB
+    if (compress_mode != WZ_NONE)
+        (ByteArray&)binary = compress(binary, compress_mode);
+#endif
+
     if (flag_base64)
         (ByteArray&)binary = base64_encode(binary, base64opts);
 
@@ -514,8 +559,82 @@ int main(int argc, char** argv, char** envp)
 
     if (!fwriter->write(binary))
     {
-        message("Write error: ", output->c_str(), "\n");
+        message("書き込み失敗: ", output->c_str(), "\n");
         return 2;
     }
     return 0;
 }
+
+/*
+ *
+ */
+#if WASMGEN_USE_ZLIB
+
+#include <zlib.h>
+
+static ByteArray compress(ByteArray& data, CompressMode mode)
+{
+    static const char *mode_name[] = {
+        "???",
+        "gzip",
+        "deflate",
+    };
+    ByteArray encode(128 + data.size() + (data.size() >> 2));
+    Bytef* encode_buffer = (Bytef*) encode.data();
+    z_stream_s stream;
+
+    verbose("Compression: ", mode_name[int(mode)], "\n");
+
+    ::memset(&stream, 0, sizeof(stream));
+    if (::deflateInit2(&stream,
+                       Z_BEST_COMPRESSION,
+                       Z_DEFLATED,
+                       15 + (int(mode == WZ_GZIP) << 4),
+                       MAX_MEM_LEVEL,
+                       Z_DEFAULT_STRATEGY) != Z_OK)
+    {
+        message("zlib の初期化に失敗しました。\n");
+        ::exit(2);
+    }
+
+    stream.next_in = (z_const Bytef *) data.data();
+    stream.avail_in = (uInt) data.size();
+    stream.next_out = encode_buffer;
+    stream.avail_out = (uInt) encode.size();
+
+    switch (mode)
+    {
+    case WZ_GZIP:
+        {
+            gz_header_s header;
+
+            ::memset(&header, 0, sizeof(header));
+            if (::deflateSetHeader(&stream, &header) != Z_OK)
+            {
+                message("gz ヘッダの設定に失敗しました。\n");
+                ::exit(2);
+            }
+        }
+        break;
+
+    case WZ_DEFLATE:
+        break;
+
+    default:
+        throw BUG("未知の圧縮形式: mode=", int(mode));
+    }
+
+    if (::deflate(&stream, Z_FINISH) == Z_STREAM_ERROR)
+    {
+        message("zlib での圧縮に失敗しました。\n");
+        ::deflateEnd(&stream);
+        ::exit(2);
+    }
+
+    encode.resize(stream.total_out);
+
+    ::deflateEnd(&stream);
+    return encode;
+}
+
+#endif /* ZLIB */

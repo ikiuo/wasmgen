@@ -20,10 +20,18 @@
 
 [GNU make](https://www.gnu.org/software/make/) を使ってビルドします。コンパイラは [clang++](https://clang.llvm.org/) を使用しています。
 
+GNUmakefile.config で [zlib](https://zlib.net/) ライブラリの使用を指定すると、.wasm を gzip/defalte 圧縮して出力できます。
+
+```
+# GNUmakefile.config
+CXXDEFS = -DUSE_ZLIB
+LIBS    = -lz
+```
+
 
 ## Windows
 
-VisualStudio (2022) では wasmgen.vcxproj を使ってビルドしてください。
+VisualStudio (2022) では wasmgen.vcxproj を使用してください。zlib 対応の設定はしていません。
 
 
 # アセンブラの表記

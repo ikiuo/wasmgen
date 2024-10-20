@@ -13,7 +13,7 @@ BINDIR        = $(prefix)/bin
 
 CXX           = clang++
 
-CXXDEFS       =
+CXXDEFS      +=
 CXXARCH       =
 CXXSTD       ?= -std=c++14
 
@@ -31,12 +31,8 @@ endif
 
 CXXDEPS      := -MD
 
-CXXFLAGS      = $(CXXDEFS) \
-		$(CXXARCH) \
-		$(CXXSTD) \
-		$(CXXOPTIMIZES) \
-		$(CXXDEBUGS) \
-		$(CXXWARNINGS) \
+CXXFLAGS      = $(CXXDEFS) $(CXXINCLUDES) $(CXXARCH) $(CXXSTD) \
+		$(CXXOPTIMIZES) $(CXXDEBUGS) $(CXXWARNINGS) \
 		$(CXXDEPS)
 
 # --------------
@@ -60,7 +56,7 @@ DEPS          = $(SRCS:%.cpp=%.d)
 
 OBJS          = $(SRCS:%.cpp=%.o)
 
-LIBS          =
+LIBS         +=
 
 PROGRAM       = wasmgen
 
