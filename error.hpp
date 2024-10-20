@@ -225,6 +225,10 @@ namespace wasmgen
         NO_MACRO_END,
         NO_MACRO_DEFINITION,
         MACRO_NOT_DEFINED,
+
+        _WARNING_INSTR = 4000,
+        TOO_FEW_PARAMETERS,
+        PARAMETER_TYPES_DONT_MATCH,
     };
 
     struct ErrorMessageData

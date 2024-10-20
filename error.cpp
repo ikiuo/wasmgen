@@ -137,6 +137,9 @@ namespace wasmgen
         {ErrorCode::NO_MACRO_END, {{0},{"マクロ定義の終端がありません。"}}},
         {ErrorCode::NO_MACRO_DEFINITION, {{0}, {"対応する .defmacro がありません。"}}},
         {ErrorCode::MACRO_NOT_DEFINED, {{0,-1,1},{"マクロ名 \"","\" は定義されてません。"}}},
+        /**/
+        {ErrorCode::TOO_FEW_PARAMETERS, {{0},{"パラメータが足りません。"}}},
+        {ErrorCode::PARAMETER_TYPES_DONT_MATCH, {{0},{"パラメータが足りません。"}}},
     };
 
 } // wasmgen

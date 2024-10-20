@@ -358,6 +358,8 @@ namespace wasmgen
         bool parse_data_line_operand(CodeList* list, CodeLine* line);
         bool parse_data_line_binary(CodeList* list, CodeLine* line);
 
+        void check_instr_stack(CodeList* list, CodeLine* line);
+
         /*-*/
 
         size_t add_functype(FuncType& functype);

@@ -3739,6 +3739,7 @@ namespace wasmgen
         list->offset = 0;
         list->code_end = nullptr;
         list->block_stack.clear();
+        list->param_stack.clear();
         for (CodeLine* line : *list)
         {
             assert(line);
@@ -3803,6 +3804,8 @@ namespace wasmgen
         auto stm = instr.stack();
         bool use_label = false;
 
+        if (!list->pass)
+            check_instr_stack(list, line);
         switch (stm)
         {
         case Instruction::ST_NONE:
@@ -3848,9 +3851,8 @@ namespace wasmgen
                 default: // case Instruction::ST_LEAVE:
                     break;
                 }
-                if (br_type)
-                    break;
-                parse_warning(ErrorCode::UNINTENTIONAL_END, {line->instr});
+                if (!br_type)
+                    parse_warning(ErrorCode::UNINTENTIONAL_END, {line->instr});
             } while (false);
 
             if (!update_br_idx(list))
@@ -4209,8 +4211,8 @@ namespace wasmgen
 
             case Instruction::OP_BT:
                 binary.append_leb128(!opval.size()
-                                           ? int64_t(ValType::EMPTY)
-                                           : int64_t(opval[0]));
+                                     ? int64_t(ValType::EMPTY)
+                                     : int64_t(opval[0]));
                 break;
 
             case Instruction::OP_MA0:
@@ -4277,7 +4279,7 @@ namespace wasmgen
 
             if (has)
             {
-                Expression* cexpr = npos->second;
+                Expression* cexpr = npos->second; assert(cexpr);
 
                 if (cexpr->token->ivalue != nexpr->token->ivalue)
                     list->retry = true;
@@ -4300,7 +4302,7 @@ namespace wasmgen
                 if (!check_operands(line, 1, 2))
                     return false;
 
-                ExpressionList* ops = line->operands;
+                ExpressionList* ops = line->operands; assert(ops);
                 Expression* op0 = (*ops)[0]; assert(op0);
                 auto ares = getvalue(op0, list->symbol);
                 int64_t padding = 0;
@@ -4363,7 +4365,7 @@ namespace wasmgen
                 if (!check_operands(line, 1, 1))
                     return false;
 
-                ExpressionList* ops = line->operands;
+                ExpressionList* ops = line->operands; assert(ops);
                 Expression* op0 = (*ops)[0]; assert(op0);
                 auto ares = getvalue(op0, list->symbol);
 
@@ -4436,6 +4438,8 @@ namespace wasmgen
         binary.clear();
         for (Expression* op : *ops)
         {
+            assert(op);
+
             auto res = getvalue(op, list->symbol);
 
             if (!res.isnumber())
@@ -4507,6 +4511,55 @@ namespace wasmgen
             }
         }
         return true;
+    }
+
+    /**/
+
+    void Parser::check_instr_stack(CodeList* list, CodeLine* line)
+    {
+        assert(list);
+        assert(line);
+
+        auto& instab = line->instab;
+        auto& pstack = list->param_stack;
+        auto& ins = instab->second;
+        auto& instr = ins.operation;
+        size_t parcnt = instr.count();
+        DataTypaParam sparam;
+        DataTypaParam iparam;
+
+        if (pstack.size() < parcnt)
+        {
+            parse_warning(ErrorCode::TOO_FEW_PARAMETERS, {line->instr});
+            pstack.clear();
+        }
+        else
+        {
+            size_t index = parcnt;
+            bool success = true;
+
+            while (index-- > 0)
+            {
+                auto sp = pstack.pop();
+                auto ip = instr.param(index);
+
+                sparam.push_back(sp);
+                iparam.push_back(ip);
+                if (ip == Instruction::DT_ANY ||
+                    sp == Instruction::DT_ANY)
+                    continue;
+                if (ip == sp)
+                    continue;
+                success = false;
+            }
+            if (!success)
+                parse_warning(ErrorCode::PARAMETER_TYPES_DONT_MATCH, {line->instr});
+        }
+
+        auto res = instr.result();
+
+        if (res != Instruction::DT_NONE)
+            pstack.push_back(res);
     }
 
     /*

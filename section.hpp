@@ -14,6 +14,9 @@ namespace wasmgen
     using MacroDataRef = RefPointer<MacroData>;
     using NewMacroData = NewPointer<MacroData>;
 
+    using DataTypeStack = StdVecStack<Instruction::DataType>;
+    using DataTypaParam = StdVector<Instruction::DataType>;
+
     ///////////////
     // SectionID //
     ///////////////
@@ -110,6 +113,7 @@ namespace wasmgen
         size_t offset;
         CodeLinePtr code_end;
         ObjectStack<CodeLine> block_stack;
+        DataTypeStack param_stack;
 
     public:
         CodeList();
