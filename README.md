@@ -20,7 +20,7 @@
 
 [GNU make](https://www.gnu.org/software/make/) を使ってビルドします。コンパイラは [clang++](https://clang.llvm.org/) を使用しています。
 
-GNUmakefile.config で [zlib](https://zlib.net/) ライブラリの使用を指定すると、.wasm を gzip/defalte 圧縮して出力できます。
+GNUmakefile.config で [zlib](https://zlib.net/) ライブラリの使用を指定すると、.wasm を gzip/defalte 圧縮形式にして出力できます。
 
 ```
 # GNUmakefile.config
