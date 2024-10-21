@@ -120,11 +120,12 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 
 ### 範囲
 
-整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。
+整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。さらに追加で、同じ数値を<code>repeat</code>個複製してます。
 
 ```
 [start:end]
 [start:end:step]
+[start:end:step:repeat]
 ```
 
 **例**
@@ -133,6 +134,7 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 [1:4] → [1,2,3]
 [4:1] → [4,3,2]
 [0:8:2] → [0,2,4,6]
+[0:8:2:2] → [0,0,2,2,4,4,6,6]
 ```
 
 

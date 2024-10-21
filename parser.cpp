@@ -1076,10 +1076,14 @@ namespace wasmgen
     Expression* Parser::parse_expr_unpack_range(Expression* expr)
     {
         ExpressionList* children = expr->children; assert(children);
-        ExprValue xstart, xend, xstep;
+        ExprValue xstart, xend, xstep, xrepeat;
 
         switch (children->size())
         {
+        case 4:
+            xrepeat = getvalue((*children)[3]);
+            if (!xrepeat.isint())
+                return expr;
         case 3:
             xstep = getvalue((*children)[2]);
             if (!xstep.isint())
@@ -1099,12 +1103,15 @@ namespace wasmgen
         int64_t start = int64_t(xstart);
         int64_t end = int64_t(xend);
         int64_t step = start <= end ? +1 : -1;
+        int64_t repeat = 1;
         int64_t rend = end - step;
         int64_t rmin = std::min<int64_t>(start, rend);
         int64_t rmax = std::max<int64_t>(start, rend);
 
         if (xstep.isint())
             step = int64_t(xstep);
+        if (xrepeat.isint())
+            repeat = int64_t(xrepeat);
         if (start != end && !step)
         {
             parse_error(ErrorCode::INVALID_RANGE_STEP, {*(*children)[2]});
@@ -1115,7 +1122,12 @@ namespace wasmgen
         ExpressionList* nchildren = new ExpressionList;
 
         for (int64_t n = start; in_range(rmin, n, rmax); n += step)
-            nchildren->push_back(make_value(ntoken, n));
+        {
+            Expression* vexpr = make_value(ntoken, n);
+
+            for (auto ri : inc_range<int64_t>(repeat))
+                nchildren->push_back(vexpr), UNUSED(ri);
+        }
 
         Expression* nexpr = new Expression(ntoken, nchildren);
 
@@ -1493,7 +1505,7 @@ namespace wasmgen
         if (separator && separator->id == TokenID::CHAR_COLON)
         {
             expr->mode = Expression::RANGE;
-            if (xtlist->size() > 2)
+            if (xtlist->size() > 4)
             {
                 parse_expr_error(ErrorCode::SYNTAX_ERROR, {(*xtlist)[2]});
                 return nullptr;
@@ -5176,11 +5188,12 @@ namespace wasmgen
 
                 int64_t end = int64_t(v1);
                 int64_t step = start <= end ? +1 : -1;
+                int64_t repeat = 1;
                 int64_t rend = end - step;
                 int64_t rmin = std::min<int64_t>(start, rend);
                 int64_t rmax = std::max<int64_t>(start, rend);
 
-                if (children.size() == 3)
+                if (children.size() >= 3)
                 {
                     auto v2 = getvalue(nest, children[2], label);
 
@@ -5190,12 +5203,21 @@ namespace wasmgen
                 }
                 if (start != end && !step)
                     break;
+                if (children.size() == 4)
+                {
+                    auto v3 = getvalue(nest, children[3], label);
+
+                    if (!v3.isint())
+                        break;
+                    repeat = int64_t(v3);
+                }
 
                 ExprValue r(ExprValue::ST_LIST);
                 auto& rl = r.list;
 
                 for (int64_t n = start; in_range(rmin, n, rmax); n += step)
-                    rl.push_back(n);
+                    for (auto ri : inc_range<int64_t>(repeat))
+                        rl.push_back(n), UNUSED(ri);
                 return r;
             }
             break;
