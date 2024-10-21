@@ -106,6 +106,36 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 2 | 先頭: 0b <br/> 後続: 0 1 | 0b1110\_0110 |
 
 
+## リスト
+
+括弧<code>(),[],{}</code>の間に情報を<code>,</code>区切りで記述します。
+
+**例**
+
+```
+(1,2,3)
+[a,b,c]
+{x,y,z}
+```
+
+### 範囲
+
+整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。
+
+```
+[start:end]
+[start:end:step]
+```
+
+**例**
+
+```
+[1:4] → [1,2,3]
+[4:1] → [4,3,2]
+[0:8:2] → [0,2,4,6]
+```
+
+
 ## 演算子
 
 
@@ -124,19 +154,6 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 三項(選択) | <code>? :</code> | val1 <code>?</code> val2 <code>:</code> val3 |
 
 
-### リスト
-
-括弧<code>(),[],{}</code>の間に情報を<code>,</code>区切りで記述します。
-
-**例**
-
-```
-(1,2,3)
-[a,b,c]
-{x,y,z}
-```
-
-
 ### リスト用演算子
 
 | 種類 | 演算子 | 例 |
@@ -151,7 +168,8 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 二項(商) | <code>[/]</code> | <code>[4,6,9] [/] [1,2,3] → [4,3,3]</code> |
 | 二項(余) | <code>[%]</code> | <code>[4,5,8] [%] [1,2,3] → [0,1,2]</code> |
 | | | |
-| 取得 | <code>[<var>n</var>]</code> | インデックス<code><var>n</var></code>の要素を取得<br/><code>[9,8,7]\[1] → 8</code><br/><code>[9,8,7]\[-1] → 7</code> |
+| 単項取得 | <code>[<var>n</var>]</code> | インデックス<code><var>n</var></code>の要素を取得<br/><code>[9,8,7]\[1] → 8</code><br/><code>[9,8,7]\[-1] → 7</code> |
+| 部分取得 | <code>[<var>n</var><sub>0</sub>,<var>n</var><sub>1</sub>...]</code><br/><code>[<var>start</var>:<var>end</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>]</code> | インデックス表によるリスト生成<br/><code>[9,8,7]\[2,0] → [9,7]</code><br/><code>[9,8,7]\[1:3] → [8,7]</code><br/><code>[9,8,7]\[0:1] → [9]</code><br/><code>[9,8,7,6]\[0:4:2] → [9,7]</code> |
 
 
 ## 文字列

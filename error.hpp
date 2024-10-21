@@ -95,6 +95,7 @@ namespace wasmgen
         _LIST = 2040,
         UNMATCHED_LIST_SIZES,
         LIST_INDEX_OVERFLOW,
+        INVALID_RANGE_STEP,
 
         /**/
 

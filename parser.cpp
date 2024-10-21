@@ -813,6 +813,8 @@ namespace wasmgen
                 break;
             }
         }
+
+        unpack_expr.clear();
         parse_unpack_children(ops);
         code_line->operands = parse_expr_unpack_list(ops);
         return true;
@@ -841,10 +843,12 @@ namespace wasmgen
             return parse_expr_unpack_unary(expr);
         case Expression::BINARY:
             return parse_expr_unpack_binary(expr);
-        case Expression::LIST:
-            return parse_expr_unpack_list(expr);
         case Expression::CONDITIONAL:
             return parse_expr_unpack_conditional(expr);
+        case Expression::LIST:
+            return parse_expr_unpack_list(expr);
+        case Expression::RANGE:
+            return parse_expr_unpack_range(expr);
         case Expression::ITEM:
             return parse_expr_unpack_item(expr);
         }
@@ -858,9 +862,22 @@ namespace wasmgen
             return expr;
 
         Identifier* idmap = alias_name; assert(idmap);
-        Expression* symexpr = idmap->getexpr(token->text);
+        String* name = token->text; assert(name);
+        Expression* symexpr = idmap->getexpr(*name);
 
-        return symexpr ? parse_expr_unpack(symexpr) : expr;
+        if (!symexpr)
+            return expr;
+        if (unpack_expr.has(*name))
+        {
+            parse_error(ErrorCode::INFINITE_LOOP, {token});
+            return expr;
+        }
+        unpack_expr.insert(*name);
+
+        Expression* nexpr = parse_expr_unpack(symexpr);
+
+        unpack_expr.erase(*name);
+        return nexpr;
     }
 
     Expression* Parser::parse_expr_unpack_unary(Expression* expr)
@@ -887,11 +904,18 @@ namespace wasmgen
             if (lhs->mode == Expression::LIST &&
                 rhs->mode == Expression::LIST)
             {
-                NewExpressionList children;
+                NewExpressionList nchildren;
 
-                children->insert(children->end(), lchildren->begin(), lchildren->end());
-                children->insert(children->end(), rchildren->begin(), rchildren->end());
-                return new Expression(lhs->token, children);
+                nchildren->insert(nchildren->end(), lchildren->begin(), lchildren->end());
+                nchildren->insert(nchildren->end(), rchildren->begin(), rchildren->end());
+
+                Expression* nexpr = new Expression(lhs->token, nchildren);
+                Token* nsep = lhs->list_separator;
+
+                nexpr->setlistparen(token);
+                nexpr->setlistseparator(nsep);
+                nexpr->setlistseparators(nchildren->size(), nsep);
+                return nexpr;
             }
             break;
 
@@ -907,11 +931,18 @@ namespace wasmgen
                 ExpressionList* lchildren = lhs->children; assert(lchildren);
                 auto sit = lchildren->begin();
                 auto eit = lchildren->end();
-                NewExpressionList children;
+                NewExpressionList nchildren;
 
                 for (int n = res, i = 0; i < n; ++i)
-                    children->insert(children->end(), sit, eit);
-                return new Expression(lhs->token, children);
+                    nchildren->insert(nchildren->end(), sit, eit);
+
+                Expression* nexpr = new Expression(lhs->token, nchildren);
+                Token* nsep = lhs->list_separator;
+
+                nexpr->setlistparen(token);
+                nexpr->setlistseparator(nsep);
+                nexpr->setlistseparators(nchildren->size(), nsep);
+                return nexpr;
             }
             break;
 
@@ -953,7 +984,14 @@ namespace wasmgen
 
                     nchildren->push_back(new Expression(ntoken, lchild, rchild));
                 }
-                return new Expression(ltoken, nchildren);
+
+                Expression* nexpr = new Expression(ltoken, nchildren);
+                Token* nsep = lhs->list_separator;
+
+                nexpr->setlistparen(token);
+                nexpr->setlistseparator(nsep);
+                nexpr->setlistseparators(nchildren->size(), nsep);
+                return nexpr;
             }
             break;
 
@@ -978,10 +1016,20 @@ namespace wasmgen
 
     Expression* Parser::parse_expr_unpack_list(Expression* expr)
     {
+        Token* token = expr->token; assert(token);
         ExpressionList* children = expr->children; assert(children);
+        ExpressionList* nchildren = parse_expr_unpack_list(children);
 
-        expr->children = parse_expr_unpack_list(children);
-        return expr;
+        if (children == nchildren)
+            return expr;
+
+        Expression* nexpr = new Expression(token, nchildren);
+
+        nexpr->setlistparen(expr);
+        if (!nexpr->setlistseparator(expr->token_list))
+            nexpr->setlistseparator(token, true);
+        nexpr->setlistseparators(nchildren->size(), nexpr->list_separator);
+        return nexpr;
     }
 
     ExpressionList* Parser::parse_expr_unpack_list(ExpressionList* list)
@@ -1025,39 +1073,108 @@ namespace wasmgen
         return nlist;
     }
 
+    Expression* Parser::parse_expr_unpack_range(Expression* expr)
+    {
+        ExpressionList* children = expr->children; assert(children);
+        ExprValue xstart, xend, xstep;
+
+        switch (children->size())
+        {
+        case 3:
+            xstep = getvalue((*children)[2]);
+            if (!xstep.isint())
+                return expr;
+        case 2:
+            xstart = getvalue((*children)[0]);
+            if (!xstart.isint())
+                return expr;
+            xend = getvalue((*children)[1]);
+            if (!xend.isint())
+                return expr;
+            break;
+        default:
+            throw BUG("未知の形式です。");
+        }
+
+        int64_t start = int64_t(xstart);
+        int64_t end = int64_t(xend);
+        int64_t step = start <= end ? +1 : -1;
+        int64_t rend = end - step;
+        int64_t rmin = std::min<int64_t>(start, rend);
+        int64_t rmax = std::max<int64_t>(start, rend);
+
+        if (xstep.isint())
+            step = int64_t(xstep);
+        if (start != end && !step)
+        {
+            parse_error(ErrorCode::INVALID_RANGE_STEP, {*(*children)[2]});
+            return expr;
+        }
+
+        NewToken ntoken = new Token(expr->token);
+        ExpressionList* nchildren = new ExpressionList;
+
+        for (int64_t n = start; in_range(rmin, n, rmax); n += step)
+            nchildren->push_back(make_value(ntoken, n));
+
+        Expression* nexpr = new Expression(ntoken, nchildren);
+
+        nexpr->setlistparen(expr);
+        if (!nexpr->setlistseparator(expr->token_list))
+            nexpr->setlistseparator(ntoken, true);
+        nexpr->setlistseparators(nchildren->size(), nexpr->list_separator);
+        return nexpr;
+    }
+
     Expression* Parser::parse_expr_unpack_item(Expression* expr)
     {
         ExpressionList* children = expr->children; assert(children && children->size() == 2);
         Expression* lexpr = (*children)[0]; assert(lexpr);
-        Expression* nexpr = (*children)[1]; assert(nexpr);
+        Expression* rexpr = (*children)[1]; assert(rexpr);
 
         if (lexpr->mode != Expression::LIST ||
-            nexpr->mode != Expression::LIST)
-            return expr;
-
-        ExpressionList* nchildren = nexpr->children; assert(nchildren);
-
-        if (nchildren->size() != 1)
-            return expr;
-
-        Expression* iexpr = (*nchildren)[0]; assert(iexpr);
-        auto res = getvalue(iexpr);
-
-        if (!res.isint())
+            rexpr->mode != Expression::LIST)
             return expr;
 
         ExpressionList* lchildren = lexpr->children; assert(lchildren);
-        int64_t size = int64_t(lchildren->size());
-        int64_t pos(res);
+        ExpressionList* rchildren = rexpr->children; assert(rchildren);
+        NewExpressionList nchildren;
 
-        if (pos < 0)
-            pos += size;
-        if (pos < 0 || size <= pos)
+        for (Expression* iexpr : *rchildren)
         {
-            parse_error(ErrorCode::LIST_INDEX_OVERFLOW, {lexpr->token});
-            return expr;
+            assert(iexpr);
+
+            auto res = getvalue(iexpr);
+
+            if (!res.isint())
+                return expr;
+
+            int64_t size = int64_t(lchildren->size());
+            int64_t pos(res);
+
+            if (pos < 0)
+                pos += size;
+            if (pos < 0 || size <= pos)
+            {
+                parse_error(ErrorCode::LIST_INDEX_OVERFLOW, {iexpr->token});
+                return expr;
+            }
+            nchildren->push_back((*lchildren)[size_t(pos)]);
         }
-        return (*lchildren)[size_t(pos)];
+
+        Token* rsep = rexpr->list_separator; assert(rsep);
+
+        if (nchildren->size() == 1 && rsep->id != TokenID::CHAR_COLON)
+            return (*nchildren)[0];
+
+        Token* token = expr->token; assert(token);
+        Expression* nexpr = new Expression(token, nchildren);
+
+        nexpr->setlistparen(expr);
+        if (!nexpr->setlistseparator(expr->token_list))
+            nexpr->setlistseparator(token, true);
+        nexpr->setlistseparators(rchildren->size(), nexpr->list_separator);
+        return nexpr;
     }
 
     /*
@@ -1286,14 +1403,12 @@ namespace wasmgen
                 {
                     auto& child = (*value->children)[0];
 
-                    child->paren_open = value->paren_open;
-                    child->paren_close = value->paren_close;
+                    child->setlistform(value);
                     value = Transfer(child);
                 }
                 return Finish(value);
             }
             break;
-
         case TokenID('['):
             return parse_expr_list(TokenID(']'), rt);
         case TokenID('{'):
@@ -1320,6 +1435,10 @@ namespace wasmgen
         NewTokenList xtlist;
         TokenPtr rt = st;
         Token* pt = nullptr;
+
+        bool colon = cid == TokenID(']');
+        TokenID char_colon = colon ? TokenID::CHAR_COLON : TokenID::UNDEF;
+        TokenPtr separator;
 
         expr->token = st;
         expr->paren_open = st;
@@ -1354,16 +1473,35 @@ namespace wasmgen
             }
             if (rt->id == cid)
                 break;
-            if (rt->id != TokenID::CHAR_COMMA)
+            if (!separator)
             {
-                parse_expr_error(ErrorCode::SYNTAX_ERROR, {pt});
+                if (rt->id != TokenID::CHAR_COMMA &&
+                    rt->id != char_colon)
+                {
+                    parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
+                    return nullptr;
+                }
+                separator = rt;
+            }
+            if (rt->id != separator->id)
+            {
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {rt});
                 return nullptr;
             }
             xtlist->push_back(rt);
         }
-
+        if (separator && separator->id == TokenID::CHAR_COLON)
+        {
+            expr->mode = Expression::RANGE;
+            if (xtlist->size() > 2)
+            {
+                parse_expr_error(ErrorCode::SYNTAX_ERROR, {(*xtlist)[2]});
+                return nullptr;
+            }
+        }
         expr->token_list = Transfer(xtlist);
         expr->paren_close = rt;
+        expr->list_separator = separator;
         return Finish(expr);
     }
 
@@ -4660,8 +4798,10 @@ namespace wasmgen
 
     ExprValue Parser::get_asmsw_value(const char* name)
     {
-        ExprValue res;
+        assert(name);
+
         Expression* expr = define_name->getexpr(name);
+        ExprValue res;
 
         if (expr)
             res = getvalue(expr);
@@ -4699,6 +4839,7 @@ namespace wasmgen
 
                         auto r = getvalue(nest, p, label);
 
+                        nest.erase(*text);
                         if (r.isvalid())
                             return r;
                     }
@@ -4718,12 +4859,9 @@ namespace wasmgen
 
         case Expression::UNARY:
             {
-                assert(children.size() >= 1);
+                assert(children.size() == 1);
 
                 auto v0 = getvalue(nest, children[0], label);
-
-                if (!v0.isnumber())
-                    break;
 
                 switch (et->id)
                 {
@@ -4738,7 +4876,9 @@ namespace wasmgen
                     break;
 
                 case TokenID::ADD:
-                    return v0;
+                    if (v0.isnumber() || v0.islist())
+                        return v0;
+                    break;
 
                 case TokenID::SUB:
                     if (v0.isint())
@@ -4748,7 +4888,8 @@ namespace wasmgen
                     break;
 
                 case TokenID::MUL:
-                    parse_error(ErrorCode::SYNTAX_ERROR, {et});
+                    if (v0.islist())
+                        return v0;
                     break;
 
                 default:
@@ -4759,7 +4900,7 @@ namespace wasmgen
 
         case Expression::BINARY:
             {
-                assert(children.size() >= 2);
+                assert(children.size() == 2);
 
                 Expression* expr0 = children[0];
                 auto v0 = getvalue(nest, expr0, label);
@@ -4981,7 +5122,7 @@ namespace wasmgen
 
         case Expression::CONDITIONAL:
             {
-                assert(children.size() >= 3);
+                assert(children.size() == 3);
 
                 auto v0 = getvalue(nest, children[0], label);
 
@@ -4999,50 +5140,115 @@ namespace wasmgen
                 {
                     assert(op);
 
+                    Token* token = op->token; assert(token);
+                    bool expand = (op->mode == Expression::UNARY &&
+                                   token->id == TokenID::MUL);
                     auto v = getvalue(nest, op, label);
 
                     if (!v.isvalid())
                         return ExprValue();
+                    if (v.islist() && expand)
+                    {
+                        for (auto& s : v.list)
+                            rl.push_back(s);
+                        continue;
+                    }
                     rl.push_back(v);
                 }
                 return r;
             }
             break;
 
+        case Expression::RANGE:
+            {
+                assert(in_range<size_t>(2, children.size(), 3));
+
+                auto v0 = getvalue(nest, children[0], label);
+
+                if (!v0.isint())
+                    break;
+
+                int64_t start = int64_t(v0);
+                auto v1 = getvalue(nest, children[1], label);
+
+                if (!v1.isint())
+                    break;
+
+                int64_t end = int64_t(v1);
+                int64_t step = start <= end ? +1 : -1;
+                int64_t rend = end - step;
+                int64_t rmin = std::min<int64_t>(start, rend);
+                int64_t rmax = std::max<int64_t>(start, rend);
+
+                if (children.size() == 3)
+                {
+                    auto v2 = getvalue(nest, children[2], label);
+
+                    if (!v2.isint())
+                        break;
+                    step = int64_t(v2);
+                }
+                if (start != end && !step)
+                    break;
+
+                ExprValue r(ExprValue::ST_LIST);
+                auto& rl = r.list;
+
+                for (int64_t n = start; in_range(rmin, n, rmax); n += step)
+                    rl.push_back(n);
+                return r;
+            }
+            break;
+
         case Expression::ITEM:
             {
-                assert(children.size() >= 2);
+                assert(children.size() == 2);
 
                 Expression* op0 = children[0]; assert(op0);
+                Expression* op1 = children[1]; assert(op1);
 
-                auto v1 = getvalue(nest, children[1], label);
+                auto v0 = getvalue(nest, op0, label);
+
+                if (!v0.islist())
+                    break;
+
+                auto v1 = getvalue(nest, op1, label);
 
                 if (!v1.islist())
                     break;
-                if (v1.list.size() != 1)
-                    break;
 
-                auto& vp = v1.list[0];
+                ExprValue r(ExprValue::ST_LIST);
+                auto& vl = v0.list;
+                auto& rl = r.list;
+                bool success = true;
 
-                if (!vp.isnumber())
-                    break;
-
-                int64_t pos(vp);
-                auto v0 = getvalue(nest, children[0], label);
-
-                if (v0.islist())
+                for (auto& vp : v1.list)
                 {
-                    auto& vl = v0.list;
+                    if (!vp.isnumber())
+                    {
+                        success = false;
+                        break;
+                    }
 
+                    int64_t pos(vp);
                     if (pos < 0)
                         pos += int64_t(vl.size());
                     if (pos < 0 || int64_t(vl.size()) <= pos)
                     {
                         parse_error(ErrorCode::LIST_INDEX_OVERFLOW, {et});
+                        success = false;
                         break;
                     }
-                    return vl[size_t(pos)];
+                    rl.push_back(vl[size_t(pos)]);
                 }
+                if (!success)
+                    break;
+
+                Token* sep = op1->list_separator; assert(sep);
+
+                if (rl.size() == 1 && sep->id != TokenID::CHAR_COLON)
+                    return rl[0];
+                return r;
             }
             break;
 

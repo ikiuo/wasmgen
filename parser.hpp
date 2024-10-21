@@ -174,13 +174,14 @@ namespace wasmgen
 
         MacroDataDict macro_dict;
         MacroDataPtr define_macro;
-        StdSet<StdString> macro_expand;
+        StdStringSet macro_expand;
         TextFileReaderPtr macro_file;
 
         CodeLinePtr code_line;
         CodeListPtr code_list;
         SectionPtr current_section;
         StringPtr current_module_name;
+        StdStringSet unpack_expr;
 
         InstructionEntry instruction_entry;
         PseudoDataEntry pseudo_data_entry;
@@ -249,6 +250,7 @@ namespace wasmgen
         Expression* parse_expr_unpack_binary(Expression* expr);
         Expression* parse_expr_unpack_list(Expression* expr);
         ExpressionList *parse_expr_unpack_list(ExpressionList* list);
+        Expression* parse_expr_unpack_range(Expression* expr);
         Expression* parse_expr_unpack_conditional(Expression* expr);
         Expression* parse_expr_unpack_item(Expression* expr);
 

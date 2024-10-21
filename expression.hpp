@@ -41,6 +41,7 @@ namespace wasmgen
             BINARY,
             CONDITIONAL,
             LIST,
+            RANGE,
             ITEM,
         };
 
@@ -58,6 +59,7 @@ namespace wasmgen
         TokenListPtr token_list;
         TokenPtr paren_open;
         TokenPtr paren_close;
+        TokenPtr list_separator;
 
     public:
         Expression() noexcept;
@@ -87,10 +89,21 @@ namespace wasmgen
 
         void gettokenlist(TokenList* list);
 
+        void setlistparen(Token* token);
+        void setlistparen(Expression* expr);
+        void setlistform(Expression* expr);
+        void setlistseparator(Token* separator, bool comma = false);
+        bool setlistseparator(TokenList* separators) noexcept;
+        void setlistseparators(size_t count, Token* separator, bool comma = false);
+
         void dump(int indent = 0);
 
         static bool is_unary_operator(TokenID id) noexcept;
         static int priority(TokenID id) noexcept;
+        static Token* make_char(Token* token, TokenID id);
+        static Token* make_comman(Token* separator);
+        static Token* make_lbracket(Token* separator);
+        static Token* make_rbracket(Token* separator);
     };
 
 } // wasmgen
@@ -199,6 +212,33 @@ namespace wasmgen
 
     /**/
 
+    inline void Expression::setlistparen(Token* token)
+    {
+        paren_open = make_lbracket(token);
+        paren_close = make_rbracket(token);
+    }
+
+    inline void Expression::setlistparen(Expression* expr)
+    {
+        paren_open = expr->paren_open;
+        paren_close = expr->paren_close;
+    }
+
+    inline void Expression::setlistform(Expression* expr)
+    {
+        setlistparen(expr);
+        list_separator = expr->list_separator;
+    }
+
+    inline void Expression::setlistseparator(Token* separator, bool comma)
+    {
+        assert(separator);
+
+        list_separator = comma ? make_comman(separator) : separator;
+    }
+
+    /**/
+
     inline bool Expression::is_unary_operator(TokenID id) noexcept
     {
         return unary_operator.find(id) != unary_operator.end();
@@ -208,6 +248,26 @@ namespace wasmgen
     {
         OperatorPriority::const_iterator it = binary_operator_priority.find(id);
         return it == binary_operator_priority.end() ? -1 : it->second;
+    }
+
+    inline Token* Expression::make_char(Token* token, TokenID id)
+    {
+        return token->id == id ? token : new Token(id, token->text);
+    }
+
+    inline Token* Expression::make_comman(Token* sep)
+    {
+        return make_char(sep, TokenID::CHAR_COMMA);
+    }
+
+    inline Token* Expression::make_lbracket(Token* sep)
+    {
+        return make_char(sep, TokenID::CHAR_LEFT_CURLY_BRACKET);
+    }
+
+    inline Token* Expression::make_rbracket(Token* sep)
+    {
+        return make_char(sep, TokenID::CHAR_RIGHT_CURLY_BRACKET);
     }
 
 } // wasmgen

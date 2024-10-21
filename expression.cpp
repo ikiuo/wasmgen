@@ -112,6 +112,8 @@ namespace wasmgen
 
     void Expression::gettokenlist(TokenList* list)
     {
+        assert(list);
+
         if (paren_open)
             list->push_back(paren_open);
         switch (mode)
@@ -142,6 +144,7 @@ namespace wasmgen
             break;
 
         case LIST:
+        case RANGE:
             {
                 size_t csz = children->size();
                 size_t tsz = token_list->size();
@@ -167,6 +170,21 @@ namespace wasmgen
         }
         if (paren_close)
             list->push_back(paren_close);
+    }
+
+    bool Expression::setlistseparator(TokenList* separators) noexcept
+    {
+        if (!separators || !separators->size())
+            return false;
+        setlistseparator((*separators)[0]);
+        return true;
+    }
+
+    void Expression::setlistseparators(size_t count, Token* separator, bool comma)
+    {
+        if (comma)
+            separator = make_comman(separator);
+        token_list = new TokenList(count ? count - 1 : 0, separator);
     }
 
     /**/
@@ -223,6 +241,11 @@ namespace wasmgen
         case LIST:
             n = children->size();
             message("LIST[", n, "]: '", GetCStr(token), "'\n");
+            break;
+
+        case RANGE:
+            n = children->size();
+            message("RANGE[", n, "]: '", GetCStr(token), "'\n");
             break;
 
         case ITEM:
