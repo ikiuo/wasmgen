@@ -813,7 +813,6 @@ namespace wasmgen
                 break;
             }
         }
-
         unpack_expr.clear();
         parse_unpack_children(ops);
         code_line->operands = parse_expr_unpack_list(ops);
@@ -1214,7 +1213,7 @@ namespace wasmgen
             nchildren->push_back((*lchildren)[size_t(pos)]);
         }
 
-        if (nchildren->size() == 1 && !expr->from_range)
+        if (nchildren->size() == 1 && !rexpr->from_range)
             return (*nchildren)[0];
 
         Token* token = expr->token; assert(token);
