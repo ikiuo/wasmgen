@@ -13,6 +13,7 @@ namespace wasmgen
 
     template <typename T> bool in_range(T minval, T value, T maxval) noexcept;
     template <typename T> T clamp(T minval, T value, T maxval) noexcept;
+    template <typename T> T ipow(T x, T y) noexcept;
 
     template <typename T> StdSet<T> operator + (const StdSet<T>& lhs, const StdSet<T>& rhs);
     template <typename T> StdSet<T> operator - (const StdSet<T>& lhs, const StdSet<T>& rhs);
@@ -55,6 +56,20 @@ namespace wasmgen
     inline T clamp(T minval, T value, T maxval) noexcept
     {
         return std::max<T>(minval, std::min<T>(value, maxval));
+    }
+
+    template <typename T>
+    T ipow(T x, T y) noexcept
+    {
+        T r;
+
+        for (r = 1; y != 0; y >>= 1)
+        {
+            if ((y & 1))
+                r *= x;
+            x *= x;
+        }
+        return r;
     }
 
     /*

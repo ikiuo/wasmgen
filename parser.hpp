@@ -45,6 +45,10 @@ namespace wasmgen
             inline auto op(double l, double r) { return fmod(l, r); }
             template <typename L, typename R> inline auto op(L l, R r) { return l % r; }
         };
+        struct OpPow {
+            inline auto op(int64_t l, int64_t r) { return ipow(l, r); }
+            template <typename L, typename R> inline auto op(L l, R r) { return pow(l, r); }
+        };
 
         using Int64List = StdVector<int64_t>;
 

@@ -283,6 +283,8 @@ namespace wasmgen
         NAME,
         QUOTE,
 
+        POWER,
+
         LSHIFT,
         RSHIFT,
         RSHIFTU,
@@ -300,6 +302,7 @@ namespace wasmgen
         VMUL,
         VDIV,
         VMOD,
+        VPOW,
 
         /**/
     };

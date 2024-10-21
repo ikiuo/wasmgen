@@ -9,44 +9,74 @@ namespace wasmgen
     // Expression //
     ////////////////
 
+    enum : int
+    {
+        XPRI_NONE,
+
+        XPRI_POWER,
+        XPRI_MUL,
+        XPRI_ADD,
+
+        XPRI_SHLR,
+
+        XPRI_CMPR,
+        XPRI_CMPE,
+
+        XPRI_AND,
+        XPRI_XOR,
+        XPRI_OR,
+
+        XPRI_VPOW,
+
+        XPRI_VMUL,
+        XPRI_VADD,
+
+        XPRI_BAND,
+        XPRI_BOR,
+    };
+
     const Expression::UnaryOperator Expression::unary_operator {
         TokenID::BNOT, TokenID::NOT,
         TokenID::ADD, TokenID::SUB, TokenID::MUL,
     };
 
     const Expression::OperatorPriority Expression::binary_operator_priority {
-        { TokenID::MUL, 1 },  // "*"
-        { TokenID::DIV, 1 },  // "/"
-        { TokenID::MOD, 1 },  // "%"
+        { TokenID::POWER, XPRI_POWER },  // "*"
 
-        { TokenID::ADD, 2 },  // "+"
-        { TokenID::SUB, 2 },  // "-"
+        { TokenID::MUL, XPRI_MUL },  // "*"
+        { TokenID::DIV, XPRI_MUL },  // "/"
+        { TokenID::MOD, XPRI_MUL },  // "%"
 
-        { TokenID::LSHIFT, 3 },   // "<<"
-        { TokenID::RSHIFT, 3 },   // ">>"
-        { TokenID::RSHIFTU, 3 },  // ">>>"
+        { TokenID::ADD, XPRI_ADD },  // "+"
+        { TokenID::SUB, XPRI_ADD },  // "-"
 
-        { TokenID::CMPLT, 4 },  // "<"
-        { TokenID::CMPLE, 4 },  // "<="
-        { TokenID::CMPGE, 4 },  // ">="
-        { TokenID::CMPGT, 4 },  // ">"
+        { TokenID::LSHIFT,  XPRI_SHLR },   // "<<"
+        { TokenID::RSHIFT,  XPRI_SHLR },   // ">>"
+        { TokenID::RSHIFTU, XPRI_SHLR },  // ">>>"
 
-        { TokenID::CMPEQ, 5 },  // "=="
-        { TokenID::CMPNE, 5 },  // "!="
+        { TokenID::CMPLT, XPRI_CMPR },  // "<"
+        { TokenID::CMPLE, XPRI_CMPR },  // "<="
+        { TokenID::CMPGE, XPRI_CMPR },  // ">="
+        { TokenID::CMPGT, XPRI_CMPR },  // ">"
 
-        { TokenID::AND, 6 },  // "&"
-        { TokenID::XOR, 7 },  // "^"
-        { TokenID::OR,  8 },  // "|"
+        { TokenID::CMPEQ, XPRI_CMPE },  // "=="
+        { TokenID::CMPNE, XPRI_CMPE },  // "!="
 
-        { TokenID::VMUL, 9 },  // "[*]"
-        { TokenID::VDIV, 9 },  // "[/]"
-        { TokenID::VMOD, 9 },  // "[%]"
+        { TokenID::AND, XPRI_AND },  // "&"
+        { TokenID::XOR, XPRI_XOR },  // "^"
+        { TokenID::OR,  XPRI_OR },  // "|"
 
-        { TokenID::VADD, 10 },  // "[+]"
-        { TokenID::VSUB, 10 },  // "[-]"
+        { TokenID::VPOW, XPRI_VPOW },  // "[**]"
 
-        { TokenID::BAND, 11 },  // "&&"
-        { TokenID::BOR, 12 },  // "||"
+        { TokenID::VMUL, XPRI_VMUL },  // "[*]"
+        { TokenID::VDIV, XPRI_VMUL },  // "[/]"
+        { TokenID::VMOD, XPRI_VMUL },  // "[%]"
+
+        { TokenID::VADD, XPRI_VADD },  // "[+]"
+        { TokenID::VSUB, XPRI_VADD },  // "[-]"
+
+        { TokenID::BAND, XPRI_BAND },  // "&&"
+        { TokenID::BOR,  XPRI_BOR },  // "||"
     };
 
     /**/

@@ -900,6 +900,40 @@ namespace wasmgen
 
         switch (token->id)
         {
+        case TokenID::POWER:
+            if (lhs->mode == Expression::LIST)
+            {
+                auto res = getvalue(rhs);
+
+                if (!res.isint())
+                    break;
+                int64_t repeat(res);
+
+                ExpressionList* lchildren = lhs->children; assert(lchildren);
+                NewExpressionList nchildren;
+
+                for (Expression* vexpr : *lchildren)
+                {
+                    assert(vexpr);
+
+                    for (auto ri : inc_range<int64_t>(repeat))
+                    {
+                        UNUSED(ri);
+
+                        nchildren->push_back(vexpr);
+                    }
+                }
+
+                Expression* nexpr = new Expression(lhs->token, nchildren);
+                Token* nsep = lhs->list_separator;
+
+                nexpr->setlistparen(token);
+                nexpr->setlistseparator(nsep);
+                nexpr->setlistseparators(nchildren->size(), nsep);
+                return nexpr;
+            }
+            break;
+
         case TokenID::ADD:
             if (lhs->mode == Expression::LIST &&
                 rhs->mode == Expression::LIST)
@@ -920,12 +954,11 @@ namespace wasmgen
             break;
 
         case TokenID::MUL:
+            if (lhs->mode == Expression::LIST)
             {
                 auto res = getvalue(rhs);
 
                 if (!res.isint())
-                    break;
-                if (lhs->mode != Expression::LIST)
                     break;
 
                 ExpressionList* lchildren = lhs->children; assert(lchildren);
@@ -951,6 +984,7 @@ namespace wasmgen
         case TokenID::VMUL:
         case TokenID::VDIV:
         case TokenID::VMOD:
+        case TokenID::VPOW:
             if (lhs->mode == Expression::LIST &&
                 rhs->mode == Expression::LIST)
             {
@@ -972,6 +1006,7 @@ namespace wasmgen
                 case TokenID::VMUL: ntoken->id = TokenID::MUL; break;
                 case TokenID::VDIV: ntoken->id = TokenID::DIV; break;
                 case TokenID::VMOD: ntoken->id = TokenID::MOD; break;
+                case TokenID::VPOW: ntoken->id = TokenID::POWER; break;
                 default: break;
                 }
 
@@ -1126,7 +1161,11 @@ namespace wasmgen
             Expression* vexpr = make_value(ntoken, n);
 
             for (auto ri : inc_range<int64_t>(repeat))
-                nchildren->push_back(vexpr), UNUSED(ri);
+            {
+                UNUSED(ri);
+
+                nchildren->push_back(vexpr);
+            }
         }
 
         Expression* nexpr = new Expression(ntoken, nchildren);
@@ -4992,15 +5031,19 @@ namespace wasmgen
                         if (vl.size() != 1)
                             break;
 
-                        auto& ve = vl[0];
                         ExprValue r(ExprValue::ST_LIST);
                         auto& rl = r.list;
+                        auto es = vl.begin();
+                        auto ee = vl.end();
+                        int64_t repeat(v1);
 
-                        for (auto n : inc_range<size_t>(uint64_t(v1)))
+                        if (repeat < 0)
+                            repeat = 0;
+                        for (auto n : inc_range<int64_t>(repeat))
                         {
                             UNUSED(n);
 
-                            rl.push_back(ve);
+                            rl.insert(rl.end(), es, ee);
                         }
                         return r;
                     }
@@ -5044,6 +5087,33 @@ namespace wasmgen
                         if (bool(v1))
                             return binary_operator(v0, v1, OpMod());
                         parse_error(ErrorCode::DIVISION_BY_ZERO, {*expr1});
+                    }
+                    break;
+
+                case TokenID::POWER:
+                    if (v0.isnumber() && v1.isnumber())
+                        return binary_operator(v0, v1, OpPow());
+                    if (v0.islist() && v1.isnumber())
+                    {
+                        auto& vl = v0.list;
+
+                        if (vl.size() != 1)
+                            break;
+
+                        ExprValue r(ExprValue::ST_LIST);
+                        auto& rl = r.list;
+                        int64_t repeat(v1);
+
+                        if (repeat < 0)
+                            repeat = 0;
+                        for (auto v : v0.list)
+                            for (auto ri : inc_range<int64_t>(repeat))
+                            {
+                                UNUSED(ri);
+
+                                rl.push_back(v);
+                            }
+                        return r;
                     }
                     break;
 
@@ -5118,6 +5188,11 @@ namespace wasmgen
                 case TokenID::VMOD:
                     if (v0.islist() && v1.islist())
                         return binary_operator(v0, v1, OpMod(), et);
+                    break;
+
+                case TokenID::VPOW:
+                    if (v0.islist() && v1.islist())
+                        return binary_operator(v0, v1, OpPow(), et);
                     break;
 
                     /**/
@@ -5217,7 +5292,11 @@ namespace wasmgen
 
                 for (int64_t n = start; in_range(rmin, n, rmax); n += step)
                     for (auto ri : inc_range<int64_t>(repeat))
-                        rl.push_back(n), UNUSED(ri);
+                    {
+                        UNUSED(ri);
+
+                        rl.push_back(n);
+                    }
                 return r;
             }
             break;

@@ -10,6 +10,7 @@ namespace wasmgen
     ///////////
 
     const Lexer::TokenDataList Lexer::token_data {
+        { TokenID::POWER, "**" },
         { TokenID::LSHIFT, "<<" },
         { TokenID::RSHIFT, ">>" },
         { TokenID::RSHIFTU, ">>>" },
@@ -19,6 +20,7 @@ namespace wasmgen
         { TokenID::CMPNE, "!=" },
         { TokenID::BAND, "&&" },
         { TokenID::BOR, "||" },
+        { TokenID::VPOW, "[**]" },
         { TokenID::VADD, "[+]" },
         { TokenID::VSUB, "[-]" },
         { TokenID::VMUL, "[*]" },
