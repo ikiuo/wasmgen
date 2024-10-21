@@ -1171,8 +1171,7 @@ namespace wasmgen
         Expression* nexpr = new Expression(ntoken, nchildren);
 
         nexpr->setlistparen(expr);
-        if (!nexpr->setlistseparator(expr->token_list))
-            nexpr->setlistseparator(ntoken, true);
+        nexpr->setlistseparator(ntoken, true);
         nexpr->setlistseparators(nchildren->size(), nexpr->list_separator);
         return nexpr;
     }
