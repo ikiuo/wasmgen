@@ -120,12 +120,12 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 
 ### 範囲
 
-整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。さらに追加で、同じ数値を<code>repeat</code>個複製してます。
+整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。さらに追加で、同じ数値を<code>dup</code>個複製します。
 
 ```
 [start:end]
 [start:end:step]
-[start:end:step:repeat]
+[start:end:step:dup]
 ```
 
 **例**
@@ -146,7 +146,8 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 種類 | 演算子 | 例 |
 |:-:|:-:|:--|
 | 単項 | <code>+</code> <br/> <code>-</code> <br/> <code>!</code> <br/> <code>~</code> | <code>+</code> value <br/> <code>-</code> value <br/> <code>!</code> value <br/> <code>~</code> value |
-| 二項(積) | <code>*</code> <br/> <code>/</code> <br/> % | val1 <code>*</code> val2 <br/> val1 <code>/</code> val2 <br/> val1 <code>%</code> val2 |
+| 二項(累) | <code>\*\*</code> | val1 <code>\*\*</code> val2 |
+| 二項(積) | <code>\*</code> <br/> <code>/</code> <br/> % | val1 <code>\*</code> val2 <br/> val1 <code>/</code> val2 <br/> val1 <code>%</code> val2 |
 | 二項(和) | <code>+</code> <br/> <code>-</code> <br/> | val1 <code>+</code> val2 <br/> val1 <code>-</code> val2 |
 | 二項(シフト) | <code>&lt;&lt;</code> <br/> <code>&gt;&gt;</code> <br/> <code>&gt;&gt;&gt;</code> | val1 <code>&lt;&lt;</code> val2 <br/> val1 <code>&gt;&gt;</code> val2 <br/> val1 <code>&gt;&gt;&gt;</code> val2 |
 | 二項(比較) | <code>&lt;</code> <br/> <code>&lt;=</code> <br/> <code>&gt;=</code> <br/> <code>&gt;</code> | val1 <code>&lt;</code> val2 <br/> val1 <code>&lt;=</code> val2 <br/> val1 <code>&gt;=</code> val2 <br/> val1 <code>&gt;</code> val2 |
@@ -162,16 +163,18 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 |:-:|:-:|:--|
 | 単項 | <code>\*</code> | 内部展開<br/><code>(1,\*(2,3)) → (1,2,3)</code> |
 | 二項(和) | <code>+</code> | <code>list + list</code> で結合<br/><code>[1,2,3] + [4,5,6] → [1,2,3,4,5,6]</code> |
-| 二項(積) | <code>\*</code> | <code>list * number</code> で複製<br/><code>[1,2]\*3 → [1,2,1,2,1,2]</code> |
+| 二項(表複写) | <code>\*</code> | <code>list * number</code> で結合複製<br/><code>[1,2]\*3 → [1,2,1,2,1,2]</code> |
+| 二項(項複写) | <code>\*\*</code> | <code>list ** number</code> で要素複製<br/><code>[1,2,3]\*\*3 → [1,1,1,2,2,2,3,3,3]</code> |
 | | | 以下、要素に対する演算<br/>要素数は同じであること |
-| 二項(和) | <code>[+]</code> | <code>[1,2,3] [+] [4,5,6] → [5,7,9]</code> |
-| 二項(差) | <code>[-]</code> | <code>[4,5,6] [-] [1,2,3] → [3,3,3]</code> |
+| 二項(累) | <code>[\*\*]</code> | <code>[4,5,6] [\*\*] [1,2,3] → [4,25,216]</code> |
 | 二項(積) | <code>[\*]</code> | <code>[4,5,6] [\*] [1,2,3] → [4,10,18]</code> |
 | 二項(商) | <code>[/]</code> | <code>[4,6,9] [/] [1,2,3] → [4,3,3]</code> |
 | 二項(余) | <code>[%]</code> | <code>[4,5,8] [%] [1,2,3] → [0,1,2]</code> |
+| 二項(和) | <code>[+]</code> | <code>[1,2,3] [+] [4,5,6] → [5,7,9]</code> |
+| 二項(差) | <code>[-]</code> | <code>[4,5,6] [-] [1,2,3] → [3,3,3]</code> |
 | | | |
 | 単項取得 | <code>[<var>n</var>]</code> | インデックス<code><var>n</var></code>の要素を取得<br/><code>[9,8,7]\[1] → 8</code><br/><code>[9,8,7]\[-1] → 7</code> |
-| 部分取得 | <code>[<var>n</var><sub>0</sub>,<var>n</var><sub>1</sub>...]</code><br/><code>[<var>start</var>:<var>end</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>]</code> | インデックス表によるリスト生成<br/><code>[9,8,7]\[2,0] → [9,7]</code><br/><code>[9,8,7]\[1:3] → [8,7]</code><br/><code>[9,8,7]\[0:1] → [9]</code><br/><code>[9,8,7,6]\[0:4:2] → [9,7]</code> |
+| 部分取得 | <code>[<var>n</var><sub>0</sub>,<var>n</var><sub>1</sub>...]</code><br/><code>[<var>start</var>:<var>end</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>:<var>dup</var>]</code> | インデックス表によるリスト生成<br/><code>[9,8,7]\[2,0] → [9,7]</code><br/><code>[9,8,7]\[1:3] → [8,7]</code><br/><code>[9,8,7]\[0:1] → [9]</code><br/><code>[9,8,7,6]\[0:4:2] → [9,7]</code><br><code>[9,8,7,6]\[0:4:2:2] → [9,9,7,7]</code> |
 
 
 ## 文字列
