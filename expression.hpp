@@ -60,6 +60,7 @@ namespace wasmgen
         TokenPtr paren_open;
         TokenPtr paren_close;
         TokenPtr list_separator;
+        bool from_range;
 
     public:
         Expression() noexcept;
@@ -93,7 +94,7 @@ namespace wasmgen
         void setlistparen(Expression* expr);
         void setlistform(Expression* expr);
         void setlistseparator(Token* separator, bool comma = false);
-        bool setlistseparator(TokenList* separators) noexcept;
+        bool setlistseparator(TokenList* separators, bool comma = false);
         void setlistseparators(size_t count, Token* separator, bool comma = false);
 
         void dump(int indent = 0);

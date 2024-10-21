@@ -1170,8 +1170,10 @@ namespace wasmgen
 
         Expression* nexpr = new Expression(ntoken, nchildren);
 
+        nexpr->from_range = true;
         nexpr->setlistparen(expr);
-        nexpr->setlistseparator(ntoken, true);
+        if (!nexpr->setlistseparator(expr->token_list, true))
+            nexpr->setlistseparator(ntoken, true);
         nexpr->setlistseparators(nchildren->size(), nexpr->list_separator);
         return nexpr;
     }
@@ -1212,9 +1214,7 @@ namespace wasmgen
             nchildren->push_back((*lchildren)[size_t(pos)]);
         }
 
-        Token* rsep = rexpr->list_separator; assert(rsep);
-
-        if (nchildren->size() == 1 && rsep->id != TokenID::CHAR_COLON)
+        if (nchildren->size() == 1 && !expr->from_range)
             return (*nchildren)[0];
 
         Token* token = expr->token; assert(token);

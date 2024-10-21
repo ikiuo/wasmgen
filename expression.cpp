@@ -84,6 +84,7 @@ namespace wasmgen
     Expression::Expression() noexcept
         : mode(EMPTY)
         , children(new ExpressionList)
+        , from_range(false)
     {
         /*NOOP*/
     }
@@ -91,6 +92,7 @@ namespace wasmgen
     Expression::Expression(Mode mode) noexcept
         : mode(mode)
         , children(new ExpressionList)
+        , from_range(false)
     {
         /*NOOP*/
     }
@@ -99,6 +101,7 @@ namespace wasmgen
         : mode(VALUE)
         , token(value)
         , children(new ExpressionList)
+        , from_range(false)
     {
         /*NOOP*/
     }
@@ -107,6 +110,7 @@ namespace wasmgen
         : mode(UNARY)
         , token(op)
         , children(new ExpressionList)
+        , from_range(false)
     {
         children->push_back(value);
     }
@@ -115,6 +119,7 @@ namespace wasmgen
         : mode(mode)
         , token(op)
         , children(new ExpressionList)
+        , from_range(false)
     {
         children->push_back(lhs);
         children->push_back(rhs);
@@ -124,6 +129,7 @@ namespace wasmgen
         : mode(CONDITIONAL)
         , token(op)
         , children(new ExpressionList)
+        , from_range(false)
     {
         children->push_back(cval);
         children->push_back(tval);
@@ -134,6 +140,7 @@ namespace wasmgen
         : mode(LIST)
         , token(op)
         , children(list)
+        , from_range(false)
     {
         /*NOOP*/
     }
@@ -202,11 +209,11 @@ namespace wasmgen
             list->push_back(paren_close);
     }
 
-    bool Expression::setlistseparator(TokenList* separators) noexcept
+    bool Expression::setlistseparator(TokenList* separators, bool comma)
     {
         if (!separators || !separators->size())
             return false;
-        setlistseparator((*separators)[0]);
+        setlistseparator((*separators)[0], comma);
         return true;
     }
 
