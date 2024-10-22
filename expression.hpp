@@ -247,8 +247,7 @@ namespace wasmgen
 
     inline int Expression::priority(TokenID id) noexcept
     {
-        OperatorPriority::const_iterator it = binary_operator_priority.find(id);
-        return it == binary_operator_priority.end() ? -1 : it->second;
+        return binary_operator_priority.get(id, -1);
     }
 
     inline Token* Expression::make_char(Token* token, TokenID id)

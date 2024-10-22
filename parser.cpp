@@ -595,6 +595,7 @@ namespace wasmgen
         auto it = insres.instr;
         auto mit = insres.macro;
 
+        expr_optimize = false;
         if (insres.find)
         {
             if (asmsw_skip)
@@ -1374,7 +1375,7 @@ namespace wasmgen
 
             int nop = Expression::priority(ct->id);
 
-            if (nop < 0 || (pop && (pop < nop)))
+            if (nop < 0 || (pop && (pop <= nop)))
             {
                 puttoken(ct);
                 break;
