@@ -47,9 +47,10 @@ namespace wasmgen
 
     protected:
         using OperatorPriority = StdMap<TokenID, int>;
-        using UnaryOperator = StdSet<TokenID>;
+        using OperatorSet = StdSet<TokenID>;
 
-        static const UnaryOperator unary_operator;
+        static const OperatorSet right_operator;
+        static const OperatorSet unary_operator;
         static const OperatorPriority binary_operator_priority;
 
     public:
@@ -99,6 +100,7 @@ namespace wasmgen
 
         void dump(int indent = 0);
 
+        static bool is_right_operator(TokenID id) noexcept;
         static bool is_unary_operator(TokenID id) noexcept;
         static int priority(TokenID id) noexcept;
         static Token* make_char(Token* token, TokenID id);
@@ -239,6 +241,11 @@ namespace wasmgen
     }
 
     /**/
+
+    inline bool Expression::is_right_operator(TokenID id) noexcept
+    {
+        return right_operator.has(id);
+    }
 
     inline bool Expression::is_unary_operator(TokenID id) noexcept
     {

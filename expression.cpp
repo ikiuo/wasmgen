@@ -49,7 +49,11 @@ namespace wasmgen
         XPRI_VBOR,
     };
 
-    const Expression::UnaryOperator Expression::unary_operator {
+    const Expression::OperatorSet Expression::right_operator {
+        TokenID::POWER,
+    };
+
+    const Expression::OperatorSet Expression::unary_operator {
         TokenID::BNOT, TokenID::NOT,
         TokenID::ADD, TokenID::SUB, TokenID::MUL,
     };

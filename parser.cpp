@@ -1374,14 +1374,19 @@ namespace wasmgen
         {
             ct = next_token();
             if (Invalid(ct))
+                return Finish(lhs);
+
+            TokenID opid = ct->id;
+            int nop = Expression::priority(opid);
+
+            if (nop < 0)
                 break;
-
-            int nop = Expression::priority(ct->id);
-
-            if (nop < 0 || (pop && (pop <= nop)))
+            if (pop)
             {
-                puttoken(ct);
-                break;
+                if (pop < nop)
+                    break;
+                if (pop == nop && !Expression::is_right_operator(opid))
+                    break;
             }
             if (!(rhs = parse_expr_binary(nop)))
             {
@@ -1404,6 +1409,8 @@ namespace wasmgen
 
             lhs = Transfer(expr);
         }
+
+        puttoken(ct);
         return Finish(lhs);
     }
 
