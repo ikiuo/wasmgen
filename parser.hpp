@@ -44,10 +44,8 @@ namespace wasmgen
         struct OpMul : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return l * r; } };
         struct OpDiv : tagDiv { template <typename L, typename R> inline auto op(L l, R r) { return l / r; } };
         struct OpMod : tagDiv {
-            inline auto op(double l, int64_t r) { return int64_t(l) % r; }
-            inline auto op(int64_t l, double r) { return fmod(l, r); }
-            inline auto op(double l, double r) { return fmod(l, r); }
-            template <typename L, typename R> inline auto op(L l, R r) { return l % r; }
+            inline auto op(int64_t l, int64_t r) { return l % r; }
+            template <typename L, typename R> inline auto op(L l, R r) { return fmod(l, r); }
         };
         struct OpPow : tagOp {
             inline auto op(int64_t l, int64_t r) { return ipow(l, r); }
@@ -621,13 +619,14 @@ namespace wasmgen
     {
         assert(l.isnumber() && r.isnumber());
 
-        return (!r.isfloat()
-                ? (!l.isfloat()
-                   ? ExprValue(f.op(l.ivalue, r.ivalue))
-                   : ExprValue(f.op(l.fvalue, r.ivalue)))
-                : (!l.isfloat()
-                   ? ExprValue(f.op(l.ivalue, r.fvalue))
-                   : ExprValue(f.op(l.fvalue, r.fvalue))));
+        switch (l.isfloat() + r.isfloat() * 2)
+        {
+        case 0: return ExprValue(f.op(l.ivalue, r.ivalue));
+        case 1: return ExprValue(f.op(l.fvalue, r.ivalue));
+        case 2: return ExprValue(f.op(l.ivalue, r.fvalue));
+        case 3: return ExprValue(f.op(l.fvalue, r.fvalue));
+        default: throw BUG("???");
+        }
     }
 
     /**/

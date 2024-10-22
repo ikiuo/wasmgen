@@ -5050,7 +5050,7 @@ namespace wasmgen
 
         assert(children->size() == 2);
 
-        Expression* expr0 = (*children)[0]; assert(expr0);
+        // Expression* expr0 = (*children)[0]; assert(expr0);
         Expression* expr1 = (*children)[1]; assert(expr1);
 
         switch (opid)
@@ -5288,7 +5288,6 @@ namespace wasmgen
     {
         assert(expr && expr->mode == Expression::CONDITIONAL);
 
-        Token* et = expr->token; assert(et);
         ExpressionList* children = expr->children; assert(children);
 
         assert(children->size() == 3);
@@ -5309,7 +5308,6 @@ namespace wasmgen
     {
         assert(expr && expr->mode == Expression::LIST);
 
-        Token* et = expr->token; assert(et);
         ExpressionList* children = expr->children; assert(children);
 
         ExprValue r(ExprValue::ST_LIST);
@@ -5341,7 +5339,6 @@ namespace wasmgen
     {
         assert(expr && expr->mode == Expression::RANGE);
 
-        Token* et = expr->token; assert(et);
         ExpressionList* children = expr->children; assert(children);
 
         assert(in_range<size_t>(2, children->size(), 3));
