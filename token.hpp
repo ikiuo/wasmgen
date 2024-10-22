@@ -297,6 +297,8 @@ namespace wasmgen
         BAND,
         BOR,
 
+        /**/
+
         VADD,
         VSUB,
         VMUL,
@@ -304,7 +306,23 @@ namespace wasmgen
         VMOD,
         VPOW,
 
-        /**/
+        VAND,
+        VXOR,
+        VOR,
+
+        VSHL,
+        VSHR,
+        VSHRU,
+
+        VCMPLT,
+        VCMPGT,
+        VCMPLE,
+        VCMPGE,
+        VCMPEQ,
+        VCMPNE,
+
+        VBAND,
+        VBOR,
     };
     static_assert(int(TokenID::EXTEND) == 128, "Bug!!");
 

@@ -11,21 +11,43 @@ namespace wasmgen
 
     const Lexer::TokenDataList Lexer::token_data {
         { TokenID::POWER, "**" },
+        /**/
         { TokenID::LSHIFT, "<<" },
         { TokenID::RSHIFT, ">>" },
         { TokenID::RSHIFTU, ">>>" },
+        /**/
         { TokenID::CMPLE, "<=" },
         { TokenID::CMPGE, ">=" },
         { TokenID::CMPEQ, "==" },
         { TokenID::CMPNE, "!=" },
+        /**/
         { TokenID::BAND, "&&" },
         { TokenID::BOR, "||" },
-        { TokenID::VPOW, "[**]" },
+        /**/
         { TokenID::VADD, "[+]" },
         { TokenID::VSUB, "[-]" },
         { TokenID::VMUL, "[*]" },
         { TokenID::VDIV, "[/]" },
         { TokenID::VMOD, "[%]" },
+        { TokenID::VPOW, "[**]" },
+        /**/
+        { TokenID::VAND, "[&]" },
+        { TokenID::VXOR, "[^]" },
+        { TokenID::VOR, "[|]" },
+        /**/
+        { TokenID::VSHL, "[<<]" },
+        { TokenID::VSHR, "[>>]" },
+        { TokenID::VSHRU, "[>>>]" },
+        /**/
+        { TokenID::VCMPLT, "[<]" },
+        { TokenID::VCMPGT, "[>]" },
+        { TokenID::VCMPLE, "[<=]" },
+        { TokenID::VCMPGE, "[>=]" },
+        { TokenID::VCMPEQ, "[==]" },
+        { TokenID::VCMPNE, "[!=]" },
+        /**/
+        { TokenID::VBAND, "[&&]" },
+        { TokenID::VBOR, "[||]" },
     };
 
     const Lexer::ScanTree Lexer::token_scan_tree(token_data);

@@ -145,15 +145,15 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 
 | 種類 | 演算子 | 例 |
 |:-:|:-:|:--|
-| 単項 | <code>+</code> <br/> <code>-</code> <br/> <code>!</code> <br/> <code>~</code> | <code>+</code> value <br/> <code>-</code> value <br/> <code>!</code> value <br/> <code>~</code> value |
+| 単項 | <code>+</code><br/><code>-</code><br/><code>!</code><br/><code>~</code> | <code>+</code> value <br/> <code>-</code> value <br/> <code>!</code> value <br/> <code>~</code> value |
 | 二項(累) | <code>\*\*</code> | val1 <code>\*\*</code> val2 |
-| 二項(積) | <code>\*</code> <br/> <code>/</code> <br/> % | val1 <code>\*</code> val2 <br/> val1 <code>/</code> val2 <br/> val1 <code>%</code> val2 |
-| 二項(和) | <code>+</code> <br/> <code>-</code> <br/> | val1 <code>+</code> val2 <br/> val1 <code>-</code> val2 |
-| 二項(シフト) | <code>&lt;&lt;</code> <br/> <code>&gt;&gt;</code> <br/> <code>&gt;&gt;&gt;</code> | val1 <code>&lt;&lt;</code> val2 <br/> val1 <code>&gt;&gt;</code> val2 <br/> val1 <code>&gt;&gt;&gt;</code> val2 |
-| 二項(比較) | <code>&lt;</code> <br/> <code>&lt;=</code> <br/> <code>&gt;=</code> <br/> <code>&gt;</code> | val1 <code>&lt;</code> val2 <br/> val1 <code>&lt;=</code> val2 <br/> val1 <code>&gt;=</code> val2 <br/> val1 <code>&gt;</code> val2 |
-| 二項(比較) | <code>==</code> <br/> <code>!=</code> | val1 <code>==</code> val2 <br/> val1 <code>!=</code> val2 |
-| 二項(論理) | <code>&amp;</code> <br/> <code>\|</code> <br/> <code>^</code> | val1 <code>&amp;</code> val2 <br/> val1 <code>\|</code> val2 <br/> val1 <code>^</code> val2 |
-| 二項(真偽) | <code>&amp;&amp;</code> <br/> <code>\|\|</code> | val1 <code>&amp;&amp;</code> val2 <br/> val1 <code>\|\|</code> val2 |
+| 二項(積) | <code>\*</code><br/><code>/</code> <br/> % | val1 <code>\*</code> val2 <br/> val1 <code>/</code> val2 <br/> val1 <code>%</code> val2 |
+| 二項(和) | <code>+</code><br/><code>-</code> <br/> | val1 <code>+</code> val2 <br/> val1 <code>-</code> val2 |
+| 二項(シフト) | <code>&lt;&lt;</code><br/><code>&gt;&gt;</code><br/><code>&gt;&gt;&gt;</code> | val1 <code>&lt;&lt;</code> val2 <br/> val1 <code>&gt;&gt;</code> val2 : 符号あり <br/> val1 <code>&gt;&gt;&gt;</code> val2 : 符号なし |
+| 二項(比較) | <code>&lt;</code><br/><code>&lt;=</code><br/><code>&gt;=</code><br/><code>&gt;</code> | val1 <code>&lt;</code> val2 <br/> val1 <code>&lt;=</code> val2 <br/> val1 <code>&gt;=</code> val2 <br/> val1 <code>&gt;</code> val2 |
+| 二項(比較) | <code>==</code><br/><code>!=</code> | val1 <code>==</code> val2 <br/> val1 <code>!=</code> val2 |
+| 二項(論理) | <code>&amp;</code><br/><code>\|</code><br/><code>^</code> | val1 <code>&amp;</code> val2 <br/> val1 <code>\|</code> val2 <br/> val1 <code>^</code> val2 |
+| 二項(真偽) | <code>&amp;&amp;</code><br/><code>\|\|</code> | val1 <code>&amp;&amp;</code> val2 <br/> val1 <code>\|\|</code> val2 |
 | 三項(選択) | <code>? :</code> | val1 <code>?</code> val2 <code>:</code> val3 |
 
 
@@ -167,11 +167,13 @@ label:  operator    operand1, operand2,                     operand3, operand4�
 | 二項(項複写) | <code>\*\*</code> | <code>list ** number</code> で要素複製<br/><code>[1,2,3]\*\*3 → [1,1,1,2,2,2,3,3,3]</code> |
 | | | 以下、要素に対する演算<br/>要素数は同じであること |
 | 二項(累) | <code>[\*\*]</code> | <code>[4,5,6] [\*\*] [1,2,3] → [4,25,216]</code> |
-| 二項(積) | <code>[\*]</code> | <code>[4,5,6] [\*] [1,2,3] → [4,10,18]</code> |
-| 二項(商) | <code>[/]</code> | <code>[4,6,9] [/] [1,2,3] → [4,3,3]</code> |
-| 二項(余) | <code>[%]</code> | <code>[4,5,8] [%] [1,2,3] → [0,1,2]</code> |
-| 二項(和) | <code>[+]</code> | <code>[1,2,3] [+] [4,5,6] → [5,7,9]</code> |
-| 二項(差) | <code>[-]</code> | <code>[4,5,6] [-] [1,2,3] → [3,3,3]</code> |
+| 二項(積) | <code>[\*]</code><br/><code>[/]</code><br/><code>[%]</code> | <code>[4,5,6] [\*] [1,2,3] → [4,10,18]</code><br/><code>[4,6,9] [/] [1,2,3] → [4,3,3]</code><br/><code>[4,5,8] [%] [1,2,3] → [0,1,2]</code> |
+| 二項(和) | <code>[+]</code><br/><code>[-]</code> | <code>[1,2,3] [+] [4,5,6] → [5,7,9]</code><br/><code>[4,5,6] [-] [1,2,3] → [3,3,3]</code> |
+| 二項(シフト) | <code>[&lt;&lt;]</code><br/><code>[&gt;&gt;]</code><br/><code>[&gt;&gt;&gt;]</code> | <code>[ 1, 1, 1, 1] [&lt;&lt;] [0,1,2,3] → [ 1, 2, 4, 8]</code><br/><code>[-1,-2,-4,-8] [&gt;&gt;] [0,1,2,3] → [-1,-1,-1,-1]</code><br/><code>[ 1, 2, 4, 8] [&gt;&gt;&gt;] [0,1,2,3] → [ 1, 1, 1, 1]</code>  |
+| 二項(比較) | <code>[&lt;]</code><br/><code>[&lt;=]</code><br/><code>[&gt;=]</code><br/><code>[&gt;]</code> | <code>[0,1,2,3] [&lt;] [3,2,1,0] → [1,1,0,0]</code><br/><code>[0,1,2,3] [&lt;=] [4,3,2,1] → [1,1,1,0]</code><br/><code>[0,1,2,3] [&gt;=] [4,3,2,1] → [0,0,1,1]</code><br/><code>[0,1,2,3] [&gt;] [3,2,1,0] → [0,0,1,1]</code> |
+| 二項(比較) | <code>[==]</code><br/><code>[!=]</code> | <code>[0,1,2,3] [==] [4,3,2,1] → [0,0,1,0]</code><br/><code>[0,1,2,3] [!=] [4,3,2,1] → [1,1,0,1]</code> |
+| 二項(論理) | <code>[&amp;]</code><br/><code>[\|]</code><br/><code>[^]</code> | <code>[0x07,0xe0] [&amp;] [0x3c,0x3c] → [0x04,0x20]</code><br/><code>[0x07,0xe0] [\|] [0x3c,0x3c] → [0x3f,0xfc]</code><br/><code>[0x07,0xe0] [^] [0x3c,0x3c] → [0x3b,0xdc]</code> |
+| 二項(真偽) | <code>[&amp;&amp;]</code><br/><code>[\|\|]</code> | <code>[0,1,2,4] [&amp;&amp;] [4,2,1,0] → [0,1,1,0]</code><br/><code>[0,0,2,2] [\|\|] [0,1,0,1] → [0,1,1,1]</code> |
 | | | |
 | 単項取得 | <code>[<var>n</var>]</code> | インデックス<code><var>n</var></code>の要素を取得<br/><code>[9,8,7]\[1] → 8</code><br/><code>[9,8,7]\[-1] → 7</code> |
 | 部分取得 | <code>[<var>n</var><sub>0</sub>,<var>n</var><sub>1</sub>...]</code><br/><code>[<var>start</var>:<var>end</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>:<var>dup</var>]</code> | インデックス表によるリスト生成<br/><code>[9,8,7]\[2,0] → [9,7]</code><br/><code>[9,8,7]\[1:3] → [8,7]</code><br/><code>[9,8,7]\[0:1] → [9]</code><br/><code>[9,8,7,6]\[0:4:2] → [9,7]</code><br><code>[9,8,7,6]\[0:4:2:2] → [9,9,7,7]</code> |
@@ -2297,7 +2299,7 @@ $exit:      end
 | <code>1</code> | <code>i32</code> | <code>memory\.grow</code> | | <code><var>r</var><sub>i32</sub> ← (MEM0 のページ サイズ)</code> <br> <code>MEM0</code> のページをサイズ <code><var>p1</var><sub>i32</sub></code> に変更 |
 | <code>3</code> | | <code>memory\.fill</code> | | <code>memset(&amp;MEM0[<var>p1</var><sub>i32</sub>], <var>p2</var><sub>i32</sub>, <var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p1</code>から長さ<code>p3</code>を<code>p2</code>で埋める |
 | <code>3</code> | | <code>memory\.copy</code> | | <code>memmove(&amp;MEM0[<var>p1</var><sub>i32</sub>], &amp;MEM0[<var>p2</var><sub>i32</sub>], <var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p2</code>から長さ<code>p3</code>を位置<code>p1</code>に移動 |
-| <code>3</code> | | <code>memory\.init</code> | <code>dataidx</code> | <code>memcpy(&amp;MEM0[<var>p1</var><sub>i32</sub>], &amp;DATA[𝑥][<var>p2</var><sub>i32</sub>], <var>p3</var><sub>i32</sub>)</code> <br/> <cod>DATA</code>の位置<code>p2</code>から長さ<code>p3</code>を<code>MEM0</code>の位置<code>p1</code>へコピー |
+| <code>3</code> | | <code>memory\.init</code> | <code>dataidx</code> | <code>memcpy(&amp;MEM0[<var>p1</var><sub>i32</sub>], &amp;DATA[𝑥][<var>p2</var><sub>i32</sub>], <var>p3</var><sub>i32</sub>)</code><br/><cod>DATA</code>の位置<code>p2</code>から長さ<code>p3</code>を<code>MEM0</code>の位置<code>p1</code>へコピー |
 
 <code>memset, mommove, memcpy</code>はC言語の標準Cライブラリを参照してください。
 

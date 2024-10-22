@@ -28,27 +28,41 @@ namespace wasmgen
 
         using MacroDataDictIter = MacroDataDict::iterator;
 
-        struct OpLT { template <typename L, typename R> inline bool op(L l, R r) { return l < r; } };
-        struct OpLE { template <typename L, typename R> inline bool op(L l, R r) { return l <= r; } };
-        struct OpEQ { template <typename L, typename R> inline bool op(L l, R r) { return l == r; } };
-        struct OpNE { template <typename L, typename R> inline bool op(L l, R r) { return l != r; } };
-        struct OpGE { template <typename L, typename R> inline bool op(L l, R r) { return l >= r; } };
-        struct OpGT { template <typename L, typename R> inline bool op(L l, R r) { return l > r; } };
+        struct tagOp {};
+        struct tagDiv {};
 
-        struct OpAdd { template <typename L, typename R> inline auto op(L l, R r) { return l + r; } };
-        struct OpSub { template <typename L, typename R> inline auto op(L l, R r) { return l - r; } };
-        struct OpMul { template <typename L, typename R> inline auto op(L l, R r) { return l * r; } };
-        struct OpDiv { template <typename L, typename R> inline auto op(L l, R r) { return l / r; } };
-        struct OpMod {
+        struct OpLT : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l < r; } };
+        struct OpLE : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l <= r; } };
+        struct OpEQ : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l == r; } };
+        struct OpNE : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l != r; } };
+        struct OpGE : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l >= r; } };
+        struct OpGT : tagOp { template <typename L, typename R> inline bool op(L l, R r) { return l > r; } };
+
+        struct OpAdd : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return l + r; } };
+        struct OpSub : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return l - r; } };
+        struct OpMul : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return l * r; } };
+        struct OpDiv : tagDiv { template <typename L, typename R> inline auto op(L l, R r) { return l / r; } };
+        struct OpMod : tagDiv {
             inline auto op(double l, int64_t r) { return int64_t(l) % r; }
             inline auto op(int64_t l, double r) { return fmod(l, r); }
             inline auto op(double l, double r) { return fmod(l, r); }
             template <typename L, typename R> inline auto op(L l, R r) { return l % r; }
         };
-        struct OpPow {
+        struct OpPow : tagOp {
             inline auto op(int64_t l, int64_t r) { return ipow(l, r); }
             template <typename L, typename R> inline auto op(L l, R r) { return pow(l, r); }
         };
+
+        struct OpAnd : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return uint64_t(l) & uint64_t(r); } };
+        struct OpXor : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return uint64_t(l) | uint64_t(r); } };
+        struct OpOr  : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return uint64_t(l) ^ uint64_t(r); } };
+
+        struct OpSHL  : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return int64_t(l) << uint64_t(r); } };
+        struct OpSHR  : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return int64_t(l) >> uint64_t(r); } };
+        struct OpSHRU : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return uint64_t(l) >> uint64_t(r); } };
+
+        struct OpBAnd : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return bool(l) && bool(r); } };
+        struct OpBOr  : tagOp { template <typename L, typename R> inline auto op(L l, R r) { return bool(l) || bool(r); } };
 
         using Int64List = StdVector<int64_t>;
 
@@ -389,6 +403,13 @@ namespace wasmgen
 
         ExprValue getvalue(Expression* expr, IdentifierList* table = nullptr);
         ExprValue getvalue(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_data(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_unary(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_binary(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_conditional(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_list(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_range(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_item(StdStringSet& nest, Expression* expr, IdentifierList* table);
 
         String* getname(Expression* expr, IdentifierList* table = nullptr);
         String* getquote(Expression* expr, IdentifierList* table = nullptr);
@@ -419,10 +440,10 @@ namespace wasmgen
 
         /*-*/
 
-        template <typename F> ExprValue binary_operator(ExprValue& l, ExprValue& r, F op, Token* token);
+        template <typename F> ExprValue binary_operator(ExprValue& l, ExprValue& r, F op);
+        template <typename F> ExprValue binary_operator(ExprValueList& l, ExprValueList& r, F op, Token* token);
+        template <typename F> ExprValue binary_voperator(ExprValue& l, ExprValue& r, F op, Token* token);
 
-        template <typename F> static ExprValue binary_operator(ExprValue& l, ExprValue& r, F op);
-        template <typename F> static ExprValue binary_operator(ExprValueList& l, ExprValueList& r, F op);
         template <typename T> static Expression* make_value(Token* token, T value);
         template <typename T> static Expression* make_value(FileString* text, T value);
         static Expression* make_string(Token* token, String* quote);
@@ -591,24 +612,10 @@ namespace wasmgen
     /**/
 
     template <typename F>
-    inline ExprValue Parser::binary_operator(ExprValue& l, ExprValue& r, F f, Token* token)
-    {
-        assert(l.islist() && r.islist());
-
-        size_t size = l.list.size();
-
-        if (size == r.list.size())
-            return binary_operator(l.list, r.list, f);
-        parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
-        return ExprValue();
-    }
-
-    /**/
-
-    template <typename F>
     inline ExprValue Parser::binary_operator(ExprValue& l, ExprValue& r, F f)
     {
         assert(l.isnumber() && r.isnumber());
+
         return (!r.isfloat()
                 ? (!l.isfloat()
                    ? ExprValue(f.op(l.ivalue, r.ivalue))
@@ -619,15 +626,38 @@ namespace wasmgen
     }
 
     template <typename F>
-    inline ExprValue Parser::binary_operator(ExprValueList& l, ExprValueList& r, F f)
+    inline ExprValue Parser::binary_operator(ExprValueList& l, ExprValueList& r, F f, Token* token)
     {
+        UNUSED(token);
         assert(l.size() == r.size());
 
         ExprValue v(ExprValue::ST_LIST);
 
         for (auto n : inc_range<size_t>(l.size()))
-            v.list.push_back(binary_operator(l[n], r[n], f));
+        {
+            auto &lv = l[n];
+            auto &rv = r[n];
+
+            if (lv.isnumber() && rv.isnumber())
+                v.list.push_back(binary_operator(lv, rv, f));
+            else
+                v.list.push_back(ExprValue());
+        }
         return v;
+    }
+
+    template <typename F>
+    inline ExprValue Parser::binary_voperator(ExprValue& l, ExprValue& r, F f, Token* token)
+    {
+        assert(l.islist() && r.islist());
+
+        if (l.list.size() != r.list.size())
+        {
+            parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
+            return ExprValue();
+        }
+
+        return binary_operator(l.list, r.list, f, token);
     }
 
     /**/

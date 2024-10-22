@@ -63,7 +63,7 @@ namespace wasmgen
     {
         T r;
 
-        for (r = 1; y != 0; y >>= 1)
+        for (r = 1; y > 0; y >>= 1)
         {
             if ((y & 1))
                 r *= x;

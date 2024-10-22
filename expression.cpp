@@ -26,13 +26,27 @@ namespace wasmgen
         XPRI_XOR,
         XPRI_OR,
 
+        XPRI_BAND,
+        XPRI_BOR,
+
+        /**/
+
         XPRI_VPOW,
 
         XPRI_VMUL,
         XPRI_VADD,
 
-        XPRI_BAND,
-        XPRI_BOR,
+        XPRI_VSHLR,
+
+        XPRI_VCMPR,
+        XPRI_VCMPE,
+
+        XPRI_VAND,
+        XPRI_VXOR,
+        XPRI_VOR,
+
+        XPRI_VBAND,
+        XPRI_VBOR,
     };
 
     const Expression::UnaryOperator Expression::unary_operator {
@@ -66,6 +80,11 @@ namespace wasmgen
         { TokenID::XOR, XPRI_XOR },  // "^"
         { TokenID::OR,  XPRI_OR },  // "|"
 
+        { TokenID::BAND, XPRI_BAND },  // "&&"
+        { TokenID::BOR,  XPRI_BOR },  // "||"
+
+        /**/
+
         { TokenID::VPOW, XPRI_VPOW },  // "[**]"
 
         { TokenID::VMUL, XPRI_VMUL },  // "[*]"
@@ -75,8 +94,24 @@ namespace wasmgen
         { TokenID::VADD, XPRI_VADD },  // "[+]"
         { TokenID::VSUB, XPRI_VADD },  // "[-]"
 
-        { TokenID::BAND, XPRI_BAND },  // "&&"
-        { TokenID::BOR,  XPRI_BOR },  // "||"
+        { TokenID::VSHL,  XPRI_VSHLR },   // "[<<]"
+        { TokenID::VSHR,  XPRI_VSHLR },   // "[>>]"
+        { TokenID::VSHRU, XPRI_VSHLR },  // "[>>>]"
+
+        { TokenID::VCMPLT, XPRI_VCMPR },  // "[<]"
+        { TokenID::VCMPLE, XPRI_VCMPR },  // "[<=]"
+        { TokenID::VCMPGE, XPRI_VCMPR },  // "[>=]"
+        { TokenID::VCMPGT, XPRI_VCMPR },  // "[>]"
+
+        { TokenID::VCMPEQ, XPRI_VCMPE },  // "[==]"
+        { TokenID::VCMPNE, XPRI_VCMPE },  // "[!=]"
+
+        { TokenID::VAND, XPRI_VAND },  // "[&]"
+        { TokenID::VXOR, XPRI_VXOR },  // "[^]"
+        { TokenID::VOR,  XPRI_VOR },  // "[|]"
+
+        { TokenID::VBAND, XPRI_VBAND },  // "[&&]"
+        { TokenID::VBOR,  XPRI_VBOR },  // "[||]"
     };
 
     /**/
