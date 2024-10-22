@@ -2,10 +2,17 @@
  * stdvec.hpp
  */
 #pragma once
-#include "stdtypes.hpp"
+#include "compiler.hpp"
 
 namespace wasmgen
 {
+    ///////////////
+    // StdVector //
+    ///////////////
+
+    template <typename T>
+    using StdVector = std::vector<T>;
+
     /////////////////
     // StdVecStack //
     /////////////////

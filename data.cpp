@@ -86,6 +86,7 @@ namespace wasmgen
         case ST_VALTYPE:
             {
                 auto it = valtype_name.find(ValType(ivalue));
+
                 if (it !=  valtype_name.end())
                     return it->second;
             }
@@ -115,6 +116,7 @@ namespace wasmgen
         case ST_VALTYPE:
             {
                 auto it = valtype_name.find(ValType(ivalue));
+
                 if (it !=  valtype_name.end())
                     return StringBlock{"valtype=", it->second};
             }

@@ -2,7 +2,7 @@
  * stdmap.hpp
  */
 #pragma once
-#include "stdtypes.hpp"
+#include "compiler.hpp"
 
 namespace wasmgen
 {

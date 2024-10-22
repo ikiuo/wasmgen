@@ -92,7 +92,7 @@ namespace wasmgen
         StdSet<T> rs;
 
         for (const auto d : lhs)
-            if (rhs.find(d) == rhs.end())
+            if (!rhs.has(d))
                 rs.insert(d);
         return rs;
     }

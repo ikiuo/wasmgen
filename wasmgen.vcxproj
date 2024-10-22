@@ -57,6 +57,7 @@
     <ClInclude Include="range.hpp" />
     <ClInclude Include="section.hpp" />
     <ClInclude Include="stdmap.hpp" />
+    <ClInclude Include="stdset.hpp" />
     <ClInclude Include="stdstr.hpp" />
     <ClInclude Include="stdvec.hpp" />
     <ClInclude Include="stdtypes.hpp" />

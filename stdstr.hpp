@@ -2,11 +2,14 @@
  * stdstr.hpp
  */
 #pragma once
-#include "stdtypes.hpp"
 #include "stdmap.hpp"
+#include "stdset.hpp"
+#include "stdvec.hpp"
 
 namespace wasmgen
 {
+    using StdString = std::string;
+
     /////////////////
     // StdCStrList //
     /////////////////

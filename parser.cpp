@@ -595,7 +595,7 @@ namespace wasmgen
         auto it = insres.instr;
         auto mit = insres.macro;
 
-        expr_optimize = false;
+        expr_optimize = true;
         if (insres.find)
         {
             if (asmsw_skip)
@@ -611,8 +611,11 @@ namespace wasmgen
             if (it == eit)
                 it = instr_defmacro;
             code_line->instab = it;
-            if (!(expr_optimize = mit == meit))
+            if (mit != meit)
+            {
                 code_line->macro = mit->second;
+                expr_optimize = false;
+            }
             if (!parse_operands())
                 return false;
             rt = next_token();
@@ -747,7 +750,7 @@ namespace wasmgen
 
         WASMGEN_DEBUG(2, "MACRO: start=\"", name ,"\"\n");
 
-        if (macro_expand.find(name) != macro_expand.end())
+        if (macro_expand.has(name))
             return parse_error(ErrorCode::NESTED_MACRO_EXPANSION, {instr});
         macro_expand.insert(name);
 

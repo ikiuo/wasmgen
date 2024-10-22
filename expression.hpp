@@ -242,7 +242,7 @@ namespace wasmgen
 
     inline bool Expression::is_unary_operator(TokenID id) noexcept
     {
-        return unary_operator.find(id) != unary_operator.end();
+        return unary_operator.has(id);
     }
 
     inline int Expression::priority(TokenID id) noexcept
