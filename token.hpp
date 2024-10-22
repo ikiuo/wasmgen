@@ -299,7 +299,7 @@ namespace wasmgen
 
         /**/
 
-        VADD,
+        VADD, VOP_START = VADD,
         VSUB,
         VMUL,
         VDIV,
@@ -322,7 +322,7 @@ namespace wasmgen
         VCMPNE,
 
         VBAND,
-        VBOR,
+        VBOR, VOP_END = VBOR,
     };
     static_assert(int(TokenID::EXTEND) == 128, "Bug!!");
 

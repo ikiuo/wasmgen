@@ -55,7 +55,7 @@ namespace wasmgen
     };
 
     const Expression::OperatorPriority Expression::binary_operator_priority {
-        { TokenID::POWER, XPRI_POWER },  // "*"
+        { TokenID::POWER, XPRI_POWER },  // "**"
 
         { TokenID::MUL, XPRI_MUL },  // "*"
         { TokenID::DIV, XPRI_MUL },  // "/"

@@ -3,6 +3,7 @@
  */
 #pragma once
 #include "stdtypes.hpp"
+#include "stdmap.hpp"
 
 namespace wasmgen
 {
@@ -38,22 +39,7 @@ namespace wasmgen
     //////////////////
 
     template <typename T>
-    class StdStringMap : public StdMap<StdString, T>
-    {
-    private:
-        using super = StdMap<StdString, T>;
-
-    public:
-        using key_type = typename super::key_type;
-
-    public:
-        using super::super;
-
-        bool has(const key_type& key) const;
-
-        T& get(const key_type& key, T& defval = T());
-        const T& get(const key_type& key, const T& defval = T()) const;
-    };
+    using StdStringMap = StdMap<StdString, T>;
 
     /**/
 
@@ -84,32 +70,6 @@ namespace wasmgen
     //////////////////
     // StdStringMap //
     //////////////////
-
-    template <typename T>
-    inline bool StdStringMap<T>::has(const key_type& key) const
-    {
-#if !WASMGEN_COMPILER_CXX20
-        return super::find(key) != super::end();
-#else /* C++20 */
-        return super::contains(key);
-#endif
-    }
-
-    template <typename T>
-    inline T& StdStringMap<T>::get(const key_type& key, T& defval)
-    {
-        auto it = super::find(key);
-
-        return it != super::end() ? it->second : defval;
-    }
-
-    template <typename T>
-    inline const T& StdStringMap<T>::get(const key_type& key, const T& defval) const
-    {
-        auto it = super::find(key);
-
-        return it != super::end() ? it->second : defval;
-    }
 
     /*
      * StdStringMap<T> = StdStringMap<T> | StdStringMap<T>

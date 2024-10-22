@@ -7,6 +7,7 @@
 #include "endian.hpp"
 #include "leb128.hpp"
 #include "range.hpp"
+#include "stdmap.hpp"
 #include "stdstr.hpp"
 #include "stdvec.hpp"
 #include "strblk.hpp"

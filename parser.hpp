@@ -18,6 +18,7 @@ namespace wasmgen
         using SectionNameDict = StdStringMap<int8_t>;
         using ElementModeDict = StdStringMap<ElementMode>;
         using InstrMacroDict = StdStringMap<Instruction::MacroCode>;
+        using TokenMap = StdMap<TokenID, TokenID>;
 
         using PTokenList = StdVector<Token*>;
 
@@ -125,6 +126,8 @@ namespace wasmgen
         };
 
     protected:
+        static const TokenMap operator_map;
+
         static const SectionNameDict section_name_dict;
         static const ElementModeDict element_mode_dict;
         static const InstrMacroDict instr_macro_dict;
@@ -405,7 +408,11 @@ namespace wasmgen
         ExprValue getvalue(StdStringSet& nest, Expression* expr, IdentifierList* table);
         ExprValue getvalue_data(StdStringSet& nest, Expression* expr, IdentifierList* table);
         ExprValue getvalue_unary(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        /**/
         ExprValue getvalue_binary(StdStringSet& nest, Expression* expr, IdentifierList* table);
+        ExprValue getvalue_binary(Expression* expr, TokenID opid, ExprValue& lhs, ExprValue& rhs);
+        ExprValue getvalue_binary_list(Expression* expr, TokenID opid, ExprValue& lhs, ExprValue& rhs);
+        /**/
         ExprValue getvalue_conditional(StdStringSet& nest, Expression* expr, IdentifierList* table);
         ExprValue getvalue_list(StdStringSet& nest, Expression* expr, IdentifierList* table);
         ExprValue getvalue_range(StdStringSet& nest, Expression* expr, IdentifierList* table);
@@ -441,8 +448,6 @@ namespace wasmgen
         /*-*/
 
         template <typename F> ExprValue binary_operator(ExprValue& l, ExprValue& r, F op);
-        template <typename F> ExprValue binary_operator(ExprValueList& l, ExprValueList& r, F op, Token* token);
-        template <typename F> ExprValue binary_voperator(ExprValue& l, ExprValue& r, F op, Token* token);
 
         template <typename T> static Expression* make_value(Token* token, T value);
         template <typename T> static Expression* make_value(FileString* text, T value);
@@ -623,41 +628,6 @@ namespace wasmgen
                 : (!l.isfloat()
                    ? ExprValue(f.op(l.ivalue, r.fvalue))
                    : ExprValue(f.op(l.fvalue, r.fvalue))));
-    }
-
-    template <typename F>
-    inline ExprValue Parser::binary_operator(ExprValueList& l, ExprValueList& r, F f, Token* token)
-    {
-        UNUSED(token);
-        assert(l.size() == r.size());
-
-        ExprValue v(ExprValue::ST_LIST);
-
-        for (auto n : inc_range<size_t>(l.size()))
-        {
-            auto &lv = l[n];
-            auto &rv = r[n];
-
-            if (lv.isnumber() && rv.isnumber())
-                v.list.push_back(binary_operator(lv, rv, f));
-            else
-                v.list.push_back(ExprValue());
-        }
-        return v;
-    }
-
-    template <typename F>
-    inline ExprValue Parser::binary_voperator(ExprValue& l, ExprValue& r, F f, Token* token)
-    {
-        assert(l.islist() && r.islist());
-
-        if (l.list.size() != r.list.size())
-        {
-            parse_error(ErrorCode::UNMATCHED_LIST_SIZES, {token});
-            return ExprValue();
-        }
-
-        return binary_operator(l.list, r.list, f, token);
     }
 
     /**/
