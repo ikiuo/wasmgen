@@ -1091,10 +1091,6 @@ namespace wasmgen
         Token* token = expr->token; assert(token);
         ExpressionList* children = expr->children; assert(children);
         ExpressionList* nchildren = parse_expr_unpack_list(children);
-
-        if (children == nchildren)
-            return expr;
-
         Expression* nexpr = new Expression(token, nchildren);
 
         nexpr->setlistparen(expr);
@@ -1136,11 +1132,16 @@ namespace wasmgen
                 auto eit = grandchildrend->end();
 
                 nlist->insert(nlist->end(), sit, eit);
+                continue;
             }
-            else if (child->mode == Expression::VALUE && child->paren_open)
+
+            if (child->mode == Expression::VALUE && child->paren_open)
+            {
                 nlist->push_back(child);
-            else
-                nlist->push_back(expr);
+                continue;
+            }
+
+            nlist->push_back(expr);
         }
         return nlist;
     }
@@ -3812,7 +3813,7 @@ namespace wasmgen
         {
             CustomSectionData* csdat = custom->section[i];
 
-            if (csdat && !reparse_code_list(csdat->code))
+            if (csdat && !parse_code_list(csdat->code))
                 return false;
         }
         return true;
@@ -3825,7 +3826,7 @@ namespace wasmgen
         for (FunctionCode* fcode : *function)
         {
             assert(fcode);
-            if (!reparse_code_list(fcode->code))
+            if (!parse_code_list(fcode->code))
                 return false;
         }
         return true;
@@ -3838,7 +3839,7 @@ namespace wasmgen
         for (GlobalData* data : *global)
         {
             assert(data);
-            if (!reparse_code_list(data->code))
+            if (!parse_code_list(data->code))
                 return false;
         }
         return true;
@@ -3851,12 +3852,12 @@ namespace wasmgen
         for (ElementData* data : *element)
         {
             assert(data);
-            if (!reparse_code_list(data->offset_expr))
+            if (!parse_code_list(data->offset_expr))
                 return false;
             for (ElementInit* init : *data->init)
             {
                 assert(init);
-                if (!reparse_code_list(init->code))
+                if (!parse_code_list(init->code))
                     return false;
             }
         }
@@ -3870,8 +3871,8 @@ namespace wasmgen
         for (DataBlock* block : *dsec)
         {
             assert(block);
-            if (!reparse_code_list(block->offset_expr) ||
-                !reparse_code_list(block->binary_code))
+            if (!parse_code_list(block->offset_expr) ||
+                !parse_code_list(block->binary_code))
                 return false;
         }
         return true;
@@ -3933,20 +3934,10 @@ namespace wasmgen
      *
      */
 
-    bool Parser::reparse_code_list(CodeList* list)
+    bool Parser::parse_code_list(CodeList* list)
     {
         if (!list)
             return true;
-        if (!parse_code_list(list))
-            return false;
-        if (list->retry)
-            retry = true;
-        return true;
-    }
-
-    bool Parser::parse_code_list(CodeList* list)
-    {
-        assert(list);
 
         if (!list->br_idx)
         {
@@ -3984,6 +3975,8 @@ namespace wasmgen
             for (CodeLine* line : list->block_stack)
                 parse_warning(ErrorCode::NO_END, {line->instr});
 
+        if (list->retry)
+            retry = true;
         ++list->pass;
         return !error_count;
     }
@@ -5016,6 +5009,9 @@ namespace wasmgen
         case TokenID::MUL:
             if (v0.islist())
                 return v0;
+            if (v0.isnumber() && expr0->paren_open)
+                return v0;
+            parse_error(ErrorCode::UNABLE_TO_EXPAND, {*expr0});
             break;
 
         default:

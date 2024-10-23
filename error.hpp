@@ -96,6 +96,7 @@ namespace wasmgen
         UNMATCHED_LIST_SIZES,
         LIST_INDEX_OVERFLOW,
         INVALID_RANGE_STEP,
+        UNABLE_TO_EXPAND,
 
         /**/
 

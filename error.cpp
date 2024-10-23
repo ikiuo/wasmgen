@@ -44,6 +44,7 @@ namespace wasmgen
         {ErrorCode::UNMATCHED_LIST_SIZES, {{0},{"リストのサイズが一致しません。"}}},
         {ErrorCode::LIST_INDEX_OVERFLOW, {{0},{"リスト要素のインデックスが大きすぎます。"}}},
         {ErrorCode::INVALID_RANGE_STEP, {{0,-1,1},{"範囲指定のステップ値(",")が無効です。"}}},
+        {ErrorCode::UNABLE_TO_EXPAND, {{0,-1,1},{"(",")は展開できません。"}}},
         /**/
         {ErrorCode::NO_SECTION_LABEL, {{-1,0},{" のラベルがありません。"}}},
         {ErrorCode::INVALID_SECTION_ID, {{0,-1,1},{"無効なセクション番号(",")です。"}}},

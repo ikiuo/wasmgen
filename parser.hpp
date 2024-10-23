@@ -372,7 +372,6 @@ namespace wasmgen
 
         void add_symbol(SectionID id, CodeList* list);
 
-        bool reparse_code_list(CodeList* list);
         bool parse_code_list(CodeList* list);
         bool parse_code_line(CodeList* list, CodeLine* line);
         bool parse_code_line_operand(CodeList* list, CodeLine* line);
