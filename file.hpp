@@ -25,6 +25,7 @@ namespace wasmgen
 
         constexpr void clear() noexcept;
         constexpr void set(size_t line, size_t column) noexcept;
+        constexpr void set(const FileTextPos& rhs) noexcept;
     };
 
     ////////////////
@@ -310,6 +311,12 @@ namespace wasmgen
     {
         line = l;
         column = c;
+    }
+
+    inline constexpr void FileTextPos::set(const FileTextPos& rhs) noexcept
+    {
+        line = rhs.line;
+        column = rhs.column;
     }
 
     ////////////////

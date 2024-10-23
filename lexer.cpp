@@ -154,14 +154,25 @@ namespace wasmgen
 
     /**/
 
-    void Lexer::prepare_token()
+    void Lexer::prepare_token(Token* token)
     {
-        FileString *line = (*file_line)[text_pos.line];
-        NewFileString text("");
+        FileStringPtr text;
 
-        text->file_name = freader->path();
-        text->text_pos.set(line->text_pos.line, text_pos.column);
+        if (token)
+        {
+            text = new FileString(token->text);
+            text->set("");
+            text->file_name = freader->path();
+            text->text_pos.set(text->text_pos);
+        }
+        else
+        {
+            FileString *line = (*file_line)[text_pos.line];
 
+            text = new FileString("");
+            text->file_name = freader->path();
+            text->text_pos.set(line->text_pos.line, text_pos.column);
+        }
         current_token = new Token(TokenID::UNDEF, text);
         current_text = Transfer(text);
     }

@@ -91,7 +91,7 @@ namespace wasmgen
         void rewindchar() noexcept;
         void update_token_line();
 
-        void prepare_token();
+        void prepare_token(Token* token = nullptr);
 
         template <typename T>
         void gettoken_chars(const T& cs);

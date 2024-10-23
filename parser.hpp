@@ -437,7 +437,7 @@ namespace wasmgen
 
         /*-*/
 
-        template <typename... Args> Token* make_token(Token* token, Args... args);
+        template <typename... Args> Token* make_token(Token* token, TokenID id, Args... args);
 
         bool make_expr(CodeList* code, Token* token, ValType valtype, int opstart, ExprConstIter opb, ExprConstIter ope);
         bool make_expr(CodeList* code, Token* token, const StdString& instr, InstrIter instab, int opstart, ExprConstIter opb, ExprConstIter ope);
@@ -601,14 +601,14 @@ namespace wasmgen
      */
 
     template <typename... Args>
-    Token* Parser::make_token(Token* token, Args... args)
+    Token* Parser::make_token(Token* token, TokenID id, Args... args)
     {
         FileString* text = token->text;
         auto s = new FileString(StringBlock{args...});
 
         s->file_name = text->file_name;
         s->text_pos = text->text_pos;
-        return new Token(TokenID::NUMBER, s);
+        return new Token(id, s);
     }
 
     /**/

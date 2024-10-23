@@ -52,6 +52,8 @@ namespace wasmgen
 
         operator const char*() const noexcept;
 
+        String* set(const char* text);
+
         String* replace(int s, int t) const;
         StringList* split(int c, int maxsplit = 0) const;
         String* join(const StringList* list) const;
@@ -118,6 +120,12 @@ namespace wasmgen
     inline String::operator const char*() const noexcept
     {
         return c_str();
+    }
+
+    inline String* String::set(const char* text)
+    {
+        *static_cast<StdString*>(this) = text;
+        return this;
     }
 
     inline String* String::join(const StringList* list) const

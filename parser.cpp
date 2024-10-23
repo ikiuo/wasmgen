@@ -676,9 +676,7 @@ namespace wasmgen
 
         if (!code_line->instr)
         {
-            assert(code_line->label);
-
-            prepare_token();
+            prepare_token(code_line->label);
             code_line->instr = Transfer(current_token);
             code_line->instab = it = instr_dummy;
         }
@@ -744,6 +742,7 @@ namespace wasmgen
     bool Parser::parse_macro()
     {
         CodeLinePtr line = code_line;
+        TokenPtr label = line->label;
         Token* instr = line->instr; assert(instr);
         String* instr_text = instr->text; assert(instr_text);
         StdString& name = *instr_text;
@@ -803,6 +802,11 @@ namespace wasmgen
                 for (auto rt = tlist->rbegin(); rt != tlist->rend(); ++rt)
                     puttoken(*rt, true);
             }
+        }
+        if (label)
+        {
+            puttoken(make_token(label, TokenID::EOL, "\n"));
+            puttoken(label);
         }
         while (parse_line())
             ;
@@ -1646,13 +1650,13 @@ namespace wasmgen
 
                     code_line->operands = empty_operands;
 
-                    code_if->instr = make_token(instr, *ins_if);
+                    code_if->instr = make_token(instr, TokenID::NAME, *ins_if);
                     code_if->instab = instr_if;
 
-                    code_return->instr = make_token(instr, *ins_return);
+                    code_return->instr = make_token(instr, TokenID::NAME, *ins_return);
                     code_return->instab = instr_return;
 
-                    code_end->instr = make_token(instr, *ins_end);
+                    code_end->instr = make_token(instr, TokenID::NAME, *ins_end);
                     code_end->instab = instr_end;
 
                     code_list->push_back(Transfer(code_line));
@@ -1668,7 +1672,7 @@ namespace wasmgen
                     code_line->operands = empty_operands;
 
                     code_jcc->label = Transfer(code_line->label);
-                    code_jcc->instr = make_token(instr, ins_jcc);
+                    code_jcc->instr = make_token(instr, TokenID::NAME, ins_jcc);
                     code_jcc->instab = instr_br_if;
 
                     code_list->push_back(Transfer(code_line));
@@ -5011,7 +5015,6 @@ namespace wasmgen
                 return v0;
             if (v0.isnumber() && expr0->paren_open)
                 return v0;
-            parse_error(ErrorCode::UNABLE_TO_EXPAND, {*expr0});
             break;
 
         default:
@@ -5706,11 +5709,11 @@ namespace wasmgen
         NewCodeLine code_const(new ExpressionList(opb, ope), opstart);
         NewCodeLine code_end;
 
-        code_const->instr = make_token(token, instr);
+        code_const->instr = make_token(token, TokenID::NAME, instr);
         code_const->instab = instab;
         code->push_back(Transfer(code_const));
 
-        code_end->instr = make_token(token, *ins_end);
+        code_end->instr = make_token(token, TokenID::NAME, *ins_end);
         code_end->instab = instr_end;
         code->push_back(Transfer(code_end));
         return true;
@@ -5778,7 +5781,7 @@ namespace wasmgen
 
     void Parser::parse_warning_too_many_operands(CodeLine* line, Token* token, size_t n)
     {
-        TokenPtr number = make_token(token, n + 1 + line->operand_start);
+        TokenPtr number = make_token(token, TokenID::NUMBER, n + 1 + line->operand_start);
 
         parse_warning(ErrorCode::TOO_MANY_OPERANDS, {token, &number});
     }
