@@ -1451,7 +1451,7 @@ namespace wasmgen
         auto res = getvalue(expr);
 
         if (!res.isnumber())
-            return nullptr;
+            return Finish(expr);
         return res.isfloat()
             ? make_value(vt, res.fvalue)
             : make_value(vt, res.ivalue);
