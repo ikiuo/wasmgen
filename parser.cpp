@@ -915,7 +915,7 @@ namespace wasmgen
     {
         Token* token = expr->token; assert(token);
         ExpressionList* children = expr->children; assert(children && children->size() == 1);
-        Expression* child = (*children)[0];
+        Expression* child = (*children)[0]; assert(child);
 
         return token->id == TokenID::ADD ? child : expr;
     }
