@@ -359,7 +359,8 @@ namespace wasmgen
         case 't': ec = '\t'; break;
         case 'n': ec = '\n'; break;
         case 'v': ec = '\v'; break;
-        case 'f': ec = '\r'; break;
+        case 'f': ec = '\f'; break;
+        case 'r': ec = '\r'; break;
 
         case '0': case '1': case '2': case '3':
         case '4': case '5': case '6': case '7':
