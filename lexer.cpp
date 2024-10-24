@@ -374,6 +374,7 @@ namespace wasmgen
             return;
 
         default:
+            ec = c;
             break;
         }
         token_append(c);
