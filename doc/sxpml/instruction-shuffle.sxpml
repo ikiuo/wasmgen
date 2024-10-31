@@ -1,0 +1,37 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-shuffle
+  (@h3 "ベクトル型内での混成")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "i8x16.shuffle") (br)
+	(code "s8x16.shuffle") (br)
+	(code "u8x16.shuffle"))
+    (td $vtop (code "lane" (sub "0") ",...,lane" (sub "15")))
+    (td $vtop
+	(code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "data[lane" (sub "𝑛") "]") (br)
+	(code "    data = [..." (var "p1") (sub "i8x16") ", ..." (var "p2") (sub "i8x16") "] ")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.swizzle") (br)
+	(code "s8x16.swizzle") (br)
+	(code "u8x16.swizzle"))
+    (td)
+    (td $vtop
+	(code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " (var "p1") (sub "i8x16") "[" (var "p2") (sub "i8x16") "[𝑛]] ?? 0")))
+   ) ; table
+  $vpad
+
+  ) ; @def

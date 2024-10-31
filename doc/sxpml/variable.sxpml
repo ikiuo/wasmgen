@@ -1,0 +1,40 @@
+;; -*- Lisp -*-
+
+(@include "css.sxpml")
+
+;;
+
+(@def $document "wasmgen : WebAssembly 用アセンブラ")
+
+;;
+
+(@def $dummy)
+
+(@def $url-wasm-spec "https://webassembly.github.io/spec/core/")
+(@def $url-wasm-text "https://webassembly.github.io/spec/core/text/")
+(@def $url-wasm-binary "https://webassembly.github.io/spec/core/binary/")
+(@def $url-wasm-module "https://webassembly.github.io/spec/core/binary/modules.html")
+(@def $url-wasm-instr "https://webassembly.github.io/spec/core/binary/instructions.html")
+(@def $url-wasm-instr-exec "https://webassembly.github.io/spec/core/exec/instructions.html")
+(@def $url-wasmdump "https://github.com/ikiuo/WebAssembly-wasmdump")
+
+(@def $url-gnu-make "https://www.gnu.org/software/make/")
+(@def $url-clang "https://clang.llvm.org/")
+(@def $url-zlib "https://zlib.net/")
+
+;;
+
+(@def $spc "\xa0")
+(@def $spc1 "\xa0")
+(@def $spc2 "\xa0\xa0")
+(@def $spc3 "\xa0\xa0\xa0")
+(@def $spc4 "\xa0\xa0\xa0\xa0")
+
+(@def $vpad (p $spc))
+
+;;
+
+(@def $html-index
+  (@index (p [style "font-size: xx-large;"] (b "目次")))
+  $vpad
+  ) ; @def

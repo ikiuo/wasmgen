@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 分岐と制御命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ</h1>
+    <h2><a name="index-1">分岐と制御命令</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>?</code></td>
+        <td></td>
+        <td class="vtop"><code>block</code></td>
+        <td class="vtop"><code>blocktype</code></td>
+        <td class="vtop">ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>?</code></td>
+        <td></td>
+        <td class="vtop"><code>loop</code></td>
+        <td class="vtop"><code>blocktype</code></td>
+        <td class="vtop">ループ・ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td></td>
+        <td class="vtop"><code>if</code></td>
+        <td class="vtop"><code>blocktype</code></td>
+        <td class="vtop"><code>if</code>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td></td>
+        <td class="vtop"><code>else</code></td>
+        <td></td>
+        <td class="vtop"><code>else</code>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>?</code></td>
+        <td></td>
+        <td class="vtop"><code>end</code><br/><code>end.block</code><br/><code>end.loop</code><br/><code>end.if</code></td>
+        <td></td>
+        <td class="vtop">ブロックまたはコードの終了<br/>(別名は入れ子対応表記用)</td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td></td>
+        <td class="vtop"><code>br</code></td>
+        <td class="vtop"><code>labelidx</code></td>
+        <td class="vtop">ブロックからの脱出<br/><code>labelidx</code>は<code>ブロック段数-1</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td></td>
+        <td class="vtop"><code>br_if</code></td>
+        <td class="vtop"><code>labelidx</code></td>
+        <td class="vtop"><code><var>p1</var><sub>i32</sub></code>が真のとき分岐<code>br</code>が実行される</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td></td>
+        <td class="vtop"><code>br_table</code></td>
+        <td class="vtop"><code>labelidx,...</code></td>
+        <td class="vtop"><code>br&nbsp;&nbsp;[...labelidx][<var>p1</var><sub>i32</sub>]</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>?</code></td>
+        <td></td>
+        <td class="vtop"><code>return</code></td>
+        <td></td>
+        <td class="vtop">関数から戻る</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>?</code></td>
+        <td class="vtop"><code>?</code></td>
+        <td class="vtop"><code>call</code></td>
+        <td class="vtop"><code>funcidx</code></td>
+        <td class="vtop">関数を呼び出す</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1+?</code></td>
+        <td class="vtop"><code>?</code></td>
+        <td class="vtop"><code>call_indirect</code></td>
+        <td class="vtop"><code>tableidx,typeidx</code></td>
+        <td class="vtop"><code>typeidx</code>型の関数<br/><code>&nbsp;&nbsp;&nbsp;&nbsp;TAB[tableidx][<var>p1</var><sub>i32</sub>]</code><br/>を呼び出す</td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td></td>
+        <td class="vtop"><code>unreachable</code></td>
+        <td></td>
+        <td class="vtop">不到達(<code>trap</code>発生)</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td></td>
+        <td class="vtop"><code>nop</code></td>
+        <td></td>
+        <td class="vtop">何もしない。</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

@@ -1,0 +1,484 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-statement-name "アセンブラの表記")
+
+(@def $wasmgen-statement
+  (@h1 $wasmgen-statement-name)
+  (p "表記は行単位です。各行は3つに区分されます。区分は左から")
+  (blockquote
+   (div (code "ラベル[:]   命令    オペランド")))
+  (p "となります。並べると見た目は以下のようになります。")
+  (pre
+   "ラベル:     命令    オペランド..."
+   "ラベル      命令    オペランド..."
+   "　　　      命令    オペランド..."
+   "　　　      命令"
+   "ラベル:"
+   "ラベル")
+
+  (h3 "ラベル")
+  (p (code "ラベル") "は" (code "命令") "に応じて値が設定される識別子です。"
+     "ラベルの直後に" (code ":") "を配置できます。")
+
+  (h3 "命令")
+  (p (code "命令") "には、実行命令と疑似命令があります。")
+
+  (h3 "オペランド")
+  (p (code "オペランド") "は" (code "命令") "に応じた内容を記述します。"
+     "コンマ(" (code ",") ")区切りです。")
+  $vpad
+
+  (@h2 "コメント")
+  (p (code "#") ", " (code ";") ", " (code "//") " から行末まで無視されます。")
+  (pre
+   "# コメント1↲"
+   "; コメント2↲"
+   "// コメント3↲")
+  (p (code "/*") " から " (code "*/") "まで無視されます。")
+  (pre
+   "... /* コメント */ ...")
+  $vpad
+
+  (@h2 "行の結合")
+  (p "行末が" (code "\\") "ならば改行文字を空白とします。"
+     "これにより次の行を結合した一行として処理されます。")
+
+  (h4 "行末が" (code "\\") "文字の例(その1)")
+  (pre
+   "label:  operator    operand1, operand2,\↲"
+   "                    operand3, operand4↲")
+  (p "改行が空白になるので、次の表記と同じ扱いになります。")
+  (pre
+   "label:  operator    operand1, operand2,                     operand3, operand4↲")
+
+  (h4 "行末が" (code "\\") "文字の例(その2)")
+  (pre
+   ";# コメント\↲"
+   "   この行もコメント↲")
+  (p "改行が空白になるので、次の表記と同じ扱いになります。")
+  (pre
+   ";# コメント    この行もコメント↲")
+  $vpad
+
+  (@h2 "数値")
+  (p "小数点(" (code ".") ")は一ヶ所、桁区切りとして(" (code "_") ")が使用可能です。")
+  (table
+   (tr
+    (th "基数")
+    (th "文字")
+    (th "備考"))
+   (tr
+    (th (code "10"))
+    (td "先頭: " (code "1 2 3 4 5 6 7 8 9") (br)
+	"後続: " (code "0 1 2 3 4 5 6 7 8 9") (br)
+	"指数: " (code "e") (br)
+	"符号: " (code "- +") "(なし)" (br)
+	"後続: " (code "0 1 2 3 4 5 6 7 8 9"))
+    (td (code "1234567890") (br)
+	(code "1.97625e-2 = 1.97625 / 100")))
+   (tr
+    (th (code "16"))
+    (td "先頭: " (code "0x") (br)
+	"後続: " (code "0 1 2 3 4 5 6 7 8 9 a b c d e f") (br)
+	"指数: " (code "p") (br)
+	"符号: " (code "- +") "(なし)" (br)
+	"後続: " (code "0 1 2 3 4 5 6 7 8 9"))
+    (td (code "0x89ab_cdef") (br)
+	(code "0x0123p4 = 0x0123 << 4")))
+   (tr
+    (th (code "8"))
+    (td "先頭: " (code "0") (br)
+	"後続: " (code "0 1 2 3 4 5 6 7"))
+    (td (code "0377")))
+   (tr
+    (th (code "2"))
+    (td "先頭: " (code "0b") (br)
+	"後続: " (code "0 1"))
+    (td (code "0b1110_0110")))
+   ) ; table
+  $vpad
+
+  (@h2 "文字列")
+  (p "文字" (code "\"") "または" (code "'") "で括られた範囲を文字列とします。"
+     "文字" (code "\\") "をエスケープ文字とします。")
+  (table
+   (tr
+    (th "種類")
+    (th "エスケープ シーケンス"))
+   (tr
+    (th "制御文字")
+    (td (code "\\a") (code "\\b") (code "\\t") (code "\\n")
+	(code "\\v") (code "\\f") (code "\\r")))
+   (tr
+    (th "8進コード")
+    (td "最大3桁(8bit) : " (code "\\") "NNN"))
+   (tr
+    (th "16進コード")
+    (td "最大2桁(8bit) : " (code "\\x") "HH"))
+   (tr
+    (th "UCSコード")
+    (td "最大6桁(24bit) : " (code "\\u") "HHHHHH"))
+   (tr
+    (th "上記以外")
+    (td (code "\\") "の直後の文字が有効" (br)
+	"例:" (code "\\\\") " → " (code "\\")))
+   ) ; table
+  $vpad
+
+  (@h2 "識別子")
+  (p "識別用の文字列には、英数字に加えて幾つかの記号を含むことができます。")
+  $vpad
+
+  (@h3 "命令用の識別子")
+  (p "先頭の文字は、アルファベット")
+  (pre
+   "A B C D E F G H I J K L M N O P Q R S T U V W X Y Z"
+   "a b c d e f g h i j k l m n o p q r s t u v w x y z")
+  (p "に加えて")
+  (pre
+   "$ . _ @")
+  (p "が使用可能です。2文字目以降は数字")
+  (pre
+   "0 1 2 3 4 5 6 7 8 9")
+  (p "が加わります。先頭の文字が" (code ".") "または" (code "@") "で始まる識別子はアセンブラ用とします。")
+  $vpad
+
+  (@h3 "ラベル用の識別子")
+  (p "命令用と同じですが、(疑似)命令以外の識別子が行の先頭(空白を除く)に現れたときにラベルと判断します。")
+  $vpad
+
+  (@h3 "値型の識別子")
+  (p "引数型および返値型は以下になります。")
+  (table
+   (tr
+    (th "種類")
+    (th "型(識別子)"))
+   (tr
+    (th (code "numtype"))
+    (td (code "i32 i64 f32 f64")))
+   (tr
+    (th (code "vectype"))
+    (td (code "v128")))
+   (tr
+    (th (code "reftype"))
+    (td (code "funcref externref")))
+   (tr
+    (th (code "valtype"))
+    (td (code "i32 i64 f32 f64") (br)
+	(code "v128") (br)
+	(code "funcref externref")))
+   ) ; table
+  (p (code "numtype") "と" (code "vectype") "では同型で符号の扱いが存在する識別子があります。")
+  (table
+   (tr
+    (th "共通型")
+    (th "符号あり")
+    (th "符号なし"))
+   (tr
+    (td (code "i32"))
+    (td (code "s32"))
+    (td (code "u32")))
+   (tr
+    (td (code "i64"))
+    (td (code "s64"))
+    (td (code "u64")))
+   (tr
+    (td (code "i8x16") (br)
+	(code "i16x8") (br)
+	(code "i32x4") (br)
+	(code "i64x2") (br)
+	$spc "↑" (br)
+	(code "v128"))
+    (td (code "s8x16") (br)
+	(code "s16x8") (br)
+	(code "s32x4") (br)
+	(code "s64x2") (br)
+	$spc (br)
+	$spc)
+    (td (code "u8x16") (br)
+	(code "u16x8") (br)
+	(code "u32x4") (br)
+	(code "u64x2") (br)
+	$spc (br)
+	$spc))
+   ) ; table
+  $vpad
+
+  (@h2 "リスト")
+  (p "括弧" (code "(),[],{}") "の間に情報を" (code ",") "区切りで記述します。")
+  (h4 "例")
+  (pre
+   "(1,2,3)"
+   "[a,b,c]"
+   "{x,y,z}")
+  $vpad
+
+  (@h3 "範囲")
+  (p "整数" (code "start") "から" (code "end") "の一つ前までを括弧" (code "[]") "の間に" (code ":") "区切りで記述します。"
+     "追加で" (code "step") "間隔とすることができます。"
+     "さらに追加で、同じ数値を" (code "dup") "個複製します。")
+  (pre
+   "[start:end]"
+   "[start:end:step]"
+   "[start:end:step:dup]")
+  (p (b "例"))
+  (pre
+   "[1:4] → [1,2,3]"
+   "[4:1] → [4,3,2]"
+   "[0:8:2] → [0,2,4,6]"
+   "[0:8:2:2] → [0,0,2,2,4,4,6,6]")
+  $vpad
+
+  (@h3 "関数型")
+  (p (code "{[引数],[返値]}") "の形式を関数型として扱う場所があります。")
+  (pre
+   "{ [ valtype, valtype... ], [ valtype, valtype... ] }")
+  (h4 "例")
+  (pre
+   "{[i32,i32],[i32]}              ;# (x,y) → z : 二項演算など"
+   "{[f32,f32,f32],[f32,f32,f32]}  ;# (x,y,z) → (x',y',z') : ベクトルの正規化など")
+  $vpad
+
+  (@h2 "演算子")
+  (@h3 "数値用演算子")
+  (table
+   (tr
+    (th "種類")
+    (th "演算子")
+    (th "例"))
+   (tr
+    (th "単項")
+    (td $center
+	(code "+") (br)
+	(code "-") (br)
+	(code "!") (br)
+	(code "~"))
+    (td (code "+" (var "value")) (br)
+	(code "-" (var "value")) (br)
+	(code "!" (var "value")) (br)
+	(code "~" (var "value"))))
+   (tr
+    (th "二項(累)")
+    (td $center
+	(code "**"))
+    (td (code (var "val1") " ** " (var "val2"))))
+   (tr
+    (th "二項(積)")
+    (td $center
+	(code "*") (br)
+	(code "/") (br)
+	(code "%"))
+    (td (code (var "val1") " * " (var "val2")) (br)
+	(code (var "val1") " / " (var "val2")) (br)
+	(code (var "val1") " % " (var "val2"))))
+   (tr
+    (th "二項(和)")
+    (td $center
+	(code "+") (br)
+	(code "-"))
+    (td (code (var "val1") " + " (var "val2")) (br)
+	(code (var "val1") " - " (var "val2"))))
+   (tr
+    (th "二項(シフト)")
+    (td $center
+	(code "<<") (br)
+	(code ">>") (br)
+	(code ">>>"))
+    (td (code (var "val1") " << " (var "val2")) (br)
+	(code (var "val1") " >> " (var "val2")) " : 符号あり" (br)
+	(code (var "val1") " >>> " (var "val2")) " : 符号なし"))
+   (tr
+    (th "二項(比較)")
+    (td $center
+	(code "<") (br)
+	(code "<=") (br)
+	(code ">=") (br)
+	(code ">"))
+    (td (code (var "val1") " < "  (var "val2")) (br)
+	(code (var "val1") " <= " (var "val2")) (br)
+	(code (var "val1") " >= " (var "val2")) (br)
+	(code (var "val1") " > "  (var "val2"))))
+   (tr
+    (th "二項(比較)")
+    (td $center
+	(code "==") (br)
+	(code "!="))
+    (td (code (var "val1") " == " (var "val2")) (br)
+	(code (var "val1") " != " (var "val2"))))
+   (tr
+    (th "二項(論理)")
+    (td $center
+	(code "&") (br)
+	(code "|") (br)
+	(code "^"))
+    (td (code (var "val1") " & " (var "val2")) (br)
+	(code (var "val1") " | " (var "val2")) (br)
+	(code (var "val1") " ^ " (var "val2"))))
+   (tr
+    (th "二項(真偽)")
+    (td $center
+	(code "&&") (br)
+	(code "||"))
+    (td (code (var "val1") " && " (var "val2")) (br)
+	(code (var "val1") " || " (var "val2"))))
+   (tr
+    (th "三項(選択)")
+    (td $center
+	(code "? :"))
+    (td (code (var "val1") " ? " (var "val2") " : " (var "val3"))))
+   ) ; table
+  $vpad
+
+  (@h3 "リスト用演算子")
+  (table
+   (tr
+    (th "種類")
+    (th "演算子")
+    (th "例"))
+   (tr
+    (th "単項")
+    (td $center
+	(code "*"))
+    (td "内部展開" (br)
+	(code "(1,*(2,3)) → (1,2,3)")))
+   (tr
+    (th "二項(和)")
+    (td $center
+	(code "+"))
+    (td (code (var "list") " + " (var "list")) "で結合" (br)
+	(code "[1,2,3] + [4,5,6] → [1,2,3,4,5,6]")))
+   (tr
+    (th "二項(表複写)")
+    (td $center
+	(code "*"))
+    (td (code (var "list") " * " (var "number")) "で結合複製" (br)
+	(code "[1,2]*3 → [1,2,1,2,1,2]")))
+   (tr
+    (th "二項(項複写)")
+    (td $center
+	(code "*"))
+    (td (code (var "list") " ** " (var "number")) "で要素複製" (br)
+	(code "[1,2,3]**3 → [1,1,1,2,2,2,3,3,3]")))
+   (tr
+    (td [colspan "3"]
+	"以下、要素間の演算 : 要素数は同じであること"))
+   (tr
+    (th "二項(累)")
+    (td $center
+	(code "[**]"))
+    (td (code "[4,5,6] [**] [1,2,3] → [4,25,216]")))
+   (tr
+    (th "二項(積)")
+    (td $center
+	(code "[*]") (br)
+	(code "[/]") (br)
+	(code "[%]"))
+    (td (code "[4,5,6] [*] [1,2,3] → [4,10,18]") (br)
+	(code "[4,6,9] [/] [1,2,3] → [4,3,3]") (br)
+	(code "[4,5,8] [%] [1,2,3] → [0,1,2]")))
+   (tr
+    (th "二項(和)")
+    (td $center
+	(code "[+]") (br)
+	(code "[-]"))
+    (td (code "[1,2,3] [+] [4,5,6] → [5,7,9]") (br)
+	(code "[4,5,6] [-] [1,2,3] → [3,3,3]")))
+   (tr
+    (th "二項(シフト)")
+    (td $center
+	(code "[<<]") (br)
+	(code "[>>]") (br)
+	(code "[>>>]"))
+    (td (code "[ 1, 1, 1, 1] [<<] [0,1,2,3] → [ 1, 2, 4, 8]") (br)
+	(code "[-1,-2,-4,-8] [>>] [0,1,2,3] → [-1,-1,-1,-1]") (br)
+	(code "[ 1, 2, 4, 8] [>>>] [0,1,2,3] → [ 1, 1, 1, 1]")))
+   (tr
+    (th "二項(比較)")
+    (td $center
+	(code "[<]") (br)
+	(code "[<=]") (br)
+	(code "[>=]") (br)
+	(code "[>]"))
+    (td (code "[0,1,2,3] [<] [3,2,1,0] → [1,1,0,0]") (br)
+	(code "[0,1,2,3] [<=] [4,3,2,1] → [1,1,1,0]") (br)
+	(code "[0,1,2,3] [>=] [4,3,2,1] → [0,0,1,1]") (br)
+	(code "[0,1,2,3] [>] [3,2,1,0] → [0,0,1,1]")))
+   (tr
+    (th "二項(比較)")
+    (td $center
+	(code "[==]") (br)
+	(code "[!=]"))
+    (td (code "[0,1,2,3] [==] [4,3,2,1] → [0,0,1,0]") (br)
+	(code "[0,1,2,3] [!=] [4,3,2,1] → [1,1,0,1]")))
+   (tr
+    (th "二項(論理)")
+    (td $center
+	(code "[&]") (br)
+	(code "[|]") (br)
+	(code "[^]"))
+    (td (code "[0x07,0xe0] [&] [0x3c,0x3c] → [0x04,0x20]") (br)
+	(code "[0x07,0xe0] [|] [0x3c,0x3c] → [0x3f,0xfc]") (br)
+	(code "[0x07,0xe0] [^] [0x3c,0x3c] → [0x3b,0xdc]")))
+   (tr
+    (th "二項(真偽)")
+    (td $center
+	(code "[&&]") (br)
+	(code "[||]"))
+    (td (code "[0,1,2,4] [&&] [4,2,1,0] → [0,1,1,0]") (br)
+	(code "[0,0,2,2] [||] [0,1,0,1] → [0,1,1,1]")))
+   ) ; table
+  $vpad
+
+  (@h3 "リスト要素の取得")
+  (table
+   (tr
+    (th "種類")
+    (th "演算子")
+    (th "例"))
+   (tr
+    (th "単項取得")
+    (td $center
+	(code "[" (var "n") "]"))
+    (td "インデックス" (code (var "n")) "の要素を取得" (br)
+	(code "[9,8,7][1] → 8") (br)
+	(code "[9,8,7][-1] → 7")))
+   (tr
+    (th "部分取得")
+    (td $center
+	(code "[" (var "n")(sub "0") "," (var "n")(sub "1") "...]") (br)
+	(code "[" (var "start") ":" (var "end") "]") (br)
+	(code "[" (var "start") ":" (var "end") ":" (var "step") "]") (br)
+	(code "[" (var "start") ":" (var "end") ":" (var "step") ":" (var "dup") "]"))
+    (td "インデックス表によるリスト生成" (br)
+	(code "[9,8,7][2,0] → [9,7]") (br)
+	(code "[9,8,7][1:3] → [8,7]") (br)
+	(code "[9,8,7][0:1] → [9]") (br)
+	(code "[9,8,7,6][0:4:2] → [9,7]") (br)
+	(code "[9,8,7,6][0:4:2:2] → [9,9,7,7]")))
+   ) ; table
+  $vpad
+
+  (@h3 "文字列用演算子")
+  (table
+   (tr
+    (th "種類")
+    (th "演算子")
+    (th "例"))
+   (tr
+    (th "二項(結合)")
+    (td $center
+	(code "+"))
+    (td (code (var "str1") "+" (var "str2")) (br)
+	(code "\"abc\" + \"def\" → \"abcdef\"")))
+   (tr
+    (th "二項(複写)")
+    (td $center
+	(code "\*"))
+    (td (code (var "str") "*" (var "number")) (br)
+	(code "\"ab\"*3 → \"ababab\"")))
+   ) ; table
+  $vpad
+
+  ) ; @def

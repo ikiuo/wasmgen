@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 代替用疑似命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>代替用疑似命令</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">代替用疑似命令</a><br/>
+                <a href="#index-2">疑似命令 .alias</a><br/>
+                <a href="#index-3">疑似命令 .defmacro 〜 .endmacro</a><br/>
+                <a href="#index-4">疑似命令 .delmacro</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">代替用疑似命令</a></h2>
+    <p>記述の短縮や別表現を目的とした疑似命令です。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-2">疑似命令&nbsp;<code>.alias</code></a></h3>
+    <pre>name        .alias          value...</pre>
+    <p><code>name</code>を<code>value...</code>として扱います。<code>name</code>はアセンブラ グローバルの名前空間に登録され、記述場所より後で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-3">疑似命令&nbsp;<code>.defmacro</code>&nbsp;〜&nbsp;<code>.endmacro</code></a></h3>
+    <p><code>.defmacro</code>の次の行から<code>.endmacro</code>直前の行までをマクロを登録します。</p>
+    <pre>マクロ名    .defmacro       引数...<br/>
+;#         登録範囲: ここから<br/>
+;#<br/>
+;#         &lt;マクロ名&gt;       &lt;引数&gt;...<br/>
+;#<br/>
+;#           と記述すると、&lt;引数&gt;を置換して展開します<br/>
+;#           (@で始まる疑似命令やマクロ疑似命令は置換対象外)<br/>
+;#<br/>
+;#         登録範囲: ここまで<br/>
+　　　　    .endmacro       ;# マクロ定義終わり</pre>
+    <p><code>マクロ名</code>はマクロ用名前空間に登録され、コードを記述できる場所で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-4">疑似命令&nbsp;<code>.delmacro</code></a></h3>
+    <pre>            .delmacro       マクロ名</pre>
+    <p>登録されている<code>マクロ名</code>を削除します。</p>
+    <p>&nbsp;</p>
+    <h4>マクロ使用例</h4>
+    <pre>;# マクロ定義<br/>
+<br/>
+$i32.inc    .defmacro       labelidx<br/>
+            local.get       labelidx<br/>
+            i32.const       1<br/>
+            i32.add<br/>
+            local.set       labelidx<br/>
+            .endmacro<br/>
+<br/>
+<br/>
+;# マクロ使用<br/>
+<br/>
+func1       .code<br/>
+n           .local          i32<br/>
+            ;# ...<br/>
+            $i32.inc        n<br/>
+;# $i32.inc を展開<br/>
+;#          local.get  n<br/>
+;#          i32.const  1<br/>
+;#          i32.add<br/>
+;#          local.set  n<br/>
+;#<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...<br/>
+<br/>
+<br/>
+;# マクロ削除<br/>
+<br/>
+            .delmacro       $i32.inc<br/>
+            ;# 以下では $i32.inc は使用できない<br/>
+<br/>
+<br/>
+;# 以下のパターンに注意<br/>
+;#   1) .defmacro で引数なしを定義<br/>
+;#   2) .delmacro で削除<br/>
+;#   3) 削除されたマクロ名のみの行を記述<br/>
+<br/>
+mtest       .defmacro<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...<br/>
+            .endmacro<br/>
+<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...<br/>
+            mtest           ;# これはマクロ展開される<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...<br/>
+<br/>
+            .delmacro       mtest<br/>
+<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...<br/>
+            mtest           ;# これはラベル扱い<br/>
+            ;# 𝑖𝑛𝑠𝑡𝑟...</pre>
+    <p>&nbsp;</p>
+  </body>
+</html>

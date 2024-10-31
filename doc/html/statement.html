@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - アセンブラの表記</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>アセンブラの表記</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+        <a href="#index-1">アセンブラの表記</a><br/>
+            <a href="#index-2">コメント</a><br/>
+            <a href="#index-3">行の結合</a><br/>
+            <a href="#index-4">数値</a><br/>
+            <a href="#index-5">文字列</a><br/>
+            <a href="#index-6">識別子</a><br/>
+                <a href="#index-7">命令用の識別子</a><br/>
+                <a href="#index-8">ラベル用の識別子</a><br/>
+                <a href="#index-9">値型の識別子</a><br/>
+            <a href="#index-10">リスト</a><br/>
+                <a href="#index-11">範囲</a><br/>
+                <a href="#index-12">関数型</a><br/>
+            <a href="#index-13">演算子</a><br/>
+                <a href="#index-14">数値用演算子</a><br/>
+                <a href="#index-15">リスト用演算子</a><br/>
+                <a href="#index-16">リスト要素の取得</a><br/>
+                <a href="#index-17">文字列用演算子</a><br/>
+    <p>&nbsp;</p>
+    <h1><a name="index-1">アセンブラの表記</a></h1>
+    <p>表記は行単位です。各行は3つに区分されます。区分は左から</p>
+    <blockquote>
+      <div><code>ラベル[:]&nbsp;&nbsp;&nbsp;命令&nbsp;&nbsp;&nbsp;&nbsp;オペランド</code></div>
+    </blockquote>
+    <p>となります。並べると見た目は以下のようになります。</p>
+    <pre>ラベル:     命令    オペランド...<br/>
+ラベル      命令    オペランド...<br/>
+　　　      命令    オペランド...<br/>
+　　　      命令<br/>
+ラベル:<br/>
+ラベル</pre>
+    <h3>ラベル</h3>
+    <p><code>ラベル</code>は<code>命令</code>に応じて値が設定される識別子です。ラベルの直後に<code>:</code>を配置できます。</p>
+    <h3>命令</h3>
+    <p><code>命令</code>には、実行命令と疑似命令があります。</p>
+    <h3>オペランド</h3>
+    <p><code>オペランド</code>は<code>命令</code>に応じた内容を記述します。コンマ(<code>,</code>)区切りです。</p>
+    <p>&nbsp;</p>
+    <h2><a name="index-2">コメント</a></h2>
+    <p><code>#</code>, <code>;</code>, <code>//</code> から行末まで無視されます。</p>
+    <pre># コメント1↲<br/>
+; コメント2↲<br/>
+// コメント3↲</pre>
+    <p><code>/*</code> から <code>*/</code>まで無視されます。</p>
+    <pre>... /* コメント */ ...</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-3">行の結合</a></h2>
+    <p>行末が<code>\</code>ならば改行文字を空白とします。これにより次の行を結合した一行として処理されます。</p>
+    <h4>行末が<code>\</code>文字の例(その1)</h4>
+    <pre>label:  operator    operand1, operand2,↲<br/>
+                    operand3, operand4↲</pre>
+    <p>改行が空白になるので、次の表記と同じ扱いになります。</p>
+    <pre>label:  operator    operand1, operand2,                     operand3, operand4↲</pre>
+    <h4>行末が<code>\</code>文字の例(その2)</h4>
+    <pre>;# コメント↲<br/>
+   この行もコメント↲</pre>
+    <p>改行が空白になるので、次の表記と同じ扱いになります。</p>
+    <pre>;# コメント    この行もコメント↲</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-4">数値</a></h2>
+    <p>小数点(<code>.</code>)は一ヶ所、桁区切りとして(<code>_</code>)が使用可能です。</p>
+    <table>
+      <tr>
+        <th>基数</th>
+        <th>文字</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <th><code>10</code></th>
+        <td>先頭: <code>1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7&nbsp;8&nbsp;9</code><br/>後続: <code>0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7&nbsp;8&nbsp;9</code><br/>指数: <code>e</code><br/>符号: <code>-&nbsp;+</code>(なし)<br/>後続: <code>0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7&nbsp;8&nbsp;9</code></td>
+        <td><code>1234567890</code><br/><code>1.97625e-2&nbsp;=&nbsp;1.97625&nbsp;/&nbsp;100</code></td>
+      </tr>
+      <tr>
+        <th><code>16</code></th>
+        <td>先頭: <code>0x</code><br/>後続: <code>0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7&nbsp;8&nbsp;9&nbsp;a&nbsp;b&nbsp;c&nbsp;d&nbsp;e&nbsp;f</code><br/>指数: <code>p</code><br/>符号: <code>-&nbsp;+</code>(なし)<br/>後続: <code>0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7&nbsp;8&nbsp;9</code></td>
+        <td><code>0x89ab_cdef</code><br/><code>0x0123p4&nbsp;=&nbsp;0x0123&nbsp;&lt;&lt;&nbsp;4</code></td>
+      </tr>
+      <tr>
+        <th><code>8</code></th>
+        <td>先頭: <code>0</code><br/>後続: <code>0&nbsp;1&nbsp;2&nbsp;3&nbsp;4&nbsp;5&nbsp;6&nbsp;7</code></td>
+        <td><code>0377</code></td>
+      </tr>
+      <tr>
+        <th><code>2</code></th>
+        <td>先頭: <code>0b</code><br/>後続: <code>0&nbsp;1</code></td>
+        <td><code>0b1110_0110</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-5">文字列</a></h2>
+    <p>文字<code>"</code>または<code>'</code>で括られた範囲を文字列とします。文字<code>\</code>をエスケープ文字とします。</p>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>エスケープ シーケンス</th>
+      </tr>
+      <tr>
+        <th>制御文字</th>
+        <td><code>\a</code><code>\b</code><code>\t</code><code>\n</code><code>\v</code><code>\f</code><code>\r</code></td>
+      </tr>
+      <tr>
+        <th>8進コード</th>
+        <td>最大3桁(8bit) : <code>\</code>NNN</td>
+      </tr>
+      <tr>
+        <th>16進コード</th>
+        <td>最大2桁(8bit) : <code>\x</code>HH</td>
+      </tr>
+      <tr>
+        <th>UCSコード</th>
+        <td>最大6桁(24bit) : <code>\u</code>HHHHHH</td>
+      </tr>
+      <tr>
+        <th>上記以外</th>
+        <td><code>\</code>の直後の文字が有効<br/>例:<code>\\</code> → <code>\</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-6">識別子</a></h2>
+    <p>識別用の文字列には、英数字に加えて幾つかの記号を含むことができます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-7">命令用の識別子</a></h3>
+    <p>先頭の文字は、アルファベット</p>
+    <pre>A B C D E F G H I J K L M N O P Q R S T U V W X Y Z<br/>
+a b c d e f g h i j k l m n o p q r s t u v w x y z</pre>
+    <p>に加えて</p>
+    <pre>$ . _ @</pre>
+    <p>が使用可能です。2文字目以降は数字</p>
+    <pre>0 1 2 3 4 5 6 7 8 9</pre>
+    <p>が加わります。先頭の文字が<code>.</code>または<code>@</code>で始まる識別子はアセンブラ用とします。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-8">ラベル用の識別子</a></h3>
+    <p>命令用と同じですが、(疑似)命令以外の識別子が行の先頭(空白を除く)に現れたときにラベルと判断します。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-9">値型の識別子</a></h3>
+    <p>引数型および返値型は以下になります。</p>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>型(識別子)</th>
+      </tr>
+      <tr>
+        <th><code>numtype</code></th>
+        <td><code>i32&nbsp;i64&nbsp;f32&nbsp;f64</code></td>
+      </tr>
+      <tr>
+        <th><code>vectype</code></th>
+        <td><code>v128</code></td>
+      </tr>
+      <tr>
+        <th><code>reftype</code></th>
+        <td><code>funcref&nbsp;externref</code></td>
+      </tr>
+      <tr>
+        <th><code>valtype</code></th>
+        <td><code>i32&nbsp;i64&nbsp;f32&nbsp;f64</code><br/><code>v128</code><br/><code>funcref&nbsp;externref</code></td>
+      </tr>
+    </table>
+    <p><code>numtype</code>と<code>vectype</code>では同型で符号の扱いが存在する識別子があります。</p>
+    <table>
+      <tr>
+        <th>共通型</th>
+        <th>符号あり</th>
+        <th>符号なし</th>
+      </tr>
+      <tr>
+        <td><code>i32</code></td>
+        <td><code>s32</code></td>
+        <td><code>u32</code></td>
+      </tr>
+      <tr>
+        <td><code>i64</code></td>
+        <td><code>s64</code></td>
+        <td><code>u64</code></td>
+      </tr>
+      <tr>
+        <td><code>i8x16</code><br/><code>i16x8</code><br/><code>i32x4</code><br/><code>i64x2</code><br/>&nbsp;↑<br/><code>v128</code></td>
+        <td><code>s8x16</code><br/><code>s16x8</code><br/><code>s32x4</code><br/><code>s64x2</code><br/>&nbsp;<br/>&nbsp;</td>
+        <td><code>u8x16</code><br/><code>u16x8</code><br/><code>u32x4</code><br/><code>u64x2</code><br/>&nbsp;<br/>&nbsp;</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-10">リスト</a></h2>
+    <p>括弧<code>(),[],{}</code>の間に情報を<code>,</code>区切りで記述します。</p>
+    <h4>例</h4>
+    <pre>(1,2,3)<br/>
+[a,b,c]<br/>
+{x,y,z}</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-11">範囲</a></h3>
+    <p>整数<code>start</code>から<code>end</code>の一つ前までを括弧<code>[]</code>の間に<code>:</code>区切りで記述します。追加で<code>step</code>間隔とすることができます。さらに追加で、同じ数値を<code>dup</code>個複製します。</p>
+    <pre>[start:end]<br/>
+[start:end:step]<br/>
+[start:end:step:dup]</pre>
+    <p><b>例</b></p>
+    <pre>[1:4] → [1,2,3]<br/>
+[4:1] → [4,3,2]<br/>
+[0:8:2] → [0,2,4,6]<br/>
+[0:8:2:2] → [0,0,2,2,4,4,6,6]</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-12">関数型</a></h3>
+    <p><code>{[引数],[返値]}</code>の形式を関数型として扱う場所があります。</p>
+    <pre>{ [ valtype, valtype... ], [ valtype, valtype... ] }</pre>
+    <h4>例</h4>
+    <pre>{[i32,i32],[i32]}              ;# (x,y) → z : 二項演算など<br/>
+{[f32,f32,f32],[f32,f32,f32]}  ;# (x,y,z) → (x',y',z') : ベクトルの正規化など</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-13">演算子</a></h2>
+    <h3><a name="index-14">数値用演算子</a></h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>演算子</th>
+        <th>例</th>
+      </tr>
+      <tr>
+        <th>単項</th>
+        <td class="center"><code>+</code><br/><code>-</code><br/><code>!</code><br/><code>~</code></td>
+        <td><code>+<var>value</var></code><br/><code>-<var>value</var></code><br/><code>!<var>value</var></code><br/><code>~<var>value</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(累)</th>
+        <td class="center"><code>**</code></td>
+        <td><code><var>val1</var>&nbsp;**&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(積)</th>
+        <td class="center"><code>*</code><br/><code>/</code><br/><code>%</code></td>
+        <td><code><var>val1</var>&nbsp;*&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;/&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;%&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(和)</th>
+        <td class="center"><code>+</code><br/><code>-</code></td>
+        <td><code><var>val1</var>&nbsp;+&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;-&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(シフト)</th>
+        <td class="center"><code>&lt;&lt;</code><br/><code>&gt;&gt;</code><br/><code>&gt;&gt;&gt;</code></td>
+        <td><code><var>val1</var>&nbsp;&lt;&lt;&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;&gt;&gt;&nbsp;<var>val2</var></code> : 符号あり<br/><code><var>val1</var>&nbsp;&gt;&gt;&gt;&nbsp;<var>val2</var></code> : 符号なし</td>
+      </tr>
+      <tr>
+        <th>二項(比較)</th>
+        <td class="center"><code>&lt;</code><br/><code>&lt;=</code><br/><code>&gt;=</code><br/><code>&gt;</code></td>
+        <td><code><var>val1</var>&nbsp;&lt;&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;&lt;=&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;&gt;=&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;&gt;&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(比較)</th>
+        <td class="center"><code>==</code><br/><code>!=</code></td>
+        <td><code><var>val1</var>&nbsp;==&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;!=&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(論理)</th>
+        <td class="center"><code>&amp;</code><br/><code>|</code><br/><code>^</code></td>
+        <td><code><var>val1</var>&nbsp;&amp;&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;|&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;^&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>二項(真偽)</th>
+        <td class="center"><code>&amp;&amp;</code><br/><code>||</code></td>
+        <td><code><var>val1</var>&nbsp;&amp;&amp;&nbsp;<var>val2</var></code><br/><code><var>val1</var>&nbsp;||&nbsp;<var>val2</var></code></td>
+      </tr>
+      <tr>
+        <th>三項(選択)</th>
+        <td class="center"><code>?&nbsp;:</code></td>
+        <td><code><var>val1</var>&nbsp;?&nbsp;<var>val2</var>&nbsp;:&nbsp;<var>val3</var></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-15">リスト用演算子</a></h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>演算子</th>
+        <th>例</th>
+      </tr>
+      <tr>
+        <th>単項</th>
+        <td class="center"><code>*</code></td>
+        <td>内部展開<br/><code>(1,*(2,3))&nbsp;→&nbsp;(1,2,3)</code></td>
+      </tr>
+      <tr>
+        <th>二項(和)</th>
+        <td class="center"><code>+</code></td>
+        <td><code><var>list</var>&nbsp;+&nbsp;<var>list</var></code>で結合<br/><code>[1,2,3]&nbsp;+&nbsp;[4,5,6]&nbsp;→&nbsp;[1,2,3,4,5,6]</code></td>
+      </tr>
+      <tr>
+        <th>二項(表複写)</th>
+        <td class="center"><code>*</code></td>
+        <td><code><var>list</var>&nbsp;*&nbsp;<var>number</var></code>で結合複製<br/><code>[1,2]*3&nbsp;→&nbsp;[1,2,1,2,1,2]</code></td>
+      </tr>
+      <tr>
+        <th>二項(項複写)</th>
+        <td class="center"><code>*</code></td>
+        <td><code><var>list</var>&nbsp;**&nbsp;<var>number</var></code>で要素複製<br/><code>[1,2,3]**3&nbsp;→&nbsp;[1,1,1,2,2,2,3,3,3]</code></td>
+      </tr>
+      <tr>
+        <td colspan="3">以下、要素間の演算 : 要素数は同じであること</td>
+      </tr>
+      <tr>
+        <th>二項(累)</th>
+        <td class="center"><code>[**]</code></td>
+        <td><code>[4,5,6]&nbsp;[**]&nbsp;[1,2,3]&nbsp;→&nbsp;[4,25,216]</code></td>
+      </tr>
+      <tr>
+        <th>二項(積)</th>
+        <td class="center"><code>[*]</code><br/><code>[/]</code><br/><code>[%]</code></td>
+        <td><code>[4,5,6]&nbsp;[*]&nbsp;[1,2,3]&nbsp;→&nbsp;[4,10,18]</code><br/><code>[4,6,9]&nbsp;[/]&nbsp;[1,2,3]&nbsp;→&nbsp;[4,3,3]</code><br/><code>[4,5,8]&nbsp;[%]&nbsp;[1,2,3]&nbsp;→&nbsp;[0,1,2]</code></td>
+      </tr>
+      <tr>
+        <th>二項(和)</th>
+        <td class="center"><code>[+]</code><br/><code>[-]</code></td>
+        <td><code>[1,2,3]&nbsp;[+]&nbsp;[4,5,6]&nbsp;→&nbsp;[5,7,9]</code><br/><code>[4,5,6]&nbsp;[-]&nbsp;[1,2,3]&nbsp;→&nbsp;[3,3,3]</code></td>
+      </tr>
+      <tr>
+        <th>二項(シフト)</th>
+        <td class="center"><code>[&lt;&lt;]</code><br/><code>[&gt;&gt;]</code><br/><code>[&gt;&gt;&gt;]</code></td>
+        <td><code>[&nbsp;1,&nbsp;1,&nbsp;1,&nbsp;1]&nbsp;[&lt;&lt;]&nbsp;[0,1,2,3]&nbsp;→&nbsp;[&nbsp;1,&nbsp;2,&nbsp;4,&nbsp;8]</code><br/><code>[-1,-2,-4,-8]&nbsp;[&gt;&gt;]&nbsp;[0,1,2,3]&nbsp;→&nbsp;[-1,-1,-1,-1]</code><br/><code>[&nbsp;1,&nbsp;2,&nbsp;4,&nbsp;8]&nbsp;[&gt;&gt;&gt;]&nbsp;[0,1,2,3]&nbsp;→&nbsp;[&nbsp;1,&nbsp;1,&nbsp;1,&nbsp;1]</code></td>
+      </tr>
+      <tr>
+        <th>二項(比較)</th>
+        <td class="center"><code>[&lt;]</code><br/><code>[&lt;=]</code><br/><code>[&gt;=]</code><br/><code>[&gt;]</code></td>
+        <td><code>[0,1,2,3]&nbsp;[&lt;]&nbsp;[3,2,1,0]&nbsp;→&nbsp;[1,1,0,0]</code><br/><code>[0,1,2,3]&nbsp;[&lt;=]&nbsp;[4,3,2,1]&nbsp;→&nbsp;[1,1,1,0]</code><br/><code>[0,1,2,3]&nbsp;[&gt;=]&nbsp;[4,3,2,1]&nbsp;→&nbsp;[0,0,1,1]</code><br/><code>[0,1,2,3]&nbsp;[&gt;]&nbsp;[3,2,1,0]&nbsp;→&nbsp;[0,0,1,1]</code></td>
+      </tr>
+      <tr>
+        <th>二項(比較)</th>
+        <td class="center"><code>[==]</code><br/><code>[!=]</code></td>
+        <td><code>[0,1,2,3]&nbsp;[==]&nbsp;[4,3,2,1]&nbsp;→&nbsp;[0,0,1,0]</code><br/><code>[0,1,2,3]&nbsp;[!=]&nbsp;[4,3,2,1]&nbsp;→&nbsp;[1,1,0,1]</code></td>
+      </tr>
+      <tr>
+        <th>二項(論理)</th>
+        <td class="center"><code>[&amp;]</code><br/><code>[|]</code><br/><code>[^]</code></td>
+        <td><code>[0x07,0xe0]&nbsp;[&amp;]&nbsp;[0x3c,0x3c]&nbsp;→&nbsp;[0x04,0x20]</code><br/><code>[0x07,0xe0]&nbsp;[|]&nbsp;[0x3c,0x3c]&nbsp;→&nbsp;[0x3f,0xfc]</code><br/><code>[0x07,0xe0]&nbsp;[^]&nbsp;[0x3c,0x3c]&nbsp;→&nbsp;[0x3b,0xdc]</code></td>
+      </tr>
+      <tr>
+        <th>二項(真偽)</th>
+        <td class="center"><code>[&amp;&amp;]</code><br/><code>[||]</code></td>
+        <td><code>[0,1,2,4]&nbsp;[&amp;&amp;]&nbsp;[4,2,1,0]&nbsp;→&nbsp;[0,1,1,0]</code><br/><code>[0,0,2,2]&nbsp;[||]&nbsp;[0,1,0,1]&nbsp;→&nbsp;[0,1,1,1]</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-16">リスト要素の取得</a></h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>演算子</th>
+        <th>例</th>
+      </tr>
+      <tr>
+        <th>単項取得</th>
+        <td class="center"><code>[<var>n</var>]</code></td>
+        <td>インデックス<code><var>n</var></code>の要素を取得<br/><code>[9,8,7][1]&nbsp;→&nbsp;8</code><br/><code>[9,8,7][-1]&nbsp;→&nbsp;7</code></td>
+      </tr>
+      <tr>
+        <th>部分取得</th>
+        <td class="center"><code>[<var>n</var><sub>0</sub>,<var>n</var><sub>1</sub>...]</code><br/><code>[<var>start</var>:<var>end</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>]</code><br/><code>[<var>start</var>:<var>end</var>:<var>step</var>:<var>dup</var>]</code></td>
+        <td>インデックス表によるリスト生成<br/><code>[9,8,7][2,0]&nbsp;→&nbsp;[9,7]</code><br/><code>[9,8,7][1:3]&nbsp;→&nbsp;[8,7]</code><br/><code>[9,8,7][0:1]&nbsp;→&nbsp;[9]</code><br/><code>[9,8,7,6][0:4:2]&nbsp;→&nbsp;[9,7]</code><br/><code>[9,8,7,6][0:4:2:2]&nbsp;→&nbsp;[9,9,7,7]</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-17">文字列用演算子</a></h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>演算子</th>
+        <th>例</th>
+      </tr>
+      <tr>
+        <th>二項(結合)</th>
+        <td class="center"><code>+</code></td>
+        <td><code><var>str1</var>+<var>str2</var></code><br/><code>"abc"&nbsp;+&nbsp;"def"&nbsp;→&nbsp;"abcdef"</code></td>
+      </tr>
+      <tr>
+        <th>二項(複写)</th>
+        <td class="center"><code>*</code></td>
+        <td><code><var>str</var>*<var>number</var></code><br/><code>"ab"*3&nbsp;→&nbsp;"ababab"</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

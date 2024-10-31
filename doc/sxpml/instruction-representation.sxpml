@@ -1,0 +1,288 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-representation-name "内容・備考などでの表現")
+
+(@def $wasmgen-instruction-representation
+  (@h2 $wasmgen-instruction-representation-name)
+
+  (@h3 (a [href $url-wasm-instr-exec] "仕様書") "にある配列の略記")
+  (table
+   (tr
+    (th "インデックス" (code "𝑥"))
+    (th "略記")
+    (th "仕様表記"))
+   (tr
+    (td (code "funcidx"))
+    (td (code "FUNC[𝑥]"))
+    (td (code "S.tables[F.module.funcaddrs[𝑥]]")))
+   (tr
+    (td (code "tableidx"))
+    (td (code "TAB[𝑥]"))
+    (td (code "S.tables[F.module.tableaddrs[𝑥]].elem")))
+   (tr
+    (td (code "memidx"))
+    (td (code "MEM[𝑥]"))
+    (td (code "S.mems[F.module.elemaddrs[𝑥]].elem")))
+   (tr
+    (td (code "dataidx"))
+    (td (code "DATA[𝑥]"))
+    (td (code "S.datas[F.module.dataaddrs[𝑥]].data")))
+   ) ; table
+  (p "また、" (code "MEM0 = MEM[0]") "とします。")
+  $vpad
+
+  (@h3 "機能表現")
+  (p "処理表現を JavaScript 風にすると以下のようになります。")
+  (table
+   (tr
+    (th "機能")
+    (th "出力")
+    (th "備考"))
+   (tr
+    (td (code "abs(x)"))
+    (td (code "x < 0 ? -x : x"))
+    (td "絶対値"))
+   (tr
+    (td (code "sqrt(x)"))
+    (td (code "√x"))
+    (td "平方根"))
+   (tr
+    (td (code "ceil(x)"))
+    (td (code "x") "以上の整数")
+    (td "天井関数（切り上げ）"))
+   (tr
+    (td (code "nearest(x)"))
+    (td (code "x") "を四捨五入した整数")
+    (td "丸め関数（四捨五入）"))
+   (tr
+    (td (code "floor(x)"))
+    (td (code "x") "以下の整数")
+    (td "床関数（切り捨て）"))
+   (tr
+    (td (code "trunc(x)"))
+    (td (code "x") "の小数部を切り捨て")
+    (td "ゼロ方向丸め関数"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "minU(x)"))
+    (td (code "0"))
+    (td "符号なし" (code "x") "ビットの最小値" (code "0")))
+   (tr
+    (td (code "maxU(x)"))
+    (td (code "(1 << b) - 1"))
+    (td "符号なし" (code "x") "ビットの最大値" (code "2" (sup "x") "-1")))
+   (tr
+    (td (code "minS(x)"))
+    (td (code "- (1 << (b - 1))"))
+    (td "符号あり" (code "x") "ビットの最小値" (code "-2" (sup "x-1"))))
+   (tr
+    (td (code "maxS(x)"))
+    (td (code "+ (1 << (b - 1)) - 1"))
+    (td "符号あり" (code "x") "ビットの最大値" (code "+2" (sup "x-1") "-1")))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "sign(x)"))
+    (td (code "x < 0 ? 1 : 0"))
+    (td "符号ビット"))
+   (tr
+    (td (code "signN(x,N)"))
+    (td (code "(x >> (N - 1)) & 1"))
+    (td (code "N") "ビット データの符号"))
+   (tr
+    (td (code "sign8(x)"))
+    (td (code "signN(x,8)"))
+    (td "8ビット データの符号"))
+   (tr
+    (td (code "sign16(x)"))
+    (td (code "signN(x,16)"))
+    (td "16ビット データの符号"))
+   (tr
+    (td (code "sign32(x)"))
+    (td (code "signN(x,32)"))
+    (td "32ビット データの符号"))
+   (tr
+    (td (code "sign64(x)"))
+    (td (code "signN(x,64)"))
+    (td "64ビット データの符号"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "ext8u(x)"))
+    (td (code "x & maxU(8)"))
+    (td "下位8ビットが有効なゼロ拡張"))
+   (tr
+    (td (code "ext16u(x)"))
+    (td (code "x & maxU(16)"))
+    (td "下位16ビットが有効なゼロ拡張"))
+   (tr
+    (td (code "ext32u(x)"))
+    (td (code "x & maxU(32)"))
+    (td "下位32ビットが有効なゼロ拡張"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "extM(x,b)"))
+    (td (code "signN(x,b) * ~maxU(b)"))
+    (td "符号拡張用マスク値"))
+   (tr
+    (td (code "ext8s(x)"))
+    (td (code "ext8u(x) | extM(x, 8)"))
+    (td "ビット7を符号として上位ビットに拡張"))
+   (tr
+    (td (code "ext16s(x)"))
+    (td (code "ext16u(x) | extM(x, 16)"))
+    (td "ビット15を符号として上位ビットに拡張"))
+   (tr
+    (td (code "ext32s(x)"))
+    (td (code "ext32u(x) | extM(x, 32)"))
+    (td "ビット31を符号として上位ビットに拡張"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "min(x,y)"))
+    (td (code "x < y ? x : y"))
+    (td (code "x") "と" (code "y") "の小さい方"))
+   (tr
+    (td (code "pmin(x,y)"))
+    (td "同上")
+    (td (code "min(x,y)") "の無限・非数の扱い違い版"))
+   (tr
+    (td (code "max(x,y)"))
+    (td (code "x > y ? x : y"))
+    (td (code "x") "と" (code "y") "の大きい方"))
+   (tr
+    (td (code "pmin(x,y)"))
+    (td "同上")
+    (td (code "max(x,y)") "の無限・非数の扱い違い版"))
+   (tr
+    (td (code "clamp(s,x,e)"))
+    (td (code "max(s, min(x, e))"))
+    (td (code "x") "を" (code "s") "から" (code "e") "の範囲内に留める"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "satS(x,b)"))
+    (td (code "clamp(minS(b), x, maxS(b))"))
+    (td (code "x") "を" (code "-2"(sup "b-1")) "から" (code "2" (sup "b-1") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat8s(x)"))
+    (td (code "satS(x, 8)"))
+    (td (code "x") "を" (code "-2"(sup "7")) "から" (code "2" (sup "7") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat16s(x)"))
+    (td (code "satS(x, 16)"))
+    (td (code "x") "を" (code "-2" (sup "15")) "から" (code "2" (sup "15") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat32s(x)"))
+    (td (code "satS(x, 32)"))
+    (td (code "x") "を" (code "-2" (sup "31")) "から" (code "2" (sup "31") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat64s(x)"))
+    (td (code "satS(x, 64)"))
+    (td (code "x") "を" (code "-2" (sup "63")) "から" (code "2" (sup "63") "-1") "の範囲内に留める"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "satU(x,b)"))
+    (td (code "clamp(0, x, (1<<b)-1)"))
+    (td (code "x") "を" (code "0") "から" (code "2" (sup "b") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat8u(x)"))
+    (td (code "satU(x, 8)"))
+    (td (code "x") "を" (code "0") "から" (code "2" (sup "8") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat16u(x)"))
+    (td (code "satU(x, 16)"))
+    (td (code "x") "を" (code "0") "から" (code "2" (sup "16") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat32u(x)"))
+    (td (code "satU(x, 32)"))
+    (td (code "x") "を" (code "0") "から" (code "2" (sup "32") "-1") "の範囲内に留める"))
+   (tr
+    (td (code "sat64u(x)"))
+    (td (code "satU(x, 64)"))
+    (td (code "x") "を" (code "0") "から" (code "2" (sup "64") "-1") "の範囲内に留める"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "copysign(x,y)"))
+    (td (code "y / abs(y) * abs(x)"))
+    (td (code "x") "の符号を" (code "y") "の符号にする"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "clzN(x,b)"))
+    (td "最上位ビットから続く" (code "0") "の数")
+    (td "最小は" (code "0") ",最大で" (code "b")))
+   (tr
+    (td (code "clz32(x)"))
+    (td (code "clzN(x, 32)"))
+    (td (code "clz") "の32ビット版"))
+   (tr
+    (td (code "clz64(x)"))
+    (td (code "clzN(x, 64)"))
+    (td (code "clz") "の64ビット版"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "ctzN(x,b)"))
+    (td "最下位ビットから続く" (code "0") "の数")
+    (td "最小は" (code "0") ",最大で" (code "b")))
+   (tr
+    (td (code "ctz32(x)"))
+    (td (code "ctzN(x, 32)"))
+    (td (code "ctz") "の32ビット版"))
+   (tr
+    (td (code "ctz64(x)"))
+    (td (code "ctzN(x, 64)"))
+    (td (code "ctz") "の64ビット版"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "popcnt(x)"))
+    (td (code "x") "の2進数表現で" (code "1") "の数")
+    (td))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "rotlN(x,n,b)"))
+    (td (code "(x<<n)|((x & maxU(b)) >>> (b-n))"))
+    (td "左ローテート"))
+   (tr
+    (td (code "rotl32(x,n)"))
+    (td (code "rotlN(x, n, 32)"))
+    (td "32ビット左ローテート"))
+   (tr
+    (td (code "rotl64(x,n)"))
+    (td (code "rotlN(x, n, 64)"))
+    (td "64ビット左ローテート"))
+   (tr
+    (td (code "rotrN(x,n,b)"))
+    (td (code "((x & maxU(b)) >>> n)|(x<<(b-n))"))
+    (td "右ローテート"))
+   (tr
+    (td (code "rotr32(x,n)"))
+    (td (code "rotrN(x, n, 32)"))
+    (td "32ビット右ローテート"))
+   (tr
+    (td (code "rotr64(x,n)"))
+    (td (code "rotrN(x, n, 64)"))
+    (td "64ビット右ローテート"))
+   (tr
+    (td [colspan "3"]))
+   (tr
+    (td (code "avgr(x, y)"))
+    (td (code "(x + y + 1) >> 1"))
+    (td "加算平均(四捨五入)"))
+   (tr
+    (td (code "i15mul(x, y)"))
+    (td (code "(x * y + (1<<14)) >> 15"))
+    (td "15ビット固定小数点乗算"))
+   ) ; table
+  $vpad
+
+  ) ; @def

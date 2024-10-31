@@ -1,0 +1,52 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-memory-name "メモリ領域操作")
+
+(@def $wasmgen-instruction-memory
+  (@h2 $wasmgen-instruction-memory-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP" (code "𝑥"))
+    (th "備考"))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "memory.size"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(MEM0 のページ サイズ)")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "memory.grow"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(MEM0 のページ サイズ)") " " (br)
+	" " (code "MEM0") " のページをサイズ " (code (var "p1") (sub "i32")) " に変更"))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "memory.fill"))
+    (td)
+    (td $vtop (code "memset(&MEM0[" (var "p1") (sub "i32") "], " (var "p2") (sub "i32") ", " (var "p3") (sub "i32") ")") " " (br)
+	" 位置" (code "p1") "から長さ" (code "p3") "を" (code "p2") "で埋める"))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "memory.copy"))
+    (td)
+    (td $vtop (code "memmove(&MEM0[" (var "p1") (sub "i32") "], &MEM0[" (var "p2") (sub "i32") "], " (var "p3") (sub "i32") ")") " " (br)
+	" 位置" (code "p2") "から長さ" (code "p3") "を位置" (code "p1") "に移動"))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "memory.init"))
+    (td $vtop (code "dataidx"))
+    (td $vtop (code "memcpy(&MEM0[" (var "p1") (sub "i32") "], &DATA[𝑥][" (var "p2") (sub "i32") "], " (var "p3") (sub "i32") ")") (br)
+	(cod "DATA") "の位置" (code "p2") "から長さ" (code "p3") "を" (code "MEM0") "の位置" (code "p1") "へコピー"))
+   ) ; table
+  $vpad
+  ) ; @def

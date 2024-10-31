@@ -1,0 +1,8 @@
+;; -*- Lisp -*-
+
+(@include "instruction-const.sxpml")
+(@include "instruction-getset.sxpml")
+
+(@def $wasmgen-instruction-const-getset-name
+    $wasmgen-instruction-const-name "、"
+    $wasmgen-instruction-getset-name)

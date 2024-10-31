@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "instruction-block.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-block-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-block-name)
+  $html-index
+  $wasmgen-instruction-block
+  ) ; body
+ ) ; html

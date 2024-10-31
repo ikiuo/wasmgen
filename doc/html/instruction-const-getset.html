@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 定数、ローカル変数、グローバル変数、テーブル・アクセス</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>定数、ローカル変数、グローバル変数、テーブル・アクセス</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">定数</a><br/>
+            <a href="#index-2">ローカル変数</a><br/>
+            <a href="#index-3">グローバル変数</a><br/>
+            <a href="#index-4">テーブル・アクセス</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">定数</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.const</code><br/><code>s32.const</code><br/><code>u32.const</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;<var>i32</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.const</code><br/><code>s64.const</code><br/><code>u64.const</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;<var>i64</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.const</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;<var>f32</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.const</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;<var>f64</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.const</code><br/><code>s8x16.const</code><br/><code>u8x16.const</code></td>
+        <td class="vtop"><code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.const</code><br/><code>s16x8.const</code><br/><code>u16x8.const</code></td>
+        <td class="vtop"><code>i16<sub>1</sub>,i16<sub>2</sub>,...,i16<sub>8</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.const</code><br/><code>s32x4.const</code><br/><code>u32x4.const</code></td>
+        <td class="vtop"><code>i32<sub>1</sub>,i32<sub>2</sub>,i32<sub>3</sub>,i32<sub>4</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.const</code><br/><code>s64x2.const</code><br/><code>u64x2.const</code></td>
+        <td class="vtop"><code>i64<sub>1</sub>,i64<sub>2</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.const</code></td>
+        <td class="vtop"><code>f32<sub>1</sub>,f32<sub>2</sub>,f32<sub>3</sub>,f32<sub>4</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.const</code></td>
+        <td class="vtop"><code>f64<sub>1</sub>,f64<sub>2</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.const</code></td>
+        <td class="vtop"><code>i8<sub>1</sub>,i8<sub>2</sub>,...,i8<sub>16</sub></code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>v128</var></code></td>
+      </tr>
+    </table>
+    <p>オペランドの2番目以降は省略可能で、省略部分は<code>0</code>として扱います。</p>
+    <h4>例</h4>
+    <pre>;# 全オペランドを明示<br/>
+            v128.const   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15<br/>
+            i8x16.const  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15<br/>
+            i16x8.const  0x0100,0x0302,0x0504,0x0706,0x0908,0x0b0a,0x0d0c,0x0f0e<br/>
+            i32x4.const  0x03020100,0x07060504,0x0b0a0908,0x0f0e0d0c<br/>
+            i64x2.const  0x0706050403020100,0x0f0e0d0c0b0a0908<br/>
+            f32x4.const  1.0, 2.0, 3.0, 4.0<br/>
+            f64x2.const  0.5, 0.25<br/>
+<br/>
+;# オペランド 2 番目以降の省略は 0 扱いになる<br/>
+            v128.const   0<br/>
+            i8x16.const  0,1,2,3,4,5,6,7<br/>
+            i16x8.const  0x0100,0x0302,0x0504,0x0706<br/>
+            i32x4.const  0x03020100,0x07060504<br/>
+            i64x2.const  0x0706050403020100<br/>
+            f32x4.const  1.0, 2.0<br/>
+            f64x2.const  0.5</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-2">ローカル変数</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="center"><code>1</code></td>
+        <td></td>
+        <td><code>local.get</code></td>
+        <td><code>localidx</code></td>
+        <td><code><var>r</var>&nbsp;←&nbsp;locals[𝑥]</code></td>
+      </tr>
+      <tr>
+        <td class="center"><code>0</code></td>
+        <td><code>any</code></td>
+        <td><code>local.set</code></td>
+        <td><code>localidx</code></td>
+        <td><code>locals[𝑥]&nbsp;←&nbsp;<var>p1</var></code></td>
+      </tr>
+      <tr>
+        <td class="center"><code>1</code></td>
+        <td><code>any</code></td>
+        <td><code>local.tee</code></td>
+        <td><code>localidx</code></td>
+        <td><code><var>r</var>&nbsp;←&nbsp;<var>p1</var>;&nbsp;locals[𝑥]&nbsp;←&nbsp;<var>p1</var></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-3">グローバル変数</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP<code>𝑥</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="center"><code>0</code></td>
+        <td><code>any</code></td>
+        <td><code>global.get</code></td>
+        <td><code>globalidx</code></td>
+        <td><code><var>r</var>&nbsp;←&nbsp;globals[𝑥]</code></td>
+      </tr>
+      <tr>
+        <td class="center"><code>1</code></td>
+        <td></td>
+        <td><code>global.set</code></td>
+        <td><code>globalidx</code></td>
+        <td><code>globals[𝑥]&nbsp;←&nbsp;<var>p1</var></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-4">テーブル・アクセス</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP<code>𝑥</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="center"><code>1</code></td>
+        <td><code>func</code></td>
+        <td><code>table.get</code></td>
+        <td><code>tableidx</code></td>
+        <td><code><var>r</var><sub>func</sub>&nbsp;←&nbsp;TAB[𝑥][<var>p1</var><sub>i32</sub>]</code></td>
+      </tr>
+      <tr>
+        <td class="center"><code>2</code></td>
+        <td></td>
+        <td><code>table.set</code></td>
+        <td><code>tableidx</code></td>
+        <td><code>TAB[𝑥][<var>p1</var><sub>i32</sub>]&nbsp;←&nbsp;<var>p2</var><sub>func</sub></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+;; -*- Lisp -*-
+
+(@include "instruction-ref.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-ref-name)
+  $css)
+ (body
+  ;; (h1 $document (br) $wasmgen-instruction-ref-name)
+  ;; $html-index
+  (h1 $document)
+  $wasmgen-instruction-ref
+  ) ; body
+ ) ; html

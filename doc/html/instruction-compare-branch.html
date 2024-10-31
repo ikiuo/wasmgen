@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 比較＋分岐命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ</h1>
+    <h2><a name="index-1">比較＋分岐命令</a></h2>
+    <p>アセンブラの組み込みとして、比較命令と分岐命令を並べた条件分岐命令を用意しています。比較命令を<code>&lt;cmp&gt;</code>とすると、オペランドを記述することで条件分岐命令のようになります。</p>
+    <table>
+      <tr>
+        <th>記述</th>
+        <th>展開</th>
+      </tr>
+      <tr>
+        <td class="vtop">        <pre>    &lt;cmp&gt;   &lt;labelidx&gt;</pre>
+</td>
+        <td class="vtop">        <pre>    &lt;cmp&gt;<br/>
+    br_if   &lt;labelidx&gt;</pre>
+</td>
+      </tr>
+      <tr>
+        <td class="vtop">        <pre>    &lt;cmp&gt;   return</pre>
+</td>
+        <td class="vtop">        <pre>    &lt;cmp&gt;<br/>
+    if<br/>
+        return<br/>
+    end</pre>
+</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3>比較命令一覧</h3>
+    <table>
+      <tr>
+        <th>比較</th>
+        <th><code>i32</code></th>
+        <th><code>i64</code></th>
+        <th><code>f32</code></th>
+        <th><code>f64</code></th>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>eqz</code></th>
+        <td><code>i32.eqz</code><br/><code>s32.eqz</code><br/><code>u32.eqz</code></td>
+        <td><code>i64.eqz</code><br/><code>s64.eqz</code><br/><code>u64.eqz</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>eq</code></th>
+        <td><code>i32.eq</code><br/><code>s32.eq</code><br/><code>u32.eq</code></td>
+        <td><code>i64.eq</code><br/><code>s64.eq</code><br/><code>u64.eq</code></td>
+        <td class="vtop"><code>f32.eq</code></td>
+        <td class="vtop"><code>f64.eq</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>ne</code></th>
+        <td><code>i32.ne</code><br/><code>s32.ne</code><br/><code>u32.ne</code></td>
+        <td><code>i64.ne</code><br/><code>s64.ne</code><br/><code>u64.ne</code></td>
+        <td class="vtop"><code>f32.ne</code></td>
+        <td class="vtop"><code>f64.ne</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>lt</code></th>
+        <td><code>s32.lt</code><br/><code>u32.lt</code></td>
+        <td><code>s64.lt</code><br/><code>u64.lt</code></td>
+        <td class="vtop"><code>f32.lt</code></td>
+        <td class="vtop"><code>f64.lt</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>lt_s</code></th>
+        <td><code>i32.lt_s</code></td>
+        <td><code>i64.lt_s</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>lt_u</code></th>
+        <td><code>i32.lt_u</code></td>
+        <td><code>i64.lt_u</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>le</code></th>
+        <td><code>s32.le</code><br/><code>u32.le</code></td>
+        <td><code>s64.le</code><br/><code>u64.le</code></td>
+        <td class="vtop"><code>f32.le</code></td>
+        <td class="vtop"><code>f64.le</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>le_s</code></th>
+        <td><code>i32.le_s</code></td>
+        <td><code>i64.le_s</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>le_u</code></th>
+        <td><code>i32.le_u</code></td>
+        <td><code>i64.le_u</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>ge</code></th>
+        <td><code>s32.ge</code><br/><code>u32.ge</code></td>
+        <td><code>s64.ge</code><br/><code>u64.ge</code></td>
+        <td class="vtop"><code>f32.ge</code></td>
+        <td class="vtop"><code>f64.ge</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>ge_s</code></th>
+        <td><code>i32.ge_s</code></td>
+        <td><code>i64.ge_s</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>ge_u</code></th>
+        <td><code>i32.ge_u</code></td>
+        <td><code>i64.ge_u</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>gt</code></th>
+        <td><code>s32.gt</code><br/><code>u32.gt</code></td>
+        <td><code>s64.gt</code><br/><code>u64.gt</code></td>
+        <td class="vtop"><code>f32.gt</code></td>
+        <td class="vtop"><code>f64.gt</code></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>gt_s</code></th>
+        <td><code>i32.gt_s</code></td>
+        <td><code>i64.gt_s</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th class="vtop left"><code>gt_u</code></th>
+        <td><code>i32.gt_u</code></td>
+        <td><code>i64.gt_u</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

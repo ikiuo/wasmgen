@@ -1,0 +1,13 @@
+;; -*- Lisp -*-
+
+(@include "instruction-arithmetic-unary.sxpml")
+(@include "instruction-arithmetic-binary.sxpml")
+
+(@def $wasmgen-instruction-arithmetic-name "算術演算")
+
+(@def $wasmgen-instruction-arithmetic
+  (@h2 $wasmgen-instruction-arithmetic-name " - 単項")
+  $wasmgen-instruction-arithmetic-unary
+  (@h2 $wasmgen-instruction-arithmetic-name " - 二項")
+  $wasmgen-instruction-arithmetic-binary
+  ) ; @def

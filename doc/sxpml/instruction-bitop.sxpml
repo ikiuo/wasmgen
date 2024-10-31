@@ -1,0 +1,131 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-bitop-count
+  (@h3 "ビット計数")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.clz") (br)
+	(code "s32.clz") (br)
+	(code "u32.clz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "clz32(" (var "p1") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.clz") (br)
+	(code "s64.clz") (br)
+	(code "u64.clz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " "clz64(" (var "p1") (sub "i64") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.ctz") (br)
+	(code "s32.ctz") (br)
+	(code "u32.ctz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "ctz32(" (var "p1") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.ctz") (br)
+	(code "s64.ctz") (br)
+	(code "u64.ctz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " "ctz64(" (var "p1") (sub "i64") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.popcnt") (br)
+	(code "s32.popcnt") (br)
+	(code "u32.popcnt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "popcnt(" (var "p1") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.popcnt") (br)
+	(code "s64.popcnt") (br)
+	(code "u64.popcnt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " "popcnt(" (var "p1") (sub "i64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.popcnt") (br)
+	(code "s8x16.popcnt") (br)
+	(code "u8x16.popcnt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "popcnt(" (var "p1") (sub "i8x16") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-bitop-pack
+  (@h3 "符号の集積")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i8x16.bitmask") (br)
+	(code "s8x16.bitmask") (br)
+	(code "u8x16.bitmask"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "0 ") (br)
+	(code (var "r") (sub "i32") " |= sign8(" (var "p1") (sub "i8x16") "[𝑛:0..15]) << 𝑛")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i16x8.bitmask") (br)
+	(code "s16x8.bitmask") (br)
+	(code "u16x8.bitmask"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "0 ") (br)
+	(code (var "r") (sub "i32") " |= sign16(" (var "p1") (sub "i16x8") "[𝑛:0..7]) << 𝑛")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32x4.bitmask") (br)
+	(code "s32x4.bitmask") (br)
+	(code "u32x4.bitmask"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "0 ") (br)
+	(code (var "r") (sub "i32") " |= sign32(" (var "p1") (sub "i32x4") "[𝑛:0..3]) << 𝑛")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64x2.bitmask") (br)
+	(code "s64x2.bitmask") (br)
+	(code "u64x2.bitmask"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "0 ") (br)
+	(code (var "r") (sub "i32") " |= sign64(" (var "p1") (sub "i64x2") "[𝑛:0..1]) << 𝑛")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-bitop-name "ビット操作")
+
+(@def $wasmgen-instruction-bitop
+  (@h2 $wasmgen-instruction-bitop-name)
+  $wasmgen-instruction-bitop-count
+  $wasmgen-instruction-bitop-pack
+  ) ; @def

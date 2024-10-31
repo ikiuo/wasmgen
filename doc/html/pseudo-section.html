@@ -1,0 +1,1234 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - セクション用疑似命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>セクション用疑似命令</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+        <a href="#index-1">セクション用疑似命令</a><br/>
+            <a href="#index-2">Type Section</a><br/>
+                <a href="#index-3">疑似命令 .type</a><br/>
+                <a href="#index-4">疑似命令 .param</a><br/>
+            <a href="#index-5">Import Section</a><br/>
+                <a href="#index-6">ラベルの登録先</a><br/>
+                <a href="#index-7">疑似命令 .import.func</a><br/>
+                <a href="#index-8">疑似命令 .import.table</a><br/>
+                <a href="#index-9">疑似命令 .import.memory</a><br/>
+                <a href="#index-10">疑似命令 .import.const と .import.var</a><br/>
+                <a href="#index-11">疑似命令 .import</a><br/>
+            <a href="#index-12">Function Section</a><br/>
+            <a href="#index-13">Table Section</a><br/>
+                <a href="#index-14">疑似命令 .table</a><br/>
+            <a href="#index-15">Memory Section</a><br/>
+                <a href="#index-16">疑似命令 .memory</a><br/>
+            <a href="#index-17">Global Section</a><br/>
+                <a href="#index-18">疑似命令 .gconst と .gvar</a><br/>
+            <a href="#index-19">Element Section</a><br/>
+                <a href="#index-20">疑似命令 .element</a><br/>
+                <a href="#index-21">疑似命令 .reftype</a><br/>
+                <a href="#index-22">疑似命令 .tableidx</a><br/>
+                <a href="#index-23">疑似命令 .offset</a><br/>
+                <a href="#index-24">疑似命令 .funcidx</a><br/>
+            <a href="#index-25">Data Section</a><br/>
+                <a href="#index-26">疑似命令 .data</a><br/>
+                <a href="#index-27">疑似命令 .memidx</a><br/>
+                <a href="#index-28">疑似命令 .offset</a><br/>
+                <a href="#index-29">データ列用疑似命令</a><br/>
+                <a href="#index-30">エンディアン別データ列用疑似命令</a><br/>
+            <a href="#index-31">Code Section</a><br/>
+                <a href="#index-32">疑似命令 .code</a><br/>
+                <a href="#index-33">疑似命令 .param</a><br/>
+                <a href="#index-34">疑似命令 .local</a><br/>
+            <a href="#index-35">Start Section</a><br/>
+            <a href="#index-36">Export Section</a><br/>
+                <a href="#index-37">外部開示の記述形式</a><br/>
+            <a href="#index-38">Custom Section</a><br/>
+                <a href="#index-39">疑似命令 .custom</a><br/>
+    <p>&nbsp;</p>
+    <h1><a name="index-1">セクション用疑似命令</a></h1>
+    <p><a href="https://webassembly.github.io/spec/core/binary/modules.html">WebAssembly モジュール</a>の各セクションに対応するための疑似命令があり、ラベルは序数として登録されます。</p>
+    <table>
+      <tr>
+        <th>セクション</th>
+        <th>疑似命令</th>
+        <th>ラベル登録先</th>
+      </tr>
+      <tr>
+        <td>Custom Section</td>
+        <td><code>.custom</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Type Section</td>
+        <td><code>.type</code></td>
+        <td><code>typeidx</code></td>
+      </tr>
+      <tr>
+        <td>Import Section</td>
+        <td><code>.import.func</code><br/><code>.import.table</code><br/><code>.import.memory</code><br/><code>.import.const</code><br/><code>.import.var</code></td>
+        <td><code>funcidx</code><br/><code>tableidx</code><br/><code>memidx</code><br/><code>globalidx</code><br/><code>globalidx</code></td>
+      </tr>
+      <tr>
+        <td>Function Section</td>
+        <td><code>.code</code></td>
+        <td><code>funcidx</code></td>
+      </tr>
+      <tr>
+        <td>Table Section</td>
+        <td><code>.table</code></td>
+        <td><code>tableidx</code></td>
+      </tr>
+      <tr>
+        <td>Global Section</td>
+        <td><code>.gconst</code><br/><code>.gvar</code></td>
+        <td><code>globalidx</code><br/><code>globalidx</code></td>
+      </tr>
+      <tr>
+        <td>Export Section</td>
+        <td><code>.export</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Start Section</td>
+        <td><code>.start</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td>Element Section</td>
+        <td><code>.element</code></td>
+        <td><code>elemidx</code></td>
+      </tr>
+      <tr>
+        <td>Code Section</td>
+        <td><code>.code</code></td>
+        <td><code>funcidx</code></td>
+      </tr>
+      <tr>
+        <td>Data Section</td>
+        <td><code>.data</code></td>
+        <td><code>dataidx</code></td>
+      </tr>
+      <tr>
+        <td>Data Count Section</td>
+        <td></td>
+        <td></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-2">Type Section</a></h2>
+    <p>1つの関数型データは</p>
+    <ul>
+      <li>引数型リスト</li>
+      <li>返値型リスト</li>
+    </ul>
+    <p>で構成され、Type Section は関数型のリストになります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-3">疑似命令&nbsp;<code>.type</code></a></h3>
+    <p>疑似命令<code>.type</code>で関数型を開始します。</p>
+    <pre>関数型名    .type       &lt;返値の型:valtype&gt;リスト</pre>
+    <p><code>関数型名</code>は名前空間<code>typeidx</code>に序数として登録され、<code>typeidx</code>を指定する場面で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-4">疑似命令&nbsp;<code>.param</code></a></h3>
+    <p>疑似命令<code>.type</code>の下に、疑似命令<code>.param</code>を並べて引数型リストにします。</p>
+    <pre>引数名      .param      &lt;引数の型:valtype&gt;</pre>
+    <p><code>引数名</code>は関数の名前空間<code>関数型名</code>の<code>localidx</code>に序数として登録され、<code>localidx</code>を指定する場面で参照できます。</p>
+    <p>&nbsp;</p>
+    <h4>Type Section の例</h4>
+    <pre>;# C言語の typedef void (*ftype0)(i32 x); に相当<br/>
+ftype0      .type<br/>
+x           .param      i32<br/>
+<br/>
+;# C言語の typedef i64 (*ftype1)(i64 x, i64 y); に相当<br/>
+ftype1      .type       i64<br/>
+x           .param      i64<br/>
+y           .param      i64<br/>
+<br/>
+;# C言語の typedef double (*ftype2)(double x, double y, double z); に相当<br/>
+ftype2      .type       f64<br/>
+x           .param      f64<br/>
+y           .param      f64<br/>
+z           .param      f64<br/>
+</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-5">Import Section</a></h2>
+    <p>1つの外部参照用データは</p>
+    <ul>
+      <li>外部モジュール名</li>
+      <li>参照名</li>
+      <li>種類</li>
+      <ul>
+        <li>①関数</li>
+        <li>②テーブル</li>
+        <li>③メモリ</li>
+        <li>④グローバル</li>
+        <ul>
+          <li>固定値</li>
+          <li>可変値</li>
+        </ul>
+      </ul>
+    </ul>
+    <p>で構成され、Import Section は外部参照リストになります。</p>
+    <p>&nbsp;</p>
+    <h3>外部参照の記述形式</h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>関数名</code></td>
+        <td><code>.import.func</code></td>
+        <td><code>外部モジュール名,&nbsp;外部関数名,&nbsp;&lt;typeidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>関数名</code></td>
+        <td><code>.import.func</code></td>
+        <td><code>外部モジュール名,&nbsp;外部関数名,&nbsp;関数型</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>テーブル名</code></td>
+        <td><code>.import.table</code></td>
+        <td><code>外部モジュール名,&nbsp;外部テーブル名,&nbsp;&lt;reftype&gt;,&nbsp;最小長&nbsp;[,&nbsp;最大長]</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>メモリ名</code></td>
+        <td><code>.import.memory</code></td>
+        <td><code>外部モジュール名,&nbsp;外部メモリ名,&nbsp;最小長&nbsp;[,&nbsp;最大長]</code></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>グローバル名</code></td>
+        <td><code>.import.const</code></td>
+        <td><code>外部モジュール名,&nbsp;外部変数名,&nbsp;&lt;valtype&gt;</code></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>グローバル名</code></td>
+        <td><code>.import.var</code></td>
+        <td><code>外部モジュール名,&nbsp;外部変数名,&nbsp;&lt;valtype&gt;</code></td>
+      </tr>
+    </table>
+    <pre>関数名　　　  .import.func    外部モジュール名, 外部関数名, &lt;typeidx&gt;<br/>
+関数名　　　  .import.func    外部モジュール名, 外部関数名, 関数型<br/>
+テーブル名　  .import.table   外部モジュール名, 外部テーブル名, &lt;reftype&gt;, 最小長<br/>
+テーブル名　  .import.table   外部モジュール名, 外部テーブル名, &lt;reftype&gt;, 最小長, 最大長,<br/>
+メモリ名　　  .import.memory  外部モジュール名, 外部メモリ名, 最小長<br/>
+メモリ名　　  .import.memory  外部モジュール名, 外部メモリ名, 最小長, 最大長<br/>
+グローバル名  .import.const   外部モジュール名, 外部変数名, &lt;valtype&gt;<br/>
+グローバル名  .import.var     外部モジュール名, 外部変数名, &lt;valtype&gt;</pre>
+    <h4>例</h4>
+    <pre>func0       .import.func    "xmod", "i64add", ftype1<br/>
+func1       .import.func    "xmod", "i32add", {[i32,i32],[i32]}<br/>
+tab0        .import.table   "xmod", "table1", funcref, 4<br/>
+mem0        .import.memory  "xmod", "memory1", 8<br/>
+global0     .import.const   "xmod", "gconst1", i32<br/>
+global1     .import.var     "xmod", "gvar1", i64</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-6">ラベルの登録先</a></h3>
+    <p>ラベルは種類に応じた名前空間に登録されます。</p>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>登録先<br/>名前空間</th>
+      </tr>
+      <tr>
+        <td><code>関数名</code></td>
+        <td><code>funcidx</code></td>
+      </tr>
+      <tr>
+        <td><code>テーブル名</code></td>
+        <td><code>tableidx</code></td>
+      </tr>
+      <tr>
+        <td><code>メモリ名</code></td>
+        <td><code>memidx</code></td>
+      </tr>
+      <tr>
+        <td><code>グローバル名</code></td>
+        <td><code>globalidx</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-7">疑似命令&nbsp;<code>.import.func</code></a></h3>
+    <p>外部関数の呼び出し情報を生成します。２通りの記述形式があります。</p>
+    <pre>関数名      .import.func    外部モジュール名, 外部関数名, &lt;typeidx&gt;<br/>
+関数名      .import.func    外部モジュール名, 外部関数名, 関数型</pre>
+    <p>前者は<code>&lt;typeidx&gt;</code>を指定し、後者は<code>関数型</code>を自動的に Type Section に登録します。</p>
+    <p><code>関数名</code>は名前空間<code>funcidx</code>に序数として登録され、<code>funcidx</code>を指定する場面で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-8">疑似命令&nbsp;<code>.import.table</code></a></h3>
+    <p>外部テーブルの参照情報を生成します。</p>
+    <pre>テーブル名    .import.table   外部モジュール名, 外部テーブル名, &lt;reftype&gt;, 最小長<br/>
+テーブル名    .import.table   外部モジュール名, 外部テーブル名, &lt;reftype&gt;, 最小長, 最大長</pre>
+    <p><code>最大長</code>は省略可能です。</p>
+    <p><code>テーブル名</code>は名前空間<code>tableidx</code>に序数として登録され、<code>tableidx</code>を指定する場面で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-9">疑似命令&nbsp;<code>.import.memory</code></a></h3>
+    <p>外部バイト列の参照情報を生成します。</p>
+    <pre>メモリ名      .import.memory  外部モジュール名, 外部メモリ名, 最小長<br/>
+メモリ名      .import.memory  外部モジュール名, 外部メモリ名, 最小長, 最大長</pre>
+    <p><code>最小長</code>と<code>最大長</code>は単位が 64KiB で、<code>最大長</code>は省略可能です。</p>
+    <p><code>メモリ名</code>は名前空間<code>memidx</code>に序数として登録され、<code>memidx</code>を指定する場面で参照できます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-10">疑似命令&nbsp;<code>.import.const</code>&nbsp;と&nbsp;<code>.import.var</code></a></h3>
+    <p>変更不可の外部変数の参照情報を生成します。</p>
+    <pre>グローバル名  .import.const   外部モジュール名, 外部変数名, &lt;valtype&gt;</pre>
+    <p><code>グローバル名</code>は名前空間<code>globalidx</code>に序数として登録され、<code>globalidx</code>を指定する場面で参照できます。</p>
+    <p>疑似命令<code>.import.const</code>は変更不可で、疑似命令<code>.import.var</code>は変更可能を意味します。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-11">疑似命令&nbsp;<code>.import</code></a></h3>
+    <p>既定のモジュール名を指定します。</p>
+    <pre>            .import         外部モジュール名</pre>
+    <p>疑似命令<code>.import.*</code>からオペランドの<code>外部モジュール名</code>を省略した疑似命令<code>.imp.*</code>では、疑似命令<code>.import</code>で指定した<code>外部モジュール名</code>を使用します。</p>
+    <table>
+      <tr>
+        <th>モジュール名あり</th>
+        <th>モジュール名なし</th>
+      </tr>
+      <tr>
+        <td><code>.import.func</code></td>
+        <td><code>.imp.func</code></td>
+      </tr>
+      <tr>
+        <td><code>.import.table</code></td>
+        <td><code>.imp.table</code></td>
+      </tr>
+      <tr>
+        <td><code>.import.memory</code></td>
+        <td><code>.imp.memory</code></td>
+      </tr>
+      <tr>
+        <td><code>.import.const</code></td>
+        <td><code>.imp.cons</code></td>
+      </tr>
+      <tr>
+        <td><code>.import.var</code></td>
+        <td><code>.imp.var</code></td>
+      </tr>
+    </table>
+    <h4>例</h4>
+    <pre>            .import     "xmod"               ;# 外部モジュール名を設定<br/>
+func0       .imp.func   "i64add", ftype1<br/>
+func1       .imp.func   "i32add", {[i32,i32],[i32]}<br/>
+tab0        .imp.table  "table1", funcref, 4<br/>
+mem0        .imp.memory "memory1", 8<br/>
+global0     .imp.const  "gconst1", i32<br/>
+global1     .imp.var    "gvar1", i64</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-12">Function Section</a></h2>
+    <p>1つの関数データは、<code>funcidx</code>に対応する関数型を<code>typeidx</code>で表し、Function Section は<code>typeidx</code>のリストになります。</p>
+    <p>wasmgen では関数型は自動処理されるため、Function Section 用の疑似命令はありません。</p>
+    <p>&nbsp;</p>
+    <h2><a name="index-13">Table Section</a></h2>
+    <p>1つのテーブル領域は</p>
+    <ul>
+      <li>参照型(<code>reftype</code>)</li>
+      <li>テーブル長 : 最小</li>
+      <li>テーブル長 : 最大 (省略可)</li>
+    </ul>
+    <p>で構成され、Table Section はテーブルのリストになります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-14">疑似命令&nbsp;<code>.table</code></a></h3>
+    <p>WebAssembly モジュールのテーブル領域を定義します。</p>
+    <h4>テーブル領域の記述形式</h4>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>テーブル名</code></td>
+        <td><code>.table</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;最小長</code></td>
+        <td><code>最大長</code>を省略</td>
+      </tr>
+      <tr>
+        <td><code>テーブル名</code></td>
+        <td><code>.table</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;最小長,&nbsp;最大長</code></td>
+        <td></td>
+      </tr>
+    </table>
+    <pre>テーブル名   .table      &lt;reftype&gt;, 最小長<br/>
+テーブル名   .table      &lt;reftype&gt;, 最小長, 最大長</pre>
+    <p><code>テーブル名</code>は名前空間<code>tableidx</code>に序数として登録され、<code>tableidx</code>を指定する場面で参照できます。</p>
+    <h4>例</h4>
+    <pre>tab1        .table      funcref, 4<br/>
+tab2        .table      funcref, 8, 16</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-15">Memory Section</a></h2>
+    <p>1つのメモリ領域は</p>
+    <ul>
+      <li>領域長 : 最小</li>
+      <li>領域長 : 最大 (省略可)</li>
+    </ul>
+    <p>で構成され、Memory Section はメモリ領域のリストになっています。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-16">疑似命令&nbsp;<code>.memory</code></a></h3>
+    <p>WebAssembly モジュールのメモリ領域を定義します。</p>
+    <h4>メモリ領域の記述形式</h4>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>メモリ名</code></td>
+        <td><code>.memory</code></td>
+        <td><code>最小長</code></td>
+        <td><code>最大長</code>を省略</td>
+      </tr>
+      <tr>
+        <td><code>メモリ名</code></td>
+        <td><code>.memory</code></td>
+        <td><code>最小長,&nbsp;最大長</code></td>
+        <td></td>
+      </tr>
+    </table>
+    <pre>メモリ名     .memory     最小長<br/>
+メモリ名     .memory     最小長, 最大長</pre>
+    <p><code>メモリ名</code>は名前空間<code>memidx</code>に序数として登録され、<code>memidx</code>を指定する場面で参照できます。</p>
+    <h4>例</h4>
+    <pre>mem1        .memory      4<br/>
+mem2        .memory      8, 16</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-17">Global Section</a></h2>
+    <p>1つのグローバル変数は</p>
+    <ul>
+      <li>データ型(<code>valtype</code>)</li>
+      <li>データ値を返すプログラム</li>
+    </ul>
+    <p>で構成され、Global Section はグローバル変数のリストになっています。</p>
+    <p>疑似命令<code>.gconst</code>または<code>.gvar</code>でグローバル変数を開始します。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-18">疑似命令&nbsp;<code>.gconst</code>&nbsp;と&nbsp;<code>.gvar</code></a></h3>
+    <h4>グローバル変数の記述形式</h4>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>グローバル名</code></td>
+        <td><code>.gconst</code></td>
+        <td><code>&lt;valtype&gt;</code></td>
+        <td>初期化コードが必要 (変更不可)</td>
+      </tr>
+      <tr>
+        <td><code>グローバル名</code></td>
+        <td><code>.gvar</code></td>
+        <td><code>&lt;valtype&gt;</code></td>
+        <td>初期化コードが必要</td>
+      </tr>
+      <tr>
+        <td><code>グローバル名</code></td>
+        <td><code>.gconst</code></td>
+        <td><code>&lt;valtype&gt;,&nbsp;値</code></td>
+        <td>初期化コードは自動生成 (変更不可)</td>
+      </tr>
+      <tr>
+        <td><code>グローバル名</code></td>
+        <td><code>.gvar</code></td>
+        <td><code>&lt;valtype&gt;,&nbsp;値</code></td>
+        <td>初期化コードは自動生成 (変更不可)</td>
+      </tr>
+    </table>
+    <pre>グローバル名  .gconst     &lt;valtype&gt;<br/>
+グローバル名  .gvar       &lt;valtype&gt;<br/>
+グローバル名  .gconst     &lt;valtype&gt;, 値<br/>
+グローバル名  .gvar       &lt;valtype&gt;, 値</pre>
+    <p><code>グローバル名</code>は名前空間<code>globalidx</code>に序数として登録され、<code>globalidx</code>を指定する場面で参照できます。初期値を省略した場合は、初期化コードが必要です。初期値を記述した場合は、初期化コードが自動生成されます。</p>
+    <h4>例</h4>
+    <pre>global2     .gconst     i32, 0<br/>
+global3     .gconst     f32, 1.0<br/>
+global4     .gconst     f32x4, 1.0, 2.0, 3.0, 4.0<br/>
+<br/>
+global5     .gvar       i32<br/>
+            i32.const   5<br/>
+<br/>
+global6     .gconst     f64<br/>
+            f64.const   3.141592653589793<br/>
+<br/>
+global7     .gvar       i32, 0<br/>
+global8     .gvar       f64, 2.0<br/>
+global9     .gvar       f64x2, 0.5, 0.25</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-19">Element Section</a></h2>
+    <p>1つのテーブル要素は</p>
+    <ul>
+      <li>参照型(<code>reftype</code>)</li>
+      <li>モード</li>
+      <ul>
+        <li>①<code>declarative</code></li>
+        <li>②<code>passive</code></li>
+        <li>③<code>active</code></li>
+        <ul>
+          <li>テーブル位置(<code>tableidx</code>と<code>オフセット</code>)</li>
+        </ul>
+      </ul>
+      <li>要素</li>
+      <ul>
+        <li>Ⓐ<code>funcidx</code>のリスト</li>
+        <li>Ⓑ<code>reftype</code>を返すプログラムのリスト</li>
+      </ul>
+    </ul>
+    <p>で構成され、Element Section はテーブル要素のリストになっています。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-20">疑似命令&nbsp;<code>.element</code></a></h3>
+    <p>疑似命令<code>.element</code>でテーブル要素を開始します。</p>
+    <h4>テーブル要素記述形式</h4>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>declarative</code></td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;declarative</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>passive</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;passive</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;active</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;active,&nbsp;&lt;tableidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>要素名</code></td>
+        <td><code>.element</code></td>
+        <td><code>&lt;reftype&gt;,&nbsp;active,&nbsp;&lt;tableidx&gt;,&nbsp;オフセット</code></td>
+      </tr>
+    </table>
+    <p><code>要素名</code>は名前空間<code>elemidx</code>に序数として登録され、<code>elemidx</code>を指定する場面で参照できます。</p>
+    <p>既定値</p>
+    <ul>
+      <li><code>reftype&nbsp;=&nbsp;funcref</code></li>
+      <li><code>tableidx&nbsp;=&nbsp;0</code></li>
+      <li><code>オフセット&nbsp;=&nbsp;0</code></li>
+    </ul>
+    <h4>①<code>declarative</code>モード</h4>
+    <pre>要素名      .element    declarative<br/>
+要素名      .element    &lt;reftype&gt;, declarative</pre>
+    <h4>②<code>passive</code>モード</h4>
+    <pre>要素名      .element    passive<br/>
+要素名      .element    &lt;reftype&gt;, passive</pre>
+    <h4>③<code>active</code>モード</h4>
+    <pre>要素名      .element<br/>
+要素名      .element    &lt;reftype&gt;<br/>
+要素名      .element    &lt;reftype&gt;, active<br/>
+要素名      .element    &lt;reftype&gt;, active, &lt;tableidx&gt;<br/>
+要素名      .element    &lt;reftype&gt;, active, &lt;tableidx&gt;, オフセット</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-21">疑似命令&nbsp;<code>.reftype</code></a></h3>
+    <p>疑似命令<code>.element</code>で<code>reftype</code>を省略したときに使用します。</p>
+    <pre>要素名      .element<br/>
+　　　      ;# ...<br/>
+　　　      .reftype    &lt;reftype&gt;</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-22">疑似命令&nbsp;<code>.tableidx</code></a></h3>
+    <p>疑似命令<code>.element</code>で<code>tableidx</code>を省略したときに使用します。</p>
+    <pre>要素名      .element    &lt;reftype&gt;, active<br/>
+　　　      ;# ...<br/>
+　　　      .tableidx   &lt;tableidx&gt;</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-23">疑似命令&nbsp;<code>.offset</code></a></h3>
+    <p>疑似命令<code>.element</code>で<code>オフセット</code>を省略したときに使用します。</p>
+    <h4>オフセット値を返すプログラムを記述する形式</h4>
+    <pre>            .offset<br/>
+;# 以下、オフセット値を返すコード<br/>
+;#          i32.const   値<br/>
+;# などを記述する</pre>
+    <h4>オフセット値を返すプログラムを自動生成する形式</h4>
+    <pre>            .offset     値<br/>
+;# オフセット値を返すコード<br/>
+;#          i32.const   値<br/>
+;# が自動生成される</pre>
+    <p>疑似命令<code>.offset</code>もない場合は、<code>オフセット</code>は<code>0</code>になります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-24">疑似命令&nbsp;<code>.funcidx</code></a></h3>
+    <p>オペランドに<code>funcidx</code>のリストと<code>reftype</code>を返すプログラムの開始になります。</p>
+    <h4>Ⓐ<code>funcidx</code>のリスト</h4>
+    <pre>            .funcidx    &lt;funcidx&gt;,&lt;funcidx&gt;,...<br/>
+            .funcidx    &lt;funcidx&gt;,&lt;funcidx&gt;,...<br/>
+            ;# ...</pre>
+    <p>疑似命令<code>.funcidx</code>の下に、<code>ref.func</code>や<code>ref.null</code>などのコードが一切ない場合は、<code>funcidx</code>のリスト形式になります。</p>
+    <h4>Ⓑ<code>reftype</code>を返すプログラムのリスト</h4>
+    <pre>            .funcidx    &lt;funcidx&gt;,&lt;funcidx&gt;,...<br/>
+;# ここに funcidx を返すプログラム<br/>
+;#          ref.null    &lt;reftype&gt;<br/>
+;# などが入る<br/>
+<br/>
+            .funcidx    &lt;funcidx&gt;,&lt;funcidx&gt;,...<br/>
+;# ref.null の存在により &lt;funcidx&gt; は<br/>
+;#          ref.func    &lt;funcidx&gt;<br/>
+;# のコードに全て置換される<br/>
+            ;# ...</pre>
+    <p>疑似命令<code>.funcidx</code>の下に、<code>ref.func</code>や<code>ref.null</code>などのコードが1つでもあると、<code>&lt;funcidx&gt;</code>も<code>reftype</code>を返すプログラムに自動変換します。</p>
+    <p>&nbsp;</p>
+    <h3>例</h3>
+    <pre>;# mode active その1<br/>
+elem0       .element<br/>
+            .reftype    funcref<br/>
+            .tableidx   tab1<br/>
+            .offset     0<br/>
+            .funcidx    func2, func3<br/>
+<br/>
+;# mode active その2<br/>
+elem1       .element<br/>
+            .tableidx   tab1<br/>
+            .offset     1<br/>
+            .funcidx    func2, func3<br/>
+<br/>
+;# mode active その3<br/>
+elem2       .element    active, tab1<br/>
+            .offset     2<br/>
+            .funcidx    func2, func3<br/>
+<br/>
+;# mode active その4<br/>
+elem3       .element    active, tab1, 3<br/>
+            .funcidx    func2<br/>
+<br/>
+;# mode passive<br/>
+elem4       .element    passive<br/>
+            .funcidx    func2<br/>
+            ref.func    func3<br/>
+            .funcidx<br/>
+            ref.func    func4<br/>
+<br/>
+;# mode declarative<br/>
+elem4       .element    declarative<br/>
+            .funcidx    func2, func3</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-25">Data Section</a></h2>
+    <p>1つのデータ列は</p>
+    <ul>
+      <li>モード</li>
+      <ul>
+        <li>①<code>active</code></li>
+        <ul>
+          <li>テーブル位置(<code>memidx</code>と<code>オフセット</code>)</li>
+        </ul>
+        <li>②<code>passive</code></li>
+      </ul>
+      <li>データ列</li>
+    </ul>
+    <p>で構成され、Data Section はデータ列のリストになっています。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-26">疑似命令&nbsp;<code>.data</code></a></h3>
+    <p>疑似命令<code>.data</code>でデータ列を開始します。</p>
+    <h4>データ列記述形式</h4>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>データ名</code></td>
+        <td><code>.data</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>データ名</code></td>
+        <td><code>.data</code></td>
+        <td><code>&lt;memidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>データ名</code></td>
+        <td><code>.data</code></td>
+        <td><code>&lt;memidx&gt;,&nbsp;オフセット</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>データ名</code></td>
+        <td><code>.data</code></td>
+      </tr>
+    </table>
+    <p><code>データ名</code>は名前空間<code>dataidx</code>に序数として登録され、<code>dataidx</code>を指定する場面で参照できます。</p>
+    <h4>①<code>active</code>モード</h4>
+    <pre>データ名    .data       &lt;memidx&gt;, オフセット<br/>
+<br/>
+;# オフセットを別途記述する形式<br/>
+データ名    .data       &lt;memidx&gt;<br/>
+　　　　    ;# 以下で<br/>
+　　　　    ;#   .offset   [オフセット]<br/>
+　　　　    ;# を使用する<br/>
+<br/>
+;# &lt;memidx&gt;とオフセットを別途記述する形式<br/>
+データ名    .data<br/>
+　　　　    ;# 以下で<br/>
+　　　　    ;#   .memidx   &lt;memidx&gt;<br/>
+　　　　    ;#   .offset   [オフセット]<br/>
+　　　　    ;# を使用する</pre>
+    <h4>②<code>passive</code>モード</h4>
+    <pre>データ名    .data</pre>
+    <p>疑似命令<code>.memidx</code>および疑似命令<code>.offset</code>が使用されないとき、<code>passive</code>モードになります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-27">疑似命令&nbsp;<code>.memidx</code></a></h3>
+    <pre>            .memidx     &lt;memidx&gt;</pre>
+    <p>疑似命令<code>.data</code>で<code>memidx</code>を省略したときに使用します。疑似命令<code>.memidx</code>もない場合は、<code>memidx</code>は<code>0</code>になります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-28">疑似命令&nbsp;<code>.offset</code></a></h3>
+    <p>疑似命令<code>.elment</code>での疑似命令<code>.offset</code>と同様です。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-29">データ列用疑似命令</a></h3>
+    <table>
+      <tr>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>.i8</code></td>
+        <td><code>&lt;8ビット値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.i16</code></td>
+        <td><code>&lt;16ビット値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.i32</code></td>
+        <td><code>&lt;32ビット値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.i64</code></td>
+        <td><code>&lt;64ビット値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.f32</code></td>
+        <td><code>&lt;単精度浮動小数点値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.f64</code></td>
+        <td><code>&lt;倍制度浮動小数点値&gt;,...</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>.sleb</code></td>
+        <td><code>&lt;符号あり整数値&gt;,...</code></td>
+        <td>符号あり LEB128 形式</td>
+      </tr>
+      <tr>
+        <td><code>.uleb</code></td>
+        <td><code>&lt;符号なし整数値&gt;,...</code></td>
+        <td>符号なし LEB128 形式</td>
+      </tr>
+      <tr>
+        <td><code>.nstring</code></td>
+        <td><code>"文字列",...</code></td>
+        <td>先頭に uleb 形式で文字列長あり</td>
+      </tr>
+      <tr>
+        <td><code>.string</code></td>
+        <td><code>"文字列",...</code></td>
+        <td>純粋な文字列データ<br/>注意: null文字終端ではない</td>
+      </tr>
+    </table>
+    <pre>            .i8         &lt;8ビット値&gt;,...<br/>
+            .i16        &lt;16ビット値&gt;,...<br/>
+            .i32        &lt;32ビット値&gt;,...<br/>
+            .i64        &lt;64ビット値&gt;,...<br/>
+            .f32        &lt;単精度浮動小数点値&gt;,...<br/>
+            .f64        &lt;倍制度浮動小数点値&gt;,...<br/>
+            .sleb       &lt;符号あり整数値&gt;,...<br/>
+            .uleb       &lt;符号なし整数値&gt;,...<br/>
+            .nstring    "UTF-8", "文字列", ...<br/>
+            .string     "UTF-8", "文字列", ...</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-30">エンディアン別データ列用疑似命令</a></h3>
+    <p>データ サイズは同じでエンディアンが異なる疑似命令があります。</p>
+    <table>
+      <tr>
+        <th>データ型</th>
+        <th>※i8値</th>
+        <th>i16値</th>
+        <th>i32値</th>
+        <th>i64値</th>
+        <th>f32値</th>
+        <th>f64値</th>
+      </tr>
+      <tr>
+        <th>リトル</th>
+        <td><code>.i8</code></td>
+        <td><code>.i16</code></td>
+        <td><code>.i32</code></td>
+        <td><code>.i64</code></td>
+        <td><code>.f32</code></td>
+        <td><code>.f64</code></td>
+      </tr>
+      <tr>
+        <th>リトル</th>
+        <td><code>.i8le</code></td>
+        <td><code>.i16le</code></td>
+        <td><code>.i32le</code></td>
+        <td><code>.i64le</code></td>
+        <td><code>.f32le</code></td>
+        <td><code>.f64le</code></td>
+      </tr>
+      <tr>
+        <th>ビッグ</th>
+        <td><code>.i8be</code></td>
+        <td><code>.i16be</code></td>
+        <td><code>.i32be</code></td>
+        <td><code>.i64be</code></td>
+        <td><code>.f32be</code></td>
+        <td><code>.f64be</code></td>
+      </tr>
+    </table>
+    <p>※ <code>.i8,&nbsp;.i8be,&nbsp;.i8le</code>に違いはありません。</p>
+    <p>&nbsp;</p>
+    <h3>例</h3>
+    <pre>data1       .data       mem1<br/>
+            .i8         0,1<br/>
+<br/>
+data2       .data       mem1, 2<br/>
+            .i16        0x0302<br/>
+<br/>
+data3       .data       mem1, 4<br/>
+            .i32be      0x04050607</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-31">Code Section</a></h2>
+    <p>1つの関数は</p>
+    <ul>
+      <li>ローカル変数リスト</li>
+      <li>実行コード</li>
+    </ul>
+    <p>で構成され、Code Section は関数のリストになります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-32">疑似命令&nbsp;<code>.code</code></a></h3>
+    <p>疑似命令<code>.code</code>で関数(コード)を開始します。</p>
+    <table>
+      <tr>
+        <th>形式</th>
+        <th>ラベル</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <th>関数型を指定</th>
+        <td><code>関数名</code></td>
+        <td><code>.code</code></td>
+        <td><code>&lt;typeidx&gt;</code></td>
+        <td>疑似命令<code>.param</code>は使用不可</td>
+      </tr>
+      <tr>
+        <th>返値型を指定</th>
+        <td><code>関数名</code></td>
+        <td><code>.code</code></td>
+        <td><code>&lt;valtype&gt;...</code></td>
+        <td>疑似命令<code>.param</code>を使用して引数を指定</td>
+      </tr>
+    </table>
+    <pre>関数名      .code       &lt;typeidx&gt;<br/>
+関数名      .code       &lt;valtype&gt;...</pre>
+    <p><code>関数名</code>は名前空間<code>funcidx</code>に序数として登録され、<code>funcidx</code>を指定する場面で参照できます。</p>
+    <h4>関数型を指定する形式</h4>
+    <pre>関数名      .code       &lt;typeidx&gt;</pre>
+    <p>オペランドに<code>typeidx</code>を指定すると関数型の引数と返値を使用するため、疑似命令<code>.param</code>で引数を追加することができません。</p>
+    <h4>返値型を指定する形式</h4>
+    <pre>関数名      .code       &lt;valtype&gt;...</pre>
+    <p>この形式では、疑似命令<code>.type</code>と同じ構造で関数型を定義します。ここで定義された関数型は関数名で関数型名として名前空間<code>typeidx</code>にも序数として登録されます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-33">疑似命令&nbsp;<code>.param</code></a></h3>
+    <pre>引数名      .param      &lt;引数の型:valtype&gt;</pre>
+    <p>Type Section の<code>.param</code>疑似命令と同じです。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-34">疑似命令&nbsp;<code>.local</code></a></h3>
+    <pre>ローカル名1   .local      &lt;変数型:valtype&gt;<br/>
+ローカル名2   .local      &lt;ローカル名?&gt;    ;# ローカルの別名を定義</pre>
+    <p><code>ローカル名1</code>は名前空間<code>関数名</code>の<code>localidx</code>に序数として登録され、<code>localidx</code>を指定する場面で参照できます。<code>ローカル名2</code>は別の<code>ローカル名</code>と同じ<code>lcoalidx</code>になります。<code>lcoalidx</code>の序数は型(<code>valtype</code>)の種類で纏められるので記述順になるとは限りません。</p>
+    <p>&nbsp;</p>
+    <h4>例</h4>
+    <pre>;# 関数型を指定<br/>
+func3       .code       ftype0<br/>
+            local.get   x<br/>
+            drop<br/>
+            ;# 不足分の end 命令は自動追加<br/>
+<br/>
+;# 関数型も記述<br/>
+func4       .code       i32<br/>
+x           .param      i32<br/>
+            local.get   x<br/>
+            end</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-35">Start Section</a></h2>
+    <p>疑似命令<code>.start</code>でモジュールの初期化処理関数を指定します。</p>
+    <pre>            .start      &lt;funcidx&gt;</pre>
+    <h4>例</h4>
+    <pre>            .start      func3</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-36">Export Section</a></h2>
+    <p>1つの開示用データは</p>
+    <ul>
+      <li>開示名</li>
+      <li>種類</li>
+      <ul>
+        <li>①関数</li>
+        <li>②テーブル</li>
+        <li>③メモリ</li>
+        <li>④グローバル</li>
+      </ul>
+    </ul>
+    <p>で構成され、Export Section は開示リストになります。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-37">外部開示の記述形式</a></h3>
+    <table>
+      <tr>
+        <th>種類</th>
+        <th>疑似命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td colspan="4">全て明示</td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>.export.func</code></td>
+        <td><code>&lt;funcidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>.export.table</code></td>
+        <td><code>&lt;tableidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>.export.memory</code></td>
+        <td><code>&lt;memidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>.export.global</code></td>
+        <td><code>&lt;globalidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="4">開示名は自動</td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>.export.func</code></td>
+        <td><code>&lt;funcidx&gt;</code></td>
+        <td>開示名は<code>&lt;funcidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>.export.table</code></td>
+        <td><code>&lt;tableidx&gt;</code></td>
+        <td>開示名は<code>&lt;tableidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>.export.memory</code></td>
+        <td><code>&lt;memidx&gt;</code></td>
+        <td>開示名は<code>&lt;memidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>.export.global</code></td>
+        <td><code>&lt;globalidx&gt;</code></td>
+        <td>開示名は<code>&lt;globalidx&gt;</code></td>
+      </tr>
+      <tr>
+        <td colspan="4">種類を自動判定</td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;funcidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;tableidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;memidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;globalidx&gt;,&nbsp;開示名</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="4">種類を自動判定 + 開示名は自動</td>
+      </tr>
+      <tr>
+        <th>①</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;funcidx&gt;</code></td>
+        <td>開示名は<code>&lt;funcidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>②</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;tableidx&gt;</code></td>
+        <td>開示名は<code>&lt;tableidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>③</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;memidx&gt;</code></td>
+        <td>開示名は<code>&lt;memidx&gt;</code></td>
+      </tr>
+      <tr>
+        <th>④</th>
+        <td><code>.export</code></td>
+        <td><code>&lt;globalidx&gt;</code></td>
+        <td>開示名は<code>&lt;globalidx&gt;</code></td>
+      </tr>
+    </table>
+    <pre>;# ①関数を開示する場合<br/>
+            .export         &lt;funcidx&gt;          ;# 開示名は&lt;funcidx&gt;を使用<br/>
+            .export         &lt;funcidx&gt;, 開示名<br/>
+            .export.func    &lt;funcidx&gt;          ;# 開示名は&lt;funcidx&gt;を使用<br/>
+            .export.func    &lt;funcidx&gt;, 開示名<br/>
+<br/>
+;# ②テーブルを開示する場合<br/>
+            .export         &lt;tableidx&gt;          ;# 開示名は&lt;tableidx&gt;を使用<br/>
+            .export         &lt;tableidx&gt;, 開示名<br/>
+            .export.table   &lt;tableidx&gt;          ;# 開示名は&lt;tableidx&gt;を使用<br/>
+            .export.table   &lt;tableidx&gt;, 開示名<br/>
+<br/>
+;# ③メモリを開示する場合<br/>
+            .export         &lt;memidx&gt;            ;# 開示名は&lt;memidx&gt;を使用<br/>
+            .export         &lt;memidx&gt;, 開示名<br/>
+            .export.memory  &lt;memidx&gt;            ;# 開示名は&lt;memidx&gt;を使用<br/>
+            .export.memory  &lt;memidx&gt;, 開示名<br/>
+<br/>
+;# ④グローバル変数を開示する場合<br/>
+            .export         &lt;globalidx&gt;         ;# 開示名は&lt;globalidx&gt;を使用<br/>
+            .export         &lt;globalidx&gt;, 開示名<br/>
+            .export.global  &lt;globalidx&gt;         ;# 開示名は&lt;globalidx&gt;を使用<br/>
+            .export.global  &lt;globalidx&gt;, 開示名</pre>
+    <p>疑似命令<code>.export</code>は、<code>globalidx,funcidx,tableidx,memidx</code>の順にラベル名を検索します。同一名が複数のセクションに存在する場合は疑似命令<code>.export.*</code>で対象を明示してください。</p>
+    <p>&nbsp;</p>
+    <h4>例</h4>
+    <pre>            .export         func2<br/>
+            .export         func2, "nfunc2"    ;# func2 を nfunc2 として開示<br/>
+            .export.func    func3<br/>
+            .export.func    func3, "nfunc3"    ;# func3 を nfunc3 として開示<br/>
+<br/>
+            .export         tab1<br/>
+            .export         tab1, "ntab1"      ;# tab1 を ntab1 として開示<br/>
+            .export.table   tab2<br/>
+            .export.table   tab2, "ntab2"      ;# tab2 を ntab2 として開示<br/>
+<br/>
+            .export         mem1<br/>
+            .export         mem1, "nmem1"      ;# mem1 を nmem1 として開示<br/>
+            .export.memory  mem2<br/>
+            .export.memory  mem2, "nmem2"      ;# mem2 を nmem2 として開示<br/>
+<br/>
+            .export         global2<br/>
+            .export         global3, "gconst"  ;# global3 を gconst として開示<br/>
+            .export.global  global5<br/>
+            .export.global  global6, "gvar"    ;# global6 を gvar として開示</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-38">Custom Section</a></h2>
+    <h3><a name="index-39">疑似命令&nbsp;<code>.custom</code></a></h3>
+    <pre>            .custom         "name", &lt;section-name&gt;</pre>
+    <p><code>.custom</code>疑似命令で、Custom Section を開始します。</p>
+    <p>カスタム セクションは各セクションの後に1つだけ追加できます。</p>
+    <p><code>&lt;section-name&gt;</code>には</p>
+    <table>
+      <tr>
+        <td><code>custom</code></td>
+        <td><code>customsec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>type</code></td>
+        <td><code>typesec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>import</code></td>
+        <td><code>importsec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>function</code></td>
+        <td><code>functionsec</code></td>
+        <td><code>func</code></td>
+      </tr>
+      <tr>
+        <td><code>table</code></td>
+        <td><code>tablesec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>memory</code></td>
+        <td><code>memsec</code></td>
+        <td><code>mem</code></td>
+      </tr>
+      <tr>
+        <td><code>global</code></td>
+        <td><code>globalsec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>export</code></td>
+        <td><code>exportsec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>start</code></td>
+        <td><code>startsec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>element</code></td>
+        <td><code>elementsec</code></td>
+        <td><code>elem</code></td>
+      </tr>
+      <tr>
+        <td><code>code</code></td>
+        <td><code>codesec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>data</code></td>
+        <td><code>datasec</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><code>datacount</code></td>
+        <td><code>datacountsec</code></td>
+        <td></td>
+      </tr>
+    </table>
+    <p>を指定できます。省略可能で、省略すると <code>custom</code>になります。Custom Section のデータ列は、Data Section のデータ列用疑似命令を使用できます。</p>
+    <p>&nbsp;</p>
+  </body>
+</html>

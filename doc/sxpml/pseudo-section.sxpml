@@ -1,0 +1,31 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-section-intro.sxpml")
+(@include "pseudo-section-type.sxpml")
+(@include "pseudo-section-import.sxpml")
+(@include "pseudo-section-function.sxpml")
+(@include "pseudo-section-table.sxpml")
+(@include "pseudo-section-memory.sxpml")
+(@include "pseudo-section-global.sxpml")
+(@include "pseudo-section-element.sxpml")
+(@include "pseudo-section-code.sxpml")
+(@include "pseudo-section-data.sxpml")
+(@include "pseudo-section-start.sxpml")
+(@include "pseudo-section-export.sxpml")
+(@include "pseudo-section-custom.sxpml")
+
+(@def $wasmgen-pseudo-section
+  $wasmgen-pseudo-section-intro
+  $wasmgen-pseudo-section-type
+  $wasmgen-pseudo-section-import
+  $wasmgen-pseudo-section-function
+  $wasmgen-pseudo-section-table
+  $wasmgen-pseudo-section-memory
+  $wasmgen-pseudo-section-global
+  $wasmgen-pseudo-section-element
+  $wasmgen-pseudo-section-data
+  $wasmgen-pseudo-section-code
+  $wasmgen-pseudo-section-start
+  $wasmgen-pseudo-section-export
+  $wasmgen-pseudo-section-custom
+  ) ; @def

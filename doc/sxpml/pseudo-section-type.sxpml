@@ -1,0 +1,51 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-type
+  (@h2 "Type Section")
+  (p "1つの関数型データは")
+  (ul
+   (li "引数型リスト")
+   (li "返値型リスト"))
+  (p "で構成され、Type Section は関数型のリストになります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".type"))
+  (p "疑似命令" (code ".type") "で関数型を開始します。")
+  (pre
+   "関数型名    .type       <返値の型:valtype>リスト")
+  (p (code "関数型名") "は名前空間" (code "typeidx") "に序数として登録され、"
+     (code "typeidx") "を指定する場面で参照できます。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".param"))
+  (p "疑似命令" (code ".type") "の下に、"
+     "疑似命令" (code ".param") "を並べて引数型リストにします。")
+  (pre
+   "引数名      .param      <引数の型:valtype>")
+  (p (code "引数名") "は関数の名前空間" (code "関数型名") "の"
+     (code "localidx") "に序数として登録され、"
+     (code "localidx") "を指定する場面で参照できます。")
+  $vpad
+
+  (h4 "Type Section の例")
+  (pre
+   ";# C言語の typedef void (*ftype0)(i32 x); に相当"
+   "ftype0      .type"
+   "x           .param      i32"
+   ""
+   ";# C言語の typedef i64 (*ftype1)(i64 x, i64 y); に相当"
+   "ftype1      .type       i64"
+   "x           .param      i64"
+   "y           .param      i64"
+   ""
+   ";# C言語の typedef double (*ftype2)(double x, double y, double z); に相当"
+   "ftype2      .type       f64"
+   "x           .param      f64"
+   "y           .param      f64"
+   "z           .param      f64"
+   "")
+  $vpad
+
+  ) ; @def

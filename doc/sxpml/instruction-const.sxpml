@@ -1,0 +1,123 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-const-name "定数")
+
+(@def $wasmgen-instruction-const
+  (@h2 $wasmgen-instruction-const-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.const") (br)
+	(code "s32.const") (br)
+	(code "u32.const"))
+    (td $vtop (code "i32"))
+    (td $vtop (code (var "r") (sub "i32") " ← " (var "i32"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.const") (br)
+	(code "s64.const") (br)
+	(code "u64.const"))
+    (td $vtop (code "i64"))
+    (td $vtop (code (var "r") (sub "i64") " ← " (var "i64"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.const"))
+    (td $vtop (code "f32"))
+    (td $vtop (code (var "r") (sub "f32") " ← " (var "f32"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.const"))
+    (td $vtop (code "f64"))
+    (td $vtop (code (var "r") (sub "f64") " ← " (var "f64"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "i8x16.const") (br)
+	(code "s8x16.const") (br)
+	(code "u8x16.const"))
+    (td $vtop (code "i8" (sub "1") ",i8" (sub "2") ",...,i8" (sub "16")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "i16x8.const") (br)
+	(code "s16x8.const") (br)
+	(code "u16x8.const"))
+    (td $vtop (code "i16" (sub "1") ",i16" (sub "2") ",...,i16" (sub "8")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "i32x4.const") (br)
+	(code "s32x4.const") (br)
+	(code "u32x4.const"))
+    (td $vtop (code "i32" (sub "1") ",i32" (sub "2") ",i32" (sub "3") ",i32" (sub "4")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "i64x2.const") (br)
+	(code "s64x2.const") (br)
+	(code "u64x2.const"))
+    (td $vtop (code "i64" (sub "1") ",i64" (sub "2")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.const"))
+    (td $vtop (code "f32" (sub "1") ",f32" (sub "2") ",f32" (sub "3") ",f32" (sub "4")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.const"))
+    (td $vtop (code "f64" (sub "1") ",f64" (sub "2")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "v128.const"))
+    (td $vtop (code "i8" (sub "1") ",i8" (sub "2") ",...,i8" (sub "16")))
+    (td $vtop (code (var "r") (sub "v128") " ← " (var "v128"))))
+   ) ; table
+  (p "オペランドの2番目以降は省略可能で、省略部分は" (code "0") "として扱います。")
+  (h4 "例")
+  (pre
+   ";# 全オペランドを明示"
+   "            v128.const   0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
+   "            i8x16.const  0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15"
+   "            i16x8.const  0x0100,0x0302,0x0504,0x0706,0x0908,0x0b0a,0x0d0c,0x0f0e"
+   "            i32x4.const  0x03020100,0x07060504,0x0b0a0908,0x0f0e0d0c"
+   "            i64x2.const  0x0706050403020100,0x0f0e0d0c0b0a0908"
+   "            f32x4.const  1.0, 2.0, 3.0, 4.0"
+   "            f64x2.const  0.5, 0.25"
+   ""
+   ";# オペランド 2 番目以降の省略は 0 扱いになる"
+   "            v128.const   0"
+   "            i8x16.const  0,1,2,3,4,5,6,7"
+   "            i16x8.const  0x0100,0x0302,0x0504,0x0706"
+   "            i32x4.const  0x03020100,0x07060504"
+   "            i64x2.const  0x0706050403020100"
+   "            f32x4.const  1.0, 2.0"
+   "            f64x2.const  0.5")
+  $vpad
+
+  ) ; @def

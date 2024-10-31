@@ -1,0 +1,12 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-function
+  (@h2 "Function Section")
+  (p "1つの関数データは、" (code "funcidx") "に対応する関数型を" (code "typeidx") "で表し、"
+     "Function Section は" (code "typeidx") "のリストになります。")
+  (p "wasmgen では関数型は自動処理されるため、Function Section 用の疑似命令はありません。")
+  $vpad
+
+  ) ; @def

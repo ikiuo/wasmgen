@@ -1,0 +1,99 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-getset-local-name "ローカル変数")
+(@def $wasmgen-instruction-getset-global-name "グローバル変数")
+(@def $wasmgen-instruction-getset-table-name "テーブル・アクセス")
+
+(@def $wasmgen-instruction-getset-name
+    $wasmgen-instruction-getset-local-name "、"
+    $wasmgen-instruction-getset-global-name "、"
+    $wasmgen-instruction-getset-table-name)
+
+(@def $wasmgen-instruction-getset-local
+  (@h2 $wasmgen-instruction-getset-local-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $center (code "1"))
+    (td)
+    (td (code "local.get"))
+    (td (code "localidx"))
+    (td (code (var "r") " ← " "locals[𝑥]")))
+   (tr
+    (td $center (code "0"))
+    (td (code "any"))
+    (td (code "local.set"))
+    (td (code "localidx"))
+    (td (code "locals[𝑥]" " ← " (var "p1"))))
+   (tr
+    (td $center (code "1"))
+    (td (code "any"))
+    (td (code "local.tee"))
+    (td (code "localidx"))
+    (td (code (var "r") " ← " (var "p1") "; locals[𝑥]" " ← " (var "p1"))))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-getset-global
+  (@h2 $wasmgen-instruction-getset-global-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP" (code "𝑥"))
+    (th "備考"))
+   (tr
+    (td $center (code "0"))
+    (td (code "any"))
+    (td (code "global.get"))
+    (td (code "globalidx"))
+    (td (code (var "r") " ← " "globals[𝑥]")))
+   (tr
+    (td $center (code "1"))
+    (td)
+    (td (code "global.set"))
+    (td (code "globalidx"))
+    (td (code "globals[𝑥]" " ← " (var "p1"))))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-getset-table
+  (@h2 $wasmgen-instruction-getset-table-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP" (code "𝑥"))
+    (th "備考"))
+   (tr
+    (td $center (code "1"))
+    (td (code "func"))
+    (td (code "table.get"))
+    (td (code "tableidx"))
+    (td (code (var "r") (sub "func") " ← " "TAB[𝑥][" (var "p1") (sub "i32") "]")))
+   (tr
+    (td $center (code "2"))
+    (td)
+    (td (code "table.set"))
+    (td (code "tableidx"))
+    (td (code "TAB[𝑥][" (var "p1") (sub "i32") "] ← " (var "p2") (sub "func"))))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-getset
+  $wasmgen-instruction-getset-local
+  $wasmgen-instruction-getset-global
+  $wasmgen-instruction-getset-table
+  ) ; @def

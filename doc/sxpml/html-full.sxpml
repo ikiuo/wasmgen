@@ -1,0 +1,19 @@
+;; -*- Lisp -*-
+
+(@include "full.sxpml")
+
+(@def $html-title $document)
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $html-title)
+  $css)
+ (body
+  (h1 $html-title)
+  $html-index
+  $wasmgen-full
+  ) ; body
+ ) ; head

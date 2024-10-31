@@ -1,0 +1,11 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-replace.sxpml")
+(@include "pseudo-section.sxpml")
+(@include "pseudo-assembler.sxpml")
+
+(@def $wasmgen-pseudo
+  $wasmgen-pseudo-assembler
+  $wasmgen-pseudo-replace
+  $wasmgen-pseudo-section
+  ) ; @def

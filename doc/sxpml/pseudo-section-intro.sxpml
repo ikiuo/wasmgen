@@ -1,0 +1,77 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-name "セクション用疑似命令")
+
+(@def $wasmgen-pseudo-section-intro
+  (@h1 $wasmgen-pseudo-section-name)
+  (p (a [href $url-wasm-module] "WebAssembly モジュール")
+     "の各セクションに対応するための疑似命令があり、ラベルは序数として登録されます。")
+  (table
+   (tr
+    (th "セクション")
+    (th "疑似命令")
+    (th "ラベル登録先"))
+   (tr
+    (td "Custom Section")
+    (td (code ".custom"))
+    (td))
+   (tr
+    (td "Type Section")
+    (td (code ".type"))
+    (td (code "typeidx")))
+   (tr
+    (td "Import Section")
+    (td (code ".import.func")  (br)
+	(code ".import.table") (br)
+	(code ".import.memory") (br)
+	(code ".import.const") (br)
+	(code ".import.var"))
+    (td (code "funcidx") (br)
+	(code "tableidx") (br)
+	(code "memidx") (br)
+	(code "globalidx") (br)
+	(code "globalidx")))
+   (tr
+    (td "Function Section")
+    (td (code ".code"))
+    (td (code "funcidx")))
+   (tr
+    (td "Table Section")
+    (td (code ".table"))
+    (td (code "tableidx")))
+   (tr
+    (td "Global Section")
+    (td (code ".gconst") (br)
+	(code ".gvar"))
+    (td (code "globalidx") (br)
+	(code "globalidx")))
+   (tr
+    (td "Export Section")
+    (td (code ".export"))
+    (td))
+   (tr
+    (td "Start Section")
+    (td (code ".start"))
+    (td))
+   (tr
+    (td "Element Section")
+    (td (code ".element"))
+    (td (code "elemidx")))
+   (tr
+    (td "Code Section")
+    (td (code ".code"))
+    (td (code "funcidx")))
+   (tr
+    (td "Data Section")
+    (td (code ".data"))
+    (td (code "dataidx")))
+   (tr
+    (td "Data Count Section")
+    (td)
+    (td))
+   ) ; table
+  $vpad
+
+  ) ; @def

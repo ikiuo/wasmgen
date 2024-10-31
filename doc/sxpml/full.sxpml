@@ -1,0 +1,13 @@
+;; -*- Lisp -*-
+
+(@include "intro.sxpml")
+(@include "build.sxpml")
+(@include "statement.sxpml")
+(@include "pseudo.sxpml")
+(@include "instruction.sxpml")
+
+(@def $wasmgen-full
+  $wasmgen-statement
+  $wasmgen-pseudo
+  $wasmgen-instruction
+  ) ; @def

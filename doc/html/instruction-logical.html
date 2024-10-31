@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 論理演算</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ</h1>
+    <h2><a name="index-1">論理演算</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.and</code><br/><code>s32.and</code><br/><code>u32.and</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;<var>p1</var><sub>i32</sub>&nbsp;&amp;&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.and</code><br/><code>s64.and</code><br/><code>u64.and</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;<var>p1</var><sub>i64</sub>&nbsp;&amp;&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.or</code><br/><code>s32.or</code><br/><code>u32.or</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;<var>p1</var><sub>i32</sub>&nbsp;|&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.or</code><br/><code>s64.or</code><br/><code>u64.or</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;<var>p1</var><sub>i64</sub>&nbsp;|&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.xor</code><br/><code>s32.xor</code><br/><code>u32.xor</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;<var>p1</var><sub>i32</sub>&nbsp;^&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.xor</code><br/><code>s64.xor</code><br/><code>u64.xor</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;<var>p1</var><sub>i64</sub>&nbsp;^&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.not</code><br/><code>i8x16.not</code><br/><code>s8x16.not</code><br/><code>u8x16.not</code><br/><code>i16x8.not</code><br/><code>s16x8.not</code><br/><code>u16x8.not</code><br/><code>i32x4.not</code><br/><code>s32x4.not</code><br/><code>u32x4.not</code><br/><code>i64x2.not</code><br/><code>s64x2.not</code><br/><code>u64x2.not</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;~&nbsp;<var>p1</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.and</code><br/><code>i8x16.and</code><br/><code>s8x16.and</code><br/><code>u8x16.and</code><br/><code>i16x8.and</code><br/><code>s16x8.and</code><br/><code>u16x8.and</code><br/><code>i32x4.and</code><br/><code>s32x4.and</code><br/><code>u32x4.and</code><br/><code>i64x2.and</code><br/><code>s64x2.and</code><br/><code>u64x2.and</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub>&nbsp;&amp;&nbsp;<var>p2</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.andnot</code><br/><code>i8x16.andnot</code><br/><code>s8x16.andnot</code><br/><code>u8x16.andnot</code><br/><code>i16x8.andnot</code><br/><code>s16x8.andnot</code><br/><code>u16x8.andnot</code><br/><code>i32x4.andnot</code><br/><code>s32x4.andnot</code><br/><code>u32x4.andnot</code><br/><code>i64x2.andnot</code><br/><code>s64x2.andnot</code><br/><code>u64x2.andnot</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub>&nbsp;&amp;&nbsp;~<var>p2</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.or</code><br/><code>i8x16.or</code><br/><code>s8x16.or</code><br/><code>u8x16.or</code><br/><code>i16x8.or</code><br/><code>s16x8.or</code><br/><code>u16x8.or</code><br/><code>i32x4.or</code><br/><code>s32x4.or</code><br/><code>u32x4.or</code><br/><code>i64x2.or</code><br/><code>s64x2.or</code><br/><code>u64x2.or</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub>&nbsp;|&nbsp;<var>p2</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.xor</code><br/><code>i8x16.xor</code><br/><code>s8x16.xor</code><br/><code>u8x16.xor</code><br/><code>i16x8.xor</code><br/><code>s16x8.xor</code><br/><code>u16x8.xor</code><br/><code>i32x4.xor</code><br/><code>s32x4.xor</code><br/><code>u32x4.xor</code><br/><code>i64x2.xor</code><br/><code>s64x2.xor</code><br/><code>u64x2.xor</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub>&nbsp;^&nbsp;<var>p2</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.bitselect</code><br/><code>i8x16.bitselect</code><br/><code>s8x16.bitselect</code><br/><code>u8x16.bitselect</code><br/><code>i16x8.bitselect</code><br/><code>s16x8.bitselect</code><br/><code>u16x8.bitselect</code><br/><code>i32x4.bitselect</code><br/><code>s32x4.bitselect</code><br/><code>u32x4.bitselect</code><br/><code>i64x2.bitselect</code><br/><code>s64x2.bitselect</code><br/><code>u64x2.bitselect</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;(<var>p1</var><sub>v128</sub>&nbsp;&amp;&nbsp;<var>p3</var><sub>v128</sub>)&nbsp;|&nbsp;(<var>p2</var><sub>v128</sub>&nbsp;&amp;&nbsp;~<var>p3</var><sub>v128</sub>)</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

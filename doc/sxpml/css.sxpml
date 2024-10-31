@@ -1,0 +1,78 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $css
+  (style
+   "body {"
+   "  width: 840px;"
+   "  margin: auto;"
+   "  padding: 2.0em;"
+   "  border: solid 1px lightgray;"
+   "  font-family: \"Meiryo\";"
+   "}"
+   "h1, h2 {"
+   "  border-bottom: solid 1px #eceef1;"
+   "  padding-bottom: 0.2em;"
+   "}"
+   "table {"
+   "  border: solid 1px #e8ebee;"
+   "  border-collaspe: collaspe;"
+   "  border-spacing: 0;"
+   "}"
+   "th, td {"
+   "  border: solid 1px #e8ebee;"
+   "  padding: 0.5em;"
+   "}"
+   "code, .code {"
+   "  background-color: #f6f8fa;"
+   "  padding: 0.3em 0.4em;"
+   "  font-family: \"Courier\", \"MS Gothic\";"
+   "  font-size: 0.9em ;"
+   "  line-height: 1.5em;"
+   "}"
+   "pre {"
+   "  background-color: #f6f8fa;"
+   "  padding: 1em;"
+   "  font-family: \"Courier\", \"MS Gothic\";"
+   "  font-size: 0.9em ;"
+   "  line-height: 0.6em;"
+   "}"
+   ".left {"
+   "  text-align: left;"
+   "}"
+   ".center {"
+   "  text-align: center;"
+   "}"
+   ".right {"
+   "   text-align: right;"
+   "}"
+   ".vtop {"
+   "   vertical-align: top;"
+   "}"
+   ".vbase {"
+   "   vertical-align: baseline;"
+   "}"
+   ".vmiddle {"
+   "   vertical-align: middle;"
+   "}"
+   ".vbottom {"
+   "   vertical-align: bottom;"
+   "}"
+   ) ; style
+  ) ; @def
+
+(@def $left [class "left"])
+(@def $center [class "center"])
+(@def $right [class "right"])
+
+(@def $vtop [class "vtop"])
+(@def $vbase [class "vbase"])
+(@def $vmiddle [class "vmiddle"])
+(@def $vbottom [class "vbottom"])
+
+(@def $topleft [class "vtop left"])
+(@def $topcenter [class "vtop center"])
+
+(@def $code [class "code"])
+(@def $codevtop [class "code vtop"])

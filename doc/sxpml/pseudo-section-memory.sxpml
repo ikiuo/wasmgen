@@ -1,0 +1,46 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-memory
+  (@h2 "Memory Section")
+  (p "1つのメモリ領域は")
+  (ul
+   (li "領域長 : 最小")
+   (li "領域長 : 最大 (省略可)"))
+  (p "で構成され、Memory Section はメモリ領域のリストになっています。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".memory") )
+  (p "WebAssembly モジュールのメモリ領域を定義します。")
+  (h4 "メモリ領域の記述形式")
+  (table
+   (tr
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td (code "メモリ名"))
+    (td (code ".memory"))
+    (td (code "最小長"))
+    (td (code "最大長") "を省略"))
+   (tr
+    (td (code "メモリ名"))
+    (td (code ".memory"))
+    (td (code "最小長, 最大長"))
+    (td))
+   ) ; table
+  (pre
+   "メモリ名     .memory     最小長"
+   "メモリ名     .memory     最小長, 最大長")
+  (p (code "メモリ名") "は名前空間" (code "memidx") "に序数として登録され、"
+     (code "memidx") "を指定する場面で参照できます。")
+
+  (h4 "例")
+  (pre
+   "mem1        .memory      4"
+   "mem2        .memory      8, 16")
+  $vpad
+
+  ) ; @def

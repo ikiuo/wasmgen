@@ -1,0 +1,24 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-stack-name "スタック操作")
+
+(@def $wasmgen-instruction-stack
+  (@h2 $wasmgen-instruction-stack-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td)
+    (td $vtop (code "drop"))
+    (td)
+    (td $vtop (code (var "p1")) " を破棄"))
+   ) ; table
+  $vpad
+  ) ; @def

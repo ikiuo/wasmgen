@@ -1,0 +1,72 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-custom
+  (@h2 "Custom Section")
+
+  (@h3 "疑似命令" $spc (code ".custom"))
+  (pre
+   "            .custom         \"name\", <section-name>")
+  (p (code ".custom") "疑似命令で、Custom Section を開始します。")
+  (p "カスタム セクションは各セクションの後に1つだけ追加できます。")
+  (p (code "<section-name>") "には")
+  (table
+   (tr
+    (td (code "custom"))
+    (td (code "customsec"))
+    (td))
+   (tr
+    (td (code "type"))
+    (td (code "typesec"))
+    (td))
+   (tr
+    (td (code "import"))
+    (td (code "importsec"))
+    (td))
+   (tr
+    (td (code "function"))
+    (td (code "functionsec"))
+    (td (code "func")))
+   (tr
+    (td (code "table"))
+    (td (code "tablesec"))
+    (td))
+   (tr
+    (td (code "memory"))
+    (td (code "memsec"))
+    (td (code "mem")))
+   (tr
+    (td (code "global"))
+    (td (code "globalsec"))
+    (td))
+   (tr
+    (td (code "export"))
+    (td (code "exportsec"))
+    (td))
+   (tr
+    (td (code "start"))
+    (td (code "startsec"))
+    (td))
+   (tr
+    (td (code "element"))
+    (td (code "elementsec"))
+    (td (code "elem")))
+   (tr
+    (td (code "code"))
+    (td (code "codesec"))
+    (td))
+   (tr
+    (td (code "data"))
+    (td (code "datasec"))
+    (td))
+   (tr
+    (td (code "datacount"))
+    (td (code "datacountsec"))
+    (td))
+   ) ; table
+  (p "を指定できます。省略可能で、省略すると " (code "custom") "になります。"
+     "Custom Section のデータ列は、Data Section のデータ列用疑似命令を使用できます。")
+  $vpad
+
+  ) ; @def

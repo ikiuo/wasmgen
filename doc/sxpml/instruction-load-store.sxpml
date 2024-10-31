@@ -1,0 +1,483 @@
+;; -*- Lisp -*-
+
+(@include "instruction-memarg.sxpml")
+
+(@def $wasmgen-instruction-load-store-name "メモリ・アクセス")
+
+(@def $wasmgen-instruction-load-store
+  (@h2 $wasmgen-instruction-load-store-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考 (" (code "𝑚 = オフセット") ")"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.load") (br)
+	(code "s32.load") (br)
+	(code "u32.load"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load") (br)
+	(code "s64.load") (br)
+	(code "u64.load"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.load"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "f32") " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "f32"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.load"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "f64") " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "f64"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.load8_s") (br)
+	(code "s32.load8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "ext8s(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8") ")" )))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.load16_s") (br)
+	(code "s32.load16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "ext16s(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load8_s") (br)
+	(code "s64.load8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext8s (MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load16_s") (br)
+	(code "s64.load16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext16s(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load32_s") (br)
+	(code "s64.load32"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext32s(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.load8_u") (br)
+	(code "u32.load8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "ext8u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop
+	(code "i32.load16_u") (br)
+	(code "u32.load16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "ext16u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load8_u") (br)
+	(code "u64.load8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext8u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load16_u") (br)
+	(code "u64.load16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext16u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") ")") ))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i64"))
+    (td $vtop
+	(code "i64.load32_u") (br)
+	(code "u64.load32"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") " ← " "ext32u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i32.store") (br)
+	(code "s32.store") (br)
+	(code "u32.store"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") " ← " (var "p2") (sub "i32"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i64.store") (br)
+	(code "s64.store") (br)
+	(code "u64.store"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64") " ← " (var "p2") (sub "i64"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop (code "f32.store"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "f32") " ← " (var "p2") (sub "f32"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop (code "f64.store"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "f64") " ← " (var "p2") (sub "f64"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i32.store8") (br)
+	(code "s32.store8") (br)
+	(code "u32.store8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8")  " ← " (var "p2") (sub "i32"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i32.store16") (br)
+	(code "s32.store16") (br)
+	(code "u32.store16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") " ← " (var "p2") (sub "i32"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i64.store8") (br)
+	(code "s64.store8") (br)
+	(code "u64.store8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8")  " ← " (var "p2") (sub "i64"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i64.store16") (br)
+	(code "s64.store16") (br)
+	(code "u64.store16"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") " ← " (var "p2") (sub "i64"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "i64.store32") (br)
+	(code "s64.store32") (br)
+	(code "u64.store32"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") " ← " (var "p2") (sub "i64"))))
+   ) ; table
+  (div $spc)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考 (" (code "𝑚 = オフセット") ")"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load") (br)
+	(code "i8x16.load") (br)
+	(code "s8x16.load") (br)
+	(code "u8x16.load") (br)
+	(code "i16x8.load") (br)
+	(code "s16x8.load") (br)
+	(code "u16x8.load") (br)
+	(code "i32x4.load") (br)
+	(code "s32x4.load") (br)
+	(code "u32x4.load") (br)
+	(code "i64x2.load") (br)
+	(code "s64x2.load") (br)
+	(code "u64x2.load") (br)
+	(code "f32x4.load") (br)
+	(code "f64x2.load"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "v128") " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "v128"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "v128.store") (br)
+	(code "i8x16.store") (br)
+	(code "s8x16.store") (br)
+	(code "u8x16.store") (br)
+	(code "i16x8.store") (br)
+	(code "s16x8.store") (br)
+	(code "u16x8.store") (br)
+	(code "i32x4.store") (br)
+	(code "s32x4.store") (br)
+	(code "u32x4.store") (br)
+	(code "i64x2.store") (br)
+	(code "s64x2.store") (br)
+	(code "u64x2.store") (br)
+	(code "f32x4.store") (br)
+	(code "f64x2.store"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "v128") " ← " (var "p2") (sub "v128"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load8x8_s") (br)
+	(code "s16x8.load8x8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i16") "[𝑛]" " ← " "ext8s(MEM0[𝑚 + " (var "p1") (sub "i32") " + 𝑛]" (sub "i8") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load16x4_s") (br)
+	(code "s32x4.load16x4"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") "[𝑛]" " ← " "ext16s(MEM0[𝑚 + " (var "p1") (sub "i32") " + 2𝑛]" (sub "i16") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load32x2_s") (br)
+	(code "s64x2.load32x2"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") "[𝑛]" " ← " "ext32s(MEM0[𝑚 + " (var "p1") (sub "i32") " + 4𝑛]" (sub "i32") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load8x8_u") (br)
+	(code "u16x8.load8x8"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i16") "[𝑛] ← ext8u(MEM0[𝑚 + " (var "p1") (sub "i32") " + 𝑛]" (sub "i8") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load16x4_u") (br)
+	(code "u32x4.load16x4"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32") "[𝑛] ← ext16u(MEM0[𝑚 + " (var "p1") (sub "i32") " + 2𝑛]" (sub "i16") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load32x2_u") (br)
+	(code "u64x2.load32x2"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64") "[𝑛] ← ext32u(MEM0[𝑚 + " (var "p1") (sub "i32") " + 4𝑛]" (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load32_zero") (br)
+	(code "i32x4.load_zero") (br)
+	(code "s32x4.load_zero") (br)
+	(code "u32x4.load_zero") (br)
+	(code "f32x4.load_zero"))
+    (td $vtop (code "memarg"))
+    (td $vtop
+	(code (var "r") (sub "v128") " ← " "ext32u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") ")") (br)
+	"上位96ビットはゼロ"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load64_zero") (br)
+	(code "i64x2.load_zero") (br)
+	(code "s64x2.load_zero") (br)
+	(code "u64x2.load_zero") (br)
+	(code "f64x2.load_zero"))
+    (td $vtop (code "memarg"))
+    (td $vtop
+	(code (var "r") (sub "v128") " ← " "ext64u(MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64") ")") (br)
+	"上位64ビットはゼロ"))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load8_splat") (br)
+	(code "i8x16.load_splat") (br)
+	(code "s8x16.load_splat") (br)
+	(code "u8x16.load_splat"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i8x16") "[0..15]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load16_splat") (br)
+	(code "i16x8.load_splat") (br)
+	(code "s16x8.load_splat") (br)
+	(code "u16x8.load_splat"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i16x8") "[0..7]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load32_splat") (br)
+	(code "i32x4.load_splat") (br)
+	(code "s32x4.load_splat") (br)
+	(code "u32x4.load_splat") (br)
+	(code "f32x4.load_splat"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i32x4") "[0..3]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load64_splat") (br)
+	(code "i64x2.load_splat") (br)
+	(code "s64x2.load_splat") (br)
+	(code "u64x2.load_splat") (br)
+	(code "f64x2.load_splat"))
+    (td $vtop (code "memarg"))
+    (td $vtop (code (var "r") (sub "i64x2") "[0..1]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load8_lane") (br)
+	(code "i8x16.load_lane") (br)
+	(code "s8x16.load_lane") (br)
+	(code "u8x16.load_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop
+	(code (var "r") (sub "i8x16") " ← " "p2" (sub "v128")) (br)
+	(code (var "r") (sub "i8x16") "[𝑛]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load16_lane") (br)
+	(code "i16x8.load_lane") (br)
+	(code "s16x8.load_lane") (br)
+	(code "u16x8.load_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop
+	(code (var "r") (sub "i16x8") " ← " "p2" (sub "v128")) (br)
+	(code (var "r") (sub "i16x8") "[𝑛]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load32_lane") (br)
+	(code "i32x4.load_lane") (br)
+	(code "s32x4.load_lane") (br)
+	(code "u32x4.load_lane") (br)
+	(code "f32x4.load_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop
+	(code (var "r") (sub "i32x4") " ← " "p2" (sub "v128")) (br)
+	(code (var "r") (sub "i32x4") "[𝑛] ← MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32"))))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop
+	(code "v128.load64_lane") (br)
+	(code "i64x2.load_lane") (br)
+	(code "s64x2.load_lane") (br)
+	(code "u64x2.load_lane") (br)
+	(code "f64x2.load_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop
+	(code (var "r") (sub "i64x2") " ← " "p2" (sub "v128")) (br)
+	(code (var "r") (sub "i64x2") "[𝑛]" " ← " "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "v128.store8_lane") (br)
+	(code "i8x16.store_lane") (br)
+	(code "s8x16.store_lane") (br)
+	(code "u8x16.store_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i8") " ← " (var "p2") (sub "i8x16") "[𝑛]")))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "v128.store16_lane") (br)
+	(code "i16x8.store_lane") (br)
+	(code "s16x8.store_lane") (br)
+	(code "u16x8.store_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i16") " ← " (var "p2") (sub "i16x8") "[𝑛]")))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "v128.store32_lane") (br)
+	(code "i32x4.store_lane") (br)
+	(code "s32x4.store_lane") (br)
+	(code "u32x4.store_lane") (br)
+	(code "f32x4.store_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i32") " ← " (var "p2") (sub "i32x4") "[𝑛]")))
+   (tr
+    (td $topcenter (code "2"))
+    (td)
+    (td $vtop
+	(code "v128.store64_lane") (br)
+	(code "i64x2.store_lane") (br)
+	(code "s64x2.store_lane") (br)
+	(code "u64x2.store_lane") (br)
+	(code "f64x2.store_lane"))
+    (td $vtop (code "lane,memarg"))
+    (td $vtop (code "MEM0[𝑚 + " (var "p1") (sub "i32") "]" (sub "i64") " ← " (var "p2") (sub "i64x2") "[𝑛]")))
+   ) ; table
+  $vpad
+
+  $wasmgen-instruction-memarg
+
+  ) ; @def

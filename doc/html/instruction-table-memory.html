@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - テーブル・メモリ領域操作</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>テーブル・メモリ領域操作</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">テーブル領域操作</a><br/>
+            <a href="#index-2">メモリ領域操作</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">テーブル領域操作</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP<code>𝑥,𝑦</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>table.size</code></td>
+        <td class="vtop"><code>tableidx</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;(TAB[𝑥]&nbsp;のサイズ)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>table.grow</code></td>
+        <td class="vtop"><code>tableidx</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;(TAB[𝑥]&nbsp;のサイズ)</code> <br/> <code>TAB[𝑥]</code> をサイズ <code><var>p2</var><sub>i32</sub></code> に変更(内容は <code><var>p1</var></code>)</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>table.fill</code></td>
+        <td class="vtop"><code>tableidx</code></td>
+        <td class="vtop"><code>TAB[𝑥][<var>p1</var><sub>i32</sub>&nbsp;:&nbsp;<var>p3</var><sub>i32</sub>]&nbsp;←&nbsp;<var>p2</var></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>table.copy</code></td>
+        <td class="vtop"><code>tableidx,tableidx</code></td>
+        <td class="vtop"><code>TAB[𝑥][<var>p1</var><sub>i32</sub>&nbsp;:&nbsp;<var>p3</var><sub>i32</sub>]&nbsp;←&nbsp;TAB[𝑦][<var>p2</var><sub>i32</sub>&nbsp;:&nbsp;<var>p3</var><sub>i32</sub>]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>table.init</code></td>
+        <td class="vtop"><code>tableidx,elemidx</code></td>
+        <td class="vtop"><code>TAB[𝑥][<var>p1</var><sub>i32</sub>&nbsp;:&nbsp;<var>p3</var><sub>i32</sub>]&nbsp;←&nbsp;ELEM[𝑦][<var>p2</var><sub>i32</sub>&nbsp;:&nbsp;<var>p3</var><sub>i32</sub>]</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td></td>
+        <td class="vtop"><code>elem.drop</code></td>
+        <td class="vtop"><code>elemidx</code></td>
+        <td class="vtop"><code>ELEM[𝑥]</code> の要素を破棄</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-2">メモリ領域操作</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP<code>𝑥</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>0</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>memory.size</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;(MEM0&nbsp;のページ&nbsp;サイズ)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>memory.grow</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;(MEM0&nbsp;のページ&nbsp;サイズ)</code> <br/> <code>MEM0</code> のページをサイズ <code><var>p1</var><sub>i32</sub></code> に変更</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>memory.fill</code></td>
+        <td></td>
+        <td class="vtop"><code>memset(&amp;MEM0[<var>p1</var><sub>i32</sub>],&nbsp;<var>p2</var><sub>i32</sub>,&nbsp;<var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p1</code>から長さ<code>p3</code>を<code>p2</code>で埋める</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>memory.copy</code></td>
+        <td></td>
+        <td class="vtop"><code>memmove(&amp;MEM0[<var>p1</var><sub>i32</sub>],&nbsp;&amp;MEM0[<var>p2</var><sub>i32</sub>],&nbsp;<var>p3</var><sub>i32</sub>)</code> <br/> 位置<code>p2</code>から長さ<code>p3</code>を位置<code>p1</code>に移動</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>3</code></td>
+        <td></td>
+        <td class="vtop"><code>memory.init</code></td>
+        <td class="vtop"><code>dataidx</code></td>
+        <td class="vtop"><code>memcpy(&amp;MEM0[<var>p1</var><sub>i32</sub>],&nbsp;&amp;DATA[𝑥][<var>p2</var><sub>i32</sub>],&nbsp;<var>p3</var><sub>i32</sub>)</code><br/><cod>DATA</cod>の位置<code>p2</code>から長さ<code>p3</code>を<code>MEM0</code>の位置<code>p1</code>へコピー</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

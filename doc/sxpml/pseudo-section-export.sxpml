@@ -1,0 +1,167 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-export
+  (@h2 "Export Section")
+  (p "1つの開示用データは")
+  (ul
+   (li "開示名")
+   (li "種類")
+   (ul
+    (li "①関数")
+    (li "②テーブル")
+    (li "③メモリ")
+    (li "④グローバル")))
+  (p "で構成され、Export Section は開示リストになります。")
+  $vpad
+
+  (@h3 "外部開示の記述形式")
+  (table
+   (tr
+    (th "種類")
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td [colspan "4"] "全て明示"))
+   (tr
+    (th "①")
+    (td (code ".export.func"))
+    (td (code "<funcidx>, 開示名"))
+    (td))
+   (tr
+    (th "②")
+    (td (code ".export.table"))
+    (td (code "<tableidx>, 開示名"))
+    (td))
+   (tr
+    (th "③")
+    (td (code ".export.memory"))
+    (td (code "<memidx>, 開示名"))
+    (td))
+   (tr
+    (th "④")
+    (td (code ".export.global"))
+    (td (code "<globalidx>, 開示名"))
+    (td))
+   (tr
+    (td [colspan "4"] "開示名は自動"))
+   (tr
+    (th "①")
+    (td (code ".export.func"))
+    (td (code "<funcidx>"))
+    (td "開示名は" (code "<funcidx>")))
+   (tr
+    (th "②")
+    (td (code ".export.table"))
+    (td (code "<tableidx>"))
+    (td "開示名は" (code "<tableidx>")))
+   (tr
+    (th "③")
+    (td (code ".export.memory"))
+    (td (code "<memidx>"))
+    (td "開示名は" (code "<memidx>")))
+   (tr
+    (th "④")
+    (td (code ".export.global"))
+    (td (code "<globalidx>"))
+    (td "開示名は" (code "<globalidx>")))
+   (tr
+    (td [colspan "4"] "種類を自動判定"))
+   (tr
+    (th "①")
+    (td (code ".export"))
+    (td (code "<funcidx>, 開示名"))
+    (td))
+   (tr
+    (th "②")
+    (td (code ".export"))
+    (td (code "<tableidx>, 開示名"))
+    (td))
+   (tr
+    (th "③")
+    (td (code ".export"))
+    (td (code "<memidx>, 開示名"))
+    (td))
+   (tr
+    (th "④")
+    (td (code ".export"))
+    (td (code "<globalidx>, 開示名"))
+    (td))
+   (tr
+    (td [colspan "4"] "種類を自動判定 + 開示名は自動"))
+   (tr
+    (th "①")
+    (td (code ".export"))
+    (td (code "<funcidx>"))
+    (td "開示名は" (code "<funcidx>")))
+   (tr
+    (th "②")
+    (td (code ".export"))
+    (td (code "<tableidx>"))
+    (td "開示名は" (code "<tableidx>")))
+   (tr
+    (th "③")
+    (td (code ".export"))
+    (td (code "<memidx>"))
+    (td "開示名は" (code "<memidx>")))
+   (tr
+    (th "④")
+    (td (code ".export"))
+    (td (code "<globalidx>"))
+    (td "開示名は" (code "<globalidx>")))
+   ) ; table
+  (pre
+   ";# ①関数を開示する場合"
+   "            .export         <funcidx>          ;# 開示名は<funcidx>を使用"
+   "            .export         <funcidx>, 開示名"
+   "            .export.func    <funcidx>          ;# 開示名は<funcidx>を使用"
+   "            .export.func    <funcidx>, 開示名"
+   ""
+   ";# ②テーブルを開示する場合"
+   "            .export         <tableidx>          ;# 開示名は<tableidx>を使用"
+   "            .export         <tableidx>, 開示名"
+   "            .export.table   <tableidx>          ;# 開示名は<tableidx>を使用"
+   "            .export.table   <tableidx>, 開示名"
+   ""
+   ";# ③メモリを開示する場合"
+   "            .export         <memidx>            ;# 開示名は<memidx>を使用"
+   "            .export         <memidx>, 開示名"
+   "            .export.memory  <memidx>            ;# 開示名は<memidx>を使用"
+   "            .export.memory  <memidx>, 開示名"
+   ""
+   ";# ④グローバル変数を開示する場合"
+   "            .export         <globalidx>         ;# 開示名は<globalidx>を使用"
+   "            .export         <globalidx>, 開示名"
+   "            .export.global  <globalidx>         ;# 開示名は<globalidx>を使用"
+   "            .export.global  <globalidx>, 開示名")
+  (p "疑似命令" (code ".export") "は、"
+     (code "globalidx,funcidx,tableidx,memidx") "の順にラベル名を検索します。"
+     "同一名が複数のセクションに存在する場合は疑似命令" (code ".export.*") "で対象を明示してください。")
+  $vpad
+
+  (h4 "例")
+  (pre
+   "            .export         func2"
+   "            .export         func2, \"nfunc2\"    ;# func2 を nfunc2 として開示"
+   "            .export.func    func3"
+   "            .export.func    func3, \"nfunc3\"    ;# func3 を nfunc3 として開示"
+   ""
+   "            .export         tab1"
+   "            .export         tab1, \"ntab1\"      ;# tab1 を ntab1 として開示"
+   "            .export.table   tab2"
+   "            .export.table   tab2, \"ntab2\"      ;# tab2 を ntab2 として開示"
+   ""
+   "            .export         mem1"
+   "            .export         mem1, \"nmem1\"      ;# mem1 を nmem1 として開示"
+   "            .export.memory  mem2"
+   "            .export.memory  mem2, \"nmem2\"      ;# mem2 を nmem2 として開示"
+   ""
+   "            .export         global2"
+   "            .export         global3, \"gconst\"  ;# global3 を gconst として開示"
+   "            .export.global  global5"
+   "            .export.global  global6, \"gvar\"    ;# global6 を gvar として開示")
+  $vpad
+
+  ) ; @def

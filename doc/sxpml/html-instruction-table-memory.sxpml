@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "instruction-table-memory.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-table-memory-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-table-memory-name)
+  $html-index
+  $wasmgen-instruction-table-memory
+  ) ; body
+ ) ; html

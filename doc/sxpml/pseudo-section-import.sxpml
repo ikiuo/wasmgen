@@ -1,0 +1,185 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-import
+  (@h2 "Import Section")
+  (p "1つの外部参照用データは")
+  (ul
+   (li "外部モジュール名")
+   (li "参照名")
+   (li "種類")
+   (ul
+    (li "①関数")
+    (li "②テーブル")
+    (li "③メモリ")
+    (li "④グローバル")
+    (ul
+     (li "固定値")
+     (li "可変値"))))
+  (p "で構成され、Import Section は外部参照リストになります。")
+  $vpad
+
+  (h3 "外部参照の記述形式")
+  (table
+   (tr
+    (th "種類")
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド"))
+   (tr
+    (th "①")
+    (td (code "関数名"))
+    (td (code ".import.func"))
+    (td (code "外部モジュール名, 外部関数名, <typeidx>")))
+   (tr
+    (th "①")
+    (td (code "関数名"))
+    (td (code ".import.func"))
+    (td (code "外部モジュール名, 外部関数名, 関数型")))
+   (tr
+    (th "②")
+    (td (code "テーブル名"))
+    (td (code ".import.table"))
+    (td (code "外部モジュール名, 外部テーブル名, <reftype>, 最小長 [, 最大長]")))
+   (tr
+    (th "③")
+    (td (code "メモリ名"))
+    (td (code ".import.memory"))
+    (td (code "外部モジュール名, 外部メモリ名, 最小長 [, 最大長]")))
+   (tr
+    (th "④")
+    (td (code "グローバル名"))
+    (td (code ".import.const"))
+    (td (code "外部モジュール名, 外部変数名, <valtype>")))
+   (tr
+    (th "④")
+    (td (code "グローバル名"))
+    (td (code ".import.var"))
+    (td (code "外部モジュール名, 外部変数名, <valtype>")))
+   ) ; table
+  (pre
+   "関数名　　　  .import.func    外部モジュール名, 外部関数名, <typeidx>"
+   "関数名　　　  .import.func    外部モジュール名, 外部関数名, 関数型"
+   "テーブル名　  .import.table   外部モジュール名, 外部テーブル名, <reftype>, 最小長"
+   "テーブル名　  .import.table   外部モジュール名, 外部テーブル名, <reftype>, 最小長, 最大長,"
+   "メモリ名　　  .import.memory  外部モジュール名, 外部メモリ名, 最小長"
+   "メモリ名　　  .import.memory  外部モジュール名, 外部メモリ名, 最小長, 最大長"
+   "グローバル名  .import.const   外部モジュール名, 外部変数名, <valtype>"
+   "グローバル名  .import.var     外部モジュール名, 外部変数名, <valtype>")
+
+  (h4 "例")
+  (pre
+   "func0       .import.func    \"xmod\", \"i64add\", ftype1"
+   "func1       .import.func    \"xmod\", \"i32add\", {[i32,i32],[i32]}"
+   "tab0        .import.table   \"xmod\", \"table1\", funcref, 4"
+   "mem0        .import.memory  \"xmod\", \"memory1\", 8"
+   "global0     .import.const   \"xmod\", \"gconst1\", i32"
+   "global1     .import.var     \"xmod\", \"gvar1\", i64")
+  $vpad
+
+  (@h3 "ラベルの登録先")
+  (p "ラベルは種類に応じた名前空間に登録されます。")
+  (table
+   (tr
+    (th "ラベル")
+    (th "登録先" (br) "名前空間"))
+   (tr
+    (td (code "関数名"))
+    (td (code "funcidx")))
+   (tr
+    (td (code "テーブル名"))
+    (td (code "tableidx")))
+   (tr
+    (td (code "メモリ名"))
+    (td (code "memidx")))
+   (tr
+    (td (code "グローバル名"))
+    (td (code "globalidx")))
+   ) ; table
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".import.func"))
+  (p "外部関数の呼び出し情報を生成します。"
+     "２通りの記述形式があります。")
+  (pre
+   "関数名      .import.func    外部モジュール名, 外部関数名, <typeidx>"
+   "関数名      .import.func    外部モジュール名, 外部関数名, 関数型")
+  (p "前者は" (code "<typeidx>") "を指定し、"
+     "後者は" (code "関数型") "を自動的に Type Section に登録します。")
+  (p (code "関数名") "は名前空間" (code "funcidx") "に序数として登録され、"
+     (code "funcidx") "を指定する場面で参照できます。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".import.table"))
+  (p "外部テーブルの参照情報を生成します。")
+  (pre
+   "テーブル名    .import.table   外部モジュール名, 外部テーブル名, <reftype>, 最小長"
+   "テーブル名    .import.table   外部モジュール名, 外部テーブル名, <reftype>, 最小長, 最大長")
+  (p (code "最大長") "は省略可能です。")
+  (p (code "テーブル名") "は名前空間" (code "tableidx") "に序数として登録され、"
+     (code "tableidx") "を指定する場面で参照できます。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".import.memory"))
+  (p "外部バイト列の参照情報を生成します。")
+  (pre
+   "メモリ名      .import.memory  外部モジュール名, 外部メモリ名, 最小長"
+   "メモリ名      .import.memory  外部モジュール名, 外部メモリ名, 最小長, 最大長")
+  (p (code "最小長") "と" (code "最大長") "は単位が 64KiB で、"
+     (code "最大長") "は省略可能です。")
+  (p (code "メモリ名") "は名前空間" (code "memidx") "に序数として登録され、"
+     (code "memidx") "を指定する場面で参照できます。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".import.const") $spc "と" $spc (code ".import.var"))
+  (p "変更不可の外部変数の参照情報を生成します。")
+  (pre
+   "グローバル名  .import.const   外部モジュール名, 外部変数名, <valtype>")
+  (p (code "グローバル名") "は名前空間" (code "globalidx") "に序数として登録され、"
+     (code "globalidx") "を指定する場面で参照できます。")
+  (p "疑似命令" (code ".import.const") "は変更不可で、"
+     "疑似命令" (code ".import.var") "は変更可能を意味します。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".import") )
+  (p "既定のモジュール名を指定します。")
+  (pre
+   "            .import         外部モジュール名")
+  (p "疑似命令" (code ".import.*") "からオペランドの" (code "外部モジュール名") "を省略した"
+     "疑似命令" (code ".imp.*") "では、"
+     "疑似命令" (code ".import") "で指定した"
+     (code "外部モジュール名") "を使用します。")
+  (table
+   (tr
+    (th "モジュール名あり")
+    (th "モジュール名なし"))
+   (tr
+    (td (code ".import.func"))
+    (td (code ".imp.func")))
+   (tr
+    (td (code ".import.table"))
+    (td (code ".imp.table")))
+   (tr
+    (td (code ".import.memory"))
+    (td (code ".imp.memory")))
+   (tr
+    (td (code ".import.const"))
+    (td (code ".imp.cons")))
+   (tr
+    (td (code ".import.var"))
+    (td (code ".imp.var")))
+   ) ; table
+
+  (h4 "例")
+  (pre
+   "            .import     \"xmod\"               ;# 外部モジュール名を設定"
+   "func0       .imp.func   \"i64add\", ftype1"
+   "func1       .imp.func   \"i32add\", {[i32,i32],[i32]}"
+   "tab0        .imp.table  \"table1\", funcref, 4"
+   "mem0        .imp.memory \"memory1\", 8"
+   "global0     .imp.const  \"gconst1\", i32"
+   "global1     .imp.var    \"gvar1\", i64")
+  $vpad
+
+  ) ; @def

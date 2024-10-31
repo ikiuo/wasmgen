@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 数値型変換、ビット幅拡張、ビット幅縮小</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>数値型変換、ビット幅拡張、ビット幅縮小</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">数値型変換</a><br/>
+                <a href="#index-2">i32型とi64型の変換</a><br/>
+            <a href="#index-3">ビット幅拡張</a><br/>
+                <a href="#index-4">符号拡張</a><br/>
+                <a href="#index-5">ゼロ拡張</a><br/>
+            <a href="#index-6">ビット幅縮小</a><br/>
+            <a href="#index-7">整数型と浮動小数点型の変換</a><br/>
+                <a href="#index-8">整数化(飽和処理なし)</a><br/>
+                <a href="#index-9">整数化(飽和処理なし)</a><br/>
+                <a href="#index-10">浮動小数点化</a><br/>
+                <a href="#index-11">ビット複写型変換</a><br/>
+                <a href="#index-12">単精度と倍精度の変換</a><br/>
+            <a href="#index-13">数値型とベクトル型</a><br/>
+                <a href="#index-14">ベクトル要素の取得</a><br/>
+                <a href="#index-15">ベクトル要素の設定</a><br/>
+                <a href="#index-16">ベクトルの全要素に同一値を設定</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">数値型変換</a></h2>
+    <h3><a name="index-2"><code>i32</code>型と<code>i64</code>型の変換</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.extend_i32_s</code><br/><code>i64.extend_s32</code><br/><code>s64.extend_i32</code><br/><code>s64.extend_s32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext64s(<var>p1</var><sub>i32</sub>)</code><br/>符号拡張</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.extend_i32_u</code><br/><code>i64.extend_u32</code><br/><code>u64.extend_i32</code><br/><code>u64.extend_u32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext64u(<var>p1</var><sub>i32</sub>)</code><br/>ゼロ拡張</td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.wrap</code><br/><code>s32.wrap</code><br/><code>u32.wrap</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;<var>p1</var><sub>i64</sub>&nbsp;&amp;&nbsp;(2<sup>32</sup>-1)</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-3">ビット幅拡張</a></h2>
+    <h3><a name="index-4">符号拡張</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.extend8_s</code><br/><code>s32.extend8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext8s(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.extend8_s</code><br/><code>s64.extend8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext8s(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.extend16_s</code><br/><code>s32.extend16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext16s(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.extend16_s</code><br/><code>s64.extend16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext16s(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.extend32_s</code><br/><code>s64.extend32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext32s(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.extend_low_i8x16_s</code><br/><code>i16x8.extend_low_s8x16</code><br/><code>s16x8.extend_low_i8x16</code><br/><code>s16x8.extend_low_s8x16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;ext8s(<var>p1</var><sub>i8x16</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.extend_high_i8x16_s</code><br/><code>i16x8.extend_high_s8x16</code><br/><code>s16x8.extend_high_i8x16</code><br/><code>s16x8.extend_high_s8x16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;ext8s(<var>p1</var><sub>i8x16</sub>[2𝑛+1])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.extend_low_i16x8_s</code><br/><code>i32x4.extend_low_s16x8</code><br/><code>s32x4.extend_low_i16x8</code><br/><code>s32x4.extend_low_s16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;ext16s(<var>p1</var><sub>i16x8</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.extend_high_i16x8_s</code><br/><code>i32x4.extend_high_s16x8</code><br/><code>s32x4.extend_high_i16x8</code><br/><code>s32x4.extend_high_s16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;ext16s(<var>p1</var><sub>i16x8</sub>[2𝑛+1])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.extend_low_i32x4_s</code><br/><code>i64x2.extend_low_s32x4</code><br/><code>s64x2.extend_low_i32x4</code><br/><code>s64x2.extend_low_s32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;ext32s(<var>p1</var><sub>i32x4</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.extend_high_i32x4_s</code><br/><code>i64x2.extend_high_s32x4</code><br/><code>s64x2.extend_high_i32x4</code><br/><code>s64x2.extend_high_s32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;ext32s(<var>p1</var><sub>i32x4</sub>[2𝑛+1])</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-5">ゼロ拡張</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.extend_low_i8x16_u</code><br/><code>i16x8.extend_low_u8x16</code><br/><code>u16x8.extend_low_i8x16</code><br/><code>u16x8.extend_low_u8x16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;ext8u(<var>p1</var><sub>i8x16</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.extend_high_i8x16_u</code><br/><code>i16x8.extend_high_u8x16</code><br/><code>u16x8.extend_high_i8x16</code><br/><code>u16x8.extend_high_u8x16</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;ext8u(<var>p1</var><sub>i8x16</sub>[2𝑛+1])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.extend_low_i16x8_u</code><br/><code>i32x4.extend_low_u16x8</code><br/><code>u32x4.extend_low_i16x8</code><br/><code>u32x4.extend_low_u16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;ext16u(<var>p1</var><sub>i16x8</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.extend_high_i16x8_u</code><br/><code>i32x4.extend_high_u16x8</code><br/><code>u32x4.extend_high_i16x8</code><br/><code>u32x4.extend_high_u16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;ext16u(<var>p1</var><sub>i16x8</sub>[2𝑛+1])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.extend_low_i32x4_u</code><br/><code>i64x2.extend_low_u32x4</code><br/><code>u64x2.extend_low_i32x4</code><br/><code>u64x2.extend_low_u32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;ext32u(<var>p1</var><sub>i32x4</sub>[2𝑛+0])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.extend_high_i32x4_u</code><br/><code>i64x2.extend_high_u32x4</code><br/><code>u64x2.extend_high_i32x4</code><br/><code>u64x2.extend_high_u32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;ext32u(<var>p1</var><sub>i32x4</sub>[2𝑛+1])</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-6">ビット幅縮小</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.narrow_i16x8_s</code><br/><code>i8x16.narrow_s16x8</code><br/><code>s8x16.narrow_i16x8</code><br/><code>s8x16.narrow_s16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>[𝑛:0..15]&nbsp;←&nbsp;sat8s(<var>t</var><sub>s16x8</sub>[𝑛&nbsp;&gt;&gt;&nbsp;1])</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>s16x8</sub>&nbsp;=&nbsp;(𝑛&nbsp;&amp;&nbsp;1)&nbsp;?&nbsp;<var>p2</var><sub>s16x8</sub>&nbsp;:&nbsp;<var>p1</var><sub>s16x8</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.narrow_i16x8_u</code><br/><code>i8x16.narrow_u16x8</code><br/><code>u8x16.narrow_i16x8</code><br/><code>u8x16.narrow_u16x8</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>[𝑛:0..15]&nbsp;←&nbsp;sat8u(<var>t</var><sub>u16x8</sub>[𝑛&nbsp;&gt;&gt;&nbsp;1])</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>u16x8</sub>&nbsp;=&nbsp;(𝑛&nbsp;&amp;&nbsp;1)&nbsp;?&nbsp;<var>p2</var><sub>u16x8</sub>&nbsp;:&nbsp;<var>p1</var><sub>u16x8</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.narrow_i32x4_s</code><br/><code>i16x8.narrow_s32x4</code><br/><code>s16x8.narrow_i32x4</code><br/><code>s16x8.narrow_s32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;sat16s(<var>t</var><sub>s32x4</sub>[𝑛&nbsp;&gt;&gt;&nbsp;1])</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>s32x4</sub>&nbsp;=&nbsp;(𝑛&nbsp;&amp;&nbsp;1)&nbsp;?&nbsp;<var>p2</var><sub>s32x4</sub>&nbsp;:&nbsp;<var>p1</var><sub>s32x4</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.narrow_i32x4_u</code><br/><code>i16x8.narrow_u32x4</code><br/><code>u16x8.narrow_i32x4</code><br/><code>u16x8.narrow_u32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[𝑛:0..7]&nbsp;←&nbsp;sat16u(<var>t</var><sub>u32x4</sub>[𝑛&nbsp;&gt;&gt;&nbsp;1])</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>u32x4</sub>&nbsp;=&nbsp;(𝑛&nbsp;&amp;&nbsp;1)&nbsp;?&nbsp;<var>p2</var><sub>u32x4</sub>&nbsp;:&nbsp;<var>p1</var><sub>u32x4</sub></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-7">整数型と浮動小数点型の変換</a></h2>
+    <h3><a name="index-8">整数化(飽和処理なし)</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_f32_s</code><br/><code>s32.trunc_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>s32</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_f32_u</code><br/><code>u32.trunc_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>u32</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_f64_s</code><br/><code>s32.trunc_f64</code></td>
+        <td></td>
+        <td class="vtop center"><code><var>r</var><sub>s32</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_f64_u</code><br/><code>u32.trunc_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>u32</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_f32_s</code><br/><code>s64.trunc_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>s64</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_f32_u</code><br/><code>u64.trunc_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>u64</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_f64_s</code><br/><code>s64.trunc_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>s64</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_f64_u</code><br/><code>u64.trunc_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>u64</sub>&nbsp;←&nbsp;trunc(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-9">整数化(飽和処理なし)</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_sat_f32_s</code><br/><code>s32.trunc_sat_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;trunc(sat32s(<var>p1</var><sub>f32</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_sat_f32_u</code><br/><code>u32.trunc_sat_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;trunc(sat32u(<var>p1</var><sub>f32</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_sat_f64_s</code><br/><code>s32.trunc_sat_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;trunc(sat32s(<var>p1</var><sub>f64</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.trunc_sat_f64_u</code><br/><code>u32.trunc_sat_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;trunc(sat32u(<var>p1</var><sub>f64</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_sat_f32_s</code><br/><code>s64.trunc_sat_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;trunc(sat64s(<var>p1</var><sub>f32</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_sat_f32_u</code><br/><code>u64.trunc_sat_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;trunc(sat64u(<var>p1</var><sub>f32</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_sat_f64_s</code><br/><code>s64.trunc_sat_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;trunc(sat64s(<var>p1</var><sub>f64</sub>))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.trunc_sat_f64_u</code><br/><code>u64.trunc_sat_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;trunc(sat64u(<var>p1</var><sub>f64</sub>))</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.trunc_sat_f32x4_s</code><br/><code>s32x4.trunc_sat_f32x4</code></td>
+        <td></td>
+        <td><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;trunc(sat32s(<var>p1</var><sub>f32x4</sub>[𝑛]))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.trunc_sat_f32x4_u</code><br/><code>u32x4.trunc_sat_f32x4</code></td>
+        <td></td>
+        <td><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;trunc(sat32u(<var>p1</var><sub>f32x4</sub>[𝑛]))</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.trunc_sat_f64x2_s_zero</code><br/><code>s32x4.trunc_sat_f64x2_zero</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;trunc(sat64s(<var>t</var><sub>f64</sub>))</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>f64</sub>&nbsp;=&nbsp;𝑛&nbsp;&lt;&nbsp;2&nbsp;?&nbsp;<var>p1</var><sub>f64x2</sub>[𝑛]&nbsp;:&nbsp;0</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.trunc_sat_f64x2_u_zero</code><br/><code>u32x4.trunc_sat_f64x2_zero</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;trunc(sat64u(<var>t</var><sub>f64</sub>))</code><br/><code>&nbsp;&nbsp;&nbsp;&nbsp;<var>t</var><sub>f64</sub>&nbsp;=&nbsp;𝑛&nbsp;&lt;&nbsp;2&nbsp;?&nbsp;<var>p1</var><sub>f64x2</sub>[𝑛]&nbsp;:&nbsp;0</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-10">浮動小数点化</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.convert_i32_s</code><br/><code>f32.convert_s32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;f32(<var>p1</var><sub>s32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.convert_i32_u</code><br/><code>f32.convert_u32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;f32(<var>p1</var><sub>u32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.convert_i64_s</code><br/><code>f32.convert_s64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;f32(<var>p1</var><sub>s64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.convert_i64_u</code><br/><code>f32.convert_u64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;f32(<var>p1</var><sub>u64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.convert_i32_s</code><br/><code>f64.convert_s32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;f64(<var>p1</var><sub>s32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.convert_i32_u</code><br/><code>f64.convert_u32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;f64(<var>p1</var><sub>u32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.convert_i64_s</code><br/><code>f64.convert_s64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;f64(<var>p1</var><sub>s64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.convert_i64_u</code><br/><code>f64.convert_u64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;f64(<var>p1</var><sub>u64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.convert_i32x4_s</code><br/><code>f32x4.convert_s32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;f32(<var>p1</var><sub>s32x4</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.convert_i32x4_u</code><br/><code>f32x4.convert_u32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;f32(<var>p1</var><sub>u32x4</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.convert_low_i32x4_s</code><br/><code>f64x2.convert_low_s32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;f64(<var>p1</var><sub>s32x4</sub>[2𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.convert_low_i32x4_u</code><br/><code>f64x2.convert_low_u32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;f64(<var>p1</var><sub>u32x4</sub>[2𝑛])</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-11">ビット複写型変換</a></h3>
+    <p>バイナリ レベルでは同一。</p>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.reinterpret_f32</code><br/><code>s32.reinterpret_f32</code><br/><code>u32.reinterpret_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;bit_cast(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.reinterpret_f64</code><br/><code>s64.reinterpret_f64</code><br/><code>u64.reinterpret_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;bit_cast(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.reinterpret_i32</code><br/><code>f32.reinterpret_s32</code><br/><code>f32.reinterpret_u32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;bit_cast(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.reinterpret_i64</code><br/><code>f64.reinterpret_s64</code><br/><code>f64.reinterpret_u64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;bit_cast(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-12">単精度と倍精度の変換</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.demote_f64</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;f32(<var>p1</var><sub>f64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.promote_f32</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;f64(<var>p1</var><sub>f32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.demote_f64x2_zero</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32x4</sub>[𝑛:0..3]&nbsp;←&nbsp;f32(<var>p1</var><sub>f64x2</sub>[𝑛]&nbsp;??&nbsp;0)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.promote_low_f32x4</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64x2</sub>[𝑛:0..1]&nbsp;←&nbsp;f64(<var>p1</var><sub>f32x4</sub>[2𝑛])</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h2><a name="index-13">数値型とベクトル型</a></h2>
+    <h3><a name="index-14">ベクトル要素の取得</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考 (<code>𝑛&nbsp;=&nbsp;lane</code>)</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i8x16.extract_lane_s</code><br/><code>s8x16.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i32</sub></var>&nbsp;←&nbsp;ext8s(<var>p1</var><sub>i8x16</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i8x16.extract_lane_u</code><br/><code>u8x16.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i32</sub></var>&nbsp;←&nbsp;ext8u(<var>p1</var><sub>i8x16</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i16x8.extract_lane_s</code><br/><code>s16x8.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i32</sub></var>&nbsp;←&nbsp;ext16s(<var>p1</var><sub>i16x8</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i16x8.extract_lane_u</code><br/><code>u16x8.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i32</sub></var>&nbsp;←&nbsp;ext16u(<var>p1</var><sub>i16x8</sub>[𝑛])</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32x4.extract_lane</code><br/><code>s32x4.extract_lane</code><br/><code>u32x4.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i32</sub></var>&nbsp;←&nbsp;<var>p1</var><sub>i32x4</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64x2.extract_lane</code><br/><code>s64x2.extract_lane</code><br/><code>u64x2.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>i64</sub></var>&nbsp;←&nbsp;<var>p1</var><sub>i64x2</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32x4.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>f32</sub></var>&nbsp;←&nbsp;<var>p1</var><sub>f32x4</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64x2.extract_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r<sub>f64</sub></var>&nbsp;←&nbsp;<var>p1</var><sub>f64x2</sub>[𝑛]</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-15">ベクトル要素の設定</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考 (<code>𝑛&nbsp;=&nbsp;lane</code>)</th>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.replace_lane</code><br/><code>s8x16.replace_lane</code><br/><code>u8x16.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>i8x16</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.replace_lane</code><br/><code>s16x8.replace_lane</code><br/><code>u16x8.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>i16x8</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.replace_lane</code><br/><code>s32x4.replace_lane</code><br/><code>u32x4.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>i32x4</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.replace_lane</code><br/><code>s64x2.replace_lane</code><br/><code>u64x2.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>i64x2</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>f32x4</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>f32x4</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>f32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.replace_lane</code></td>
+        <td class="vtop"><code>lane</code></td>
+        <td class="vtop"><code><var>r</var><sub>f64x2</sub>&nbsp;←&nbsp;<var>p1</var><sub>v128</sub></code><br/><code><var>r</var><sub>f64x2</sub>[lane]&nbsp;←&nbsp;<var>p2</var><sub>f64</sub></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-16">ベクトルの全要素に同一値を設定</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.splat</code><br/><code>s8x16.splat</code><br/><code>u8x16.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>[0..15]&nbsp;←&nbsp;(<var>p1</var><sub>i32</sub>&nbsp;&amp;&nbsp;0xff)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i16x8.splat</code><br/><code>s16x8.splat</code><br/><code>u16x8.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[0..7]&nbsp;←&nbsp;(<var>p1</var><sub>i32</sub>&nbsp;&amp;&nbsp;0xffff)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i32x4.splat</code><br/><code>s32x4.splat</code><br/><code>u32x4.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[0..3]&nbsp;←&nbsp;<var>p1</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i64x2.splat</code><br/><code>s64x2.splat</code><br/><code>u64x2.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[0..1]&nbsp;←&nbsp;<var>p1</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f32x4.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f32x4</sub>[0..3]&nbsp;←&nbsp;<var>p1</var><sub>f32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>f64x2.splat</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>f64x2</sub>[0..1]&nbsp;←&nbsp;<var>p1</var><sub>f64</sub></code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+;; -*- Lisp -*-
+
+(@include "instruction-logical-shift.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-logical-shift-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-logical-shift-name)
+  $html-index
+  $wasmgen-instruction-logical
+  $wasmgen-instruction-shift
+  ) ; body
+ ) ; html

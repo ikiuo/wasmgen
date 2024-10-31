@@ -1,0 +1,324 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-arithmetic-unary-int
+  (@h3 "整数値化")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.ceil"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "ceil(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.ceil"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "ceil(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.floor"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "floor(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.floor"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "floor(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.trunc"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "trunc(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.trunc"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "trunc(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.nearest"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "nearest(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.nearest"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "nearest(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.ceil"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "ceil(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.ceil"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "ceil(" (var "p1") (sub "f64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.floor"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "floor(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.floor"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "floor(" (var "p1") (sub "f64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.trunc"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "trunc(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.trunc"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "trunc(" (var "p1") (sub "f64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.nearest"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "nearest(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.nearest"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "nearest(" (var "p1") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-arithmetic-unary-abs
+  (@h3 "絶対値")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "abs(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "abs(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.abs") (br)
+	(code "s8x16.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "abs(" (var "p1") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.abs") (br)
+	(code "s16x8.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "abs(" (var "p1") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.abs") (br)
+	(code "s32x4.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "abs(" (var "p1") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.abs") (br)
+	(code "s64x2.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "abs(" (var "p1") (sub "s64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "abs(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.abs"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "abs(" (var "p1") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-arithmetic-unary-neg
+  (@h3 "符号反転")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "-" (var "p1") (sub "f32"))))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "-" (var "p1") (sub "f64"))))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.neg") (br)
+	(code "s8x16.neg") (br)
+	(code "u8x16.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "-" (var "p1") (sub "i8x16") "[𝑛]")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.neg") (br)
+	(code "s16x8.neg") (br)
+	(code "u16x8.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "-" (var "p1") (sub "i16x8") "[𝑛]")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.neg") (br)
+	(code "s32x4.neg") (br)
+	(code "u32x4.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "-" (var "p1") (sub "i32x4") "[𝑛]")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.neg") (br)
+	(code "s64x2.neg") (br)
+	(code "u64x2.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "-" (var "p1") (sub "i64x2") "[𝑛]")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "-" (var "p1") (sub "f32x4") "[𝑛]")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.neg"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "-" (var "p1") (sub "f64x2") "[𝑛]")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-arithmetic-unary-copysign
+  (@h3 "符号複写")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.copysign"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "copysign(" (var "p1") (sub "f32") ", " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.copysign"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "copysign(" (var "p1") (sub "f64") ", " (var "p2") (sub "f64") ")")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-arithmetic-unary-sqrt
+  (@h3 "平方根")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.sqrt"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "sqrt(" (var "p1") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.sqrt"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "sqrt(" (var "p1") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.sqrt"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "sqrt(" (var "p1") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.sqrt"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "sqrt(" (var "p1") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-arithmetic-unary
+    $wasmgen-instruction-arithmetic-unary-int
+    $wasmgen-instruction-arithmetic-unary-abs
+    $wasmgen-instruction-arithmetic-unary-neg
+    $wasmgen-instruction-arithmetic-unary-copysign
+    $wasmgen-instruction-arithmetic-unary-sqrt
+    ) ; @def

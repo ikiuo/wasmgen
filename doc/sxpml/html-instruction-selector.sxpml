@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "instruction-selector.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-selector-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-selector-name)
+  $html-index
+  $wasmgen-instruction-selector
+  ) ; body
+ ) ; html

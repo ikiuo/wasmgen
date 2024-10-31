@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "instruction-arithmetic.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-arithmetic-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-arithmetic-name)
+  $html-index
+  $wasmgen-instruction-arithmetic
+  ) ; body
+ ) ; html

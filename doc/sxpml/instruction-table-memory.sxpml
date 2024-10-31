@@ -1,0 +1,11 @@
+;; -*- Lisp -*-
+
+(@include "instruction-table.sxpml")
+(@include "instruction-memory.sxpml")
+
+(@def $wasmgen-instruction-table-memory-name "テーブル・メモリ領域操作")
+
+(@def $wasmgen-instruction-table-memory
+  $wasmgen-instruction-table
+  $wasmgen-instruction-memory
+  ) ; @def

@@ -1,0 +1,16 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-start
+  (@h2 "Start Section")
+  (p "疑似命令" (code ".start") "でモジュールの初期化処理関数を指定します。")
+  (pre
+   "            .start      <funcidx>")
+
+  (h4 "例")
+  (pre
+   "            .start      func3")
+  $vpad
+
+  ) ; @def

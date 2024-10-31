@@ -1,0 +1,31 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-assembler-name "アセンブラ用疑似命令")
+
+(@def $wasmgen-pseudo-assembler-intro
+  (@h1 $wasmgen-pseudo-assembler-name)
+  (p "アセンブラ用疑似命令は" (code "@") "で始まる識別子を使用します。"
+     "ラベルは無視されます。")
+  $vpad
+
+  (@h2 "アセンブラ制御用真偽値")
+  (p "アセンブラ制御用疑似命令向けに真偽(" (code "bool") ")値が定義されています。")
+  (table
+   (tr
+    (th (code "0"))
+    (th (code "1")))
+   (tr
+    (th (code "false"))
+    (th (code "true")))
+   (tr
+    (th (code "no"))
+    (th (code "yes")))
+   (tr
+    (th (code "off"))
+    (th (code "on"))))
+  (p "注意：アセンブラ用疑似命令以外では未定義扱いです。")
+  $vpad
+
+  ) ; @def

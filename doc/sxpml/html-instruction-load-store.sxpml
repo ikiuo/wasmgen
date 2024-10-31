@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "instruction-load-store.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-load-store-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-load-store-name)
+  $html-index
+  $wasmgen-instruction-load-store
+  ) ; body
+ ) ; html

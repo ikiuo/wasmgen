@@ -1,0 +1,89 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-code
+  (@h2 "Code Section")
+  (p "1つの関数は")
+  (ul
+   (li "ローカル変数リスト")
+   (li "実行コード"))
+  (p "で構成され、Code Section は関数のリストになります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".code"))
+  (p "疑似命令" (code ".code") "で関数(コード)を開始します。")
+  (table
+   (tr
+    (th "形式")
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (th "関数型を指定")
+    (td (code "関数名"))
+    (td (code ".code"))
+    (td (code "<typeidx>"))
+    (td "疑似命令" (code ".param") "は使用不可"))
+   (tr
+    (th "返値型を指定")
+    (td (code "関数名"))
+    (td (code ".code"))
+    (td (code "<valtype>..."))
+    (td "疑似命令" (code ".param") "を使用して引数を指定"))
+   ) ; table
+  (pre
+   "関数名      .code       <typeidx>"
+   "関数名      .code       <valtype>...")
+  (p (code "関数名") "は名前空間" (code "funcidx") "に序数として登録され、"
+     (code "funcidx") "を指定する場面で参照できます。")
+
+  (h4 "関数型を指定する形式")
+  (pre
+   "関数名      .code       <typeidx>")
+  (p "オペランドに" (code "typeidx") "を指定すると関数型の引数と返値を使用するため、"
+     "疑似命令" (code ".param") "で引数を追加することができません。")
+
+  (h4 "返値型を指定する形式")
+  (pre
+   "関数名      .code       <valtype>...")
+  (p "この形式では、疑似命令" (code ".type") "と同じ構造で関数型を定義します。"
+     "ここで定義された関数型は関数名で関数型名として名前空間" (code "typeidx") "にも序数として登録されます。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".param"))
+  (pre
+   "引数名      .param      <引数の型:valtype>")
+  (p "Type Section の" (code ".param") "疑似命令と同じです。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".local"))
+  (pre
+   "ローカル名1   .local      <変数型:valtype>"
+   "ローカル名2   .local      <ローカル名?>    ;# ローカルの別名を定義")
+  (p (code "ローカル名1") "は名前空間" (code "関数名") "の"
+     (code "localidx") "に序数として登録され、"
+     (code "localidx") "を指定する場面で参照できます。"
+     (code "ローカル名2") "は別の" (code "ローカル名") "と同じ"
+     (code "lcoalidx") "になります。"
+     (code "lcoalidx") "の序数は型(" (code "valtype") ")の種類で纏められるので"
+     "記述順になるとは限りません。")
+  $vpad
+
+  (h4 "例")
+  (pre
+   ";# 関数型を指定"
+   "func3       .code       ftype0"
+   "            local.get   x"
+   "            drop"
+   "            ;# 不足分の end 命令は自動追加"
+   ""
+   ";# 関数型も記述"
+   "func4       .code       i32"
+   "x           .param      i32"
+   "            local.get   x"
+   "            end")
+  $vpad
+
+  ) ; @def

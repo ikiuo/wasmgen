@@ -1,0 +1,246 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-block-block
+  (h4 "ブロック" (code "block") "〜" (code "end"))
+  (table
+   (tr
+    (th (code "br") "分岐先")
+    (th "命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td)
+    (td (code "block"))
+    (td (code "<blocktype>"))
+    (td "ブロックの開始"))
+   (tr
+    (td $center "↓")
+    (td (code "𝑖𝑛𝑠𝑡𝑟..."))
+    (td)
+    (td "ブロック内のコード"))
+   (tr
+    (td $center "✓")
+    (td (code "end"))
+    (td)
+    (td "ブロックの終了"))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-loop
+  (h4 "ブロック" (code "loop") "〜" (code "end"))
+  (table
+   (tr
+    (th (code "br") "分岐先")
+    (th "命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td $center "✓")
+    (td (code "loop"))
+    (td (code "<blocktype>"))
+    (td "ブロックの開始"))
+   (tr
+    (td $center "↑")
+    (td (code "𝑖𝑛𝑠𝑡𝑟..."))
+    (td)
+    (td "ブロック内のコード"))
+   (tr
+    (td)
+    (td (code "end"))
+    (td)
+    (td "ブロックの終了"))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-if
+  (h4 "ブロック" (code "if") "〜" (code "else") "〜" (code "end"))
+  (table
+   (tr
+    (th [colspan "2"] (code "br") "分岐先")
+    (th [rowspan "2"] "命令")
+    (th [rowspan "2"] "オペランド")
+    (th [rowspan "2"] "備考"))
+   (tr
+    (th (code "if"))
+    (th (code "else")))
+   (tr
+    (td)
+    (td)
+    (td (code "if"))
+    (td (code "<blocktype>"))
+    (td (code "if") "ブロックの開始"))
+   (tr
+    (td $center "↓")
+    (td)
+    (td (code "𝑖𝑛𝑠𝑡𝑟..."))
+    (td)
+    (td "ブロック内のコード"))
+   (tr
+    (td $center "↓")
+    (td)
+    (td (code "else"))
+    (td)
+    (td (code "if") "ブロックの終了" (br)
+	(code "else") "ブロックの開始"))
+   (tr
+    (td $center "↓")
+    (td $center "↓")
+    (td (code "𝑖𝑛𝑠𝑡𝑟..."))
+    (td)
+    (td "ブロック内のコード"))
+   (tr
+    (td $center "✓")
+    (td $center "✓")
+    (td (code "end"))
+    (td)
+    (td "ブロックの終了"))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-description
+  (@h3 "ブロックの記述形式")
+  (table
+   (tr
+    (th "ラベル")
+    (th "命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "block"))
+    (td (code "<blocktype>"))
+    (td "ブロックの開始"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "loop"))
+    (td (code "<blocktype>"))
+    (td "ループ・ブロックの開始"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "if"))
+    (td (code "<blocktype>"))
+    (td (code "if") "ブロックの開始" (br)
+	"スタック上の" (code "i32") "が" (br)
+	"偽(" (code "0") ")ならば" (code "else") "へ分岐"))
+   (tr
+    (td)
+    (td (code "else"))
+    (td)
+    (td (code "else") "ブロックの開始"))
+   (tr
+    (td $vtop
+	(code "ラベル名"))
+    (td (code "end") (br)
+	(code "end.block") (br)
+	(code "end.loop") (br)
+	(code "end.if"))
+    (td)
+    (td $vtop
+	"ブロックまたはコードの終端" (br)
+	"別名 end.* はブロック記述用で" (br)
+	"対でない場合に警告が出ます"))
+   ) ; table
+  (pre
+   "ラベル名    block   <blocktype>"
+   "ラベル名    loop    <blocktype>"
+   "ラベル名    if      <blocktype>"
+   "　　　　    else"
+   "ラベル名    end")
+  (p (code "ラベル名") "は制御ブロックの" (code "labelidx") "になります。")
+  (p (code "block,loop,if") "に" (code "ラベル名") "がある場合は、"
+     (code "end") "の" (code "ラベル名") "は無視されます。"
+     (code "block,loop,if") "に" (code "ラベル名") "がない場合は、"
+     (code "end") "の" (code "ラベル名") "が有効になります。"
+     (code "ラベル名") "は" (code "block,loop,if") "から" (code "end") "の期間が検索対象になるため、"
+     (code "end") "より後で同じ識別子の" (code "ラベル名") "を使用することができます。")
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-start
+  (@h3 "ブロック開始の記述形式")
+  (p (code "block,loop,if") "を" (code "<instr>") "とすると、記述形式は次の通りになります。")
+  (table
+   (tr
+    (th "ラベル")
+    (th "命令")
+    (th "オペランド" (code "<blocktype>"))
+    (th "備考"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "<instr>"))
+    (td)
+    (td "返値なしの関数相当"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "<instr>"))
+    (td (code "<typeidx>"))
+    (td (code "<typeidx>") "の関数型"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "<instr>"))
+    (td (code "<valtype>"))
+    (td (code "<valtype>") "が返値の関数相当"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "<instr>"))
+    (td (code "<valtype>, <valtype>..."))
+    (td (code "<valtype>") "リストが返値の関数相当"))
+   (tr
+    (td (code "ラベル名"))
+    (td (code "<instr>"))
+    (td (code "関数型"))
+    (td "記述された" (code "関数型")))
+   ) ; table
+  (pre
+   "ラベル名    <instr>"
+   "ラベル名    <instr>     <typeidx>"
+   "ラベル名    <instr>     <valtype>"
+   "ラベル名    <instr>     <valtype>, <valtype>, ..."
+   "ラベル名    <instr>     関数型")
+  (p (code "<blocktype>") "は開始時の引数リストと終了時の返値リストの情報だから関数型相当になります。"
+     "下２つの形式はアセンブラが関数型を自動生成・登録して" (code "typeidx") "を割り当てます。")
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-sample
+  (h4 "ブロックの例")
+  (pre
+   "n           .param      i32"
+   "p           .local      i32"
+   "            block"
+   "            local.get   n"
+   "            local.tee   p"
+   "            i32.eqz"
+   "            br_if       $exit"
+   "$cont:      loop"
+   ";#          𝑖𝑛𝑠𝑡𝑟..."
+   "            local.get   p"
+   "            i32.const   1"
+   "            i32.sub"
+   "            local.tee   p"
+   "            br_if       $cont"
+   "            end.loop"
+   "$exit:      end.block")
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-block-name "ブロックと分岐命令")
+
+(@def $wasmgen-instruction-block
+  (@h2 $wasmgen-instruction-block-name)
+  (p "分岐命令はブロックからの脱出のみで、分岐するにはブロックの記述が必要です。")
+  $vpad
+
+  $wasmgen-instruction-block-block
+  $wasmgen-instruction-block-loop
+  $wasmgen-instruction-block-if
+
+  $wasmgen-instruction-block-description
+  $wasmgen-instruction-block-start
+  $wasmgen-instruction-block-sample
+  ) ; @def

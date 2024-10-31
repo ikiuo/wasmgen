@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-section.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-pseudo-section-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-pseudo-section-name)
+  $html-index
+  $wasmgen-pseudo-section
+  ) ; body
+ ) ; html

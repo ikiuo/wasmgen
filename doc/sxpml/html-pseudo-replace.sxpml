@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-replace.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-pseudo-replace-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-pseudo-replace-name)
+  $html-index
+  $wasmgen-pseudo-replace
+  ) ; body
+ ) ; html

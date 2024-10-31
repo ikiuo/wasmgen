@@ -1,0 +1,18 @@
+;; -*- Lisp -*-
+
+(@include "instruction-const-getset.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-instruction-const-getset-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-instruction-const-getset-name)
+  $html-index
+  $wasmgen-instruction-const
+  $wasmgen-instruction-getset
+  ) ; body
+ ) ; html

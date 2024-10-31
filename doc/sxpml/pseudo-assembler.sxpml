@@ -1,0 +1,11 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-assembler-intro.sxpml")
+(@include "pseudo-assembler-option.sxpml")
+(@include "pseudo-assembler-switch.sxpml")
+
+(@def $wasmgen-pseudo-assembler
+    $wasmgen-pseudo-assembler-intro
+    $wasmgen-pseudo-assembler-option
+    $wasmgen-pseudo-assembler-switch
+  ) ; @def

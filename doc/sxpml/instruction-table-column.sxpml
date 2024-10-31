@@ -1,0 +1,32 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-table-column-name "命令表の各列")
+
+(@def $wasmgen-instruction-table-column
+  (@h2 $wasmgen-instruction-table-column-name)
+  (table
+   (tr
+    (th "列")
+    (th "内容"))
+   (tr
+    (td "引数")
+    (td "実行に必要な引数の数で、最初の引数の記号は"
+	(code (var "p1")) "で" (code (var "p2") "," (var "p3") "...") "と続く"))
+   (tr
+    (td "返値")
+    (td "実行結果で、記号" (code (var "r")) "とし、添字" (code (sub "type")) "は型を意味します"))
+   (tr
+    (td "命令")
+    (td "コード(同一セル内に別名も列挙)"))
+   (tr
+    (td "OP")
+    (td "命令のオペランド"))
+   (tr
+    (td "備考")
+    (td "主に動作内容"))
+   ) ; table
+  $vpad
+
+  ) ; @def

@@ -1,0 +1,41 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-assembler-option
+  (@h2 "疑似命令" $spc (code "@option"))
+  (p (code "@option") "疑似命令ではアセンブラの動作を指定します。")
+  $vpad
+
+  (@h3 "オプション" $spc (code "include.depth"))
+  (p "疑似命令" (code "@include") "での入れ子の深さを設定します。"
+     "値は" (code "0〜100") "の範囲に制限されます。")
+  (pre
+   "@option include.depth = <int>   ;# 既定=10")
+  $vpad
+
+  (@h3 "オプション" $spc (code "comment.nest"))
+  (p (code "/\* ... \*/") "の入れ子対応を指定します。")
+  (pre
+   "@option comment.nest = <bool>   ;# 既定=false")
+  $vpad
+
+  (@h3 "オプション" $spc (code "paren.multiline"))
+  (p "括弧" (code "(),[],{}") "の間の改行許可を指定します。")
+  (pre
+   "@option paren.multiline = <bool>   ;# 既定=false")
+  $vpad
+
+  (@h3 "オプション" $spc (code "section.datacount"))
+  (p3 ".wasm ファイルへの Data Count Section 出力を制御します。")
+  (pre
+   "@option section.datacount = <bool>   ;# 既定=false")
+  $vpad
+
+  (@h3 "オプション" $spc (code "type.unique"))
+  (p ".wasm のファイル サイズ縮小を目的としたオプションです。Type Section にある関数型の「引数型リストと返値型リスト」が一致するものを同一の" (code "typeidx") "とする場合は" (code "true") "を指定します。")
+  (pre
+   "@option type.unique = <bool>   ;# 既定=false")
+  $vpad
+
+  ) ; @def

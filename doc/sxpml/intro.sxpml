@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-intro
+  (@h1 $title)
+  (p (a [href $url-wasm-spec] "WebAssembly")
+     " の"
+     (a [href $url-wasm-binary] "バイナリ形式(.wasm)")
+     "を生成するための1行1命令形式アセンブラです。"
+     "対応しているファイルの文字コードは UTF-8/16/32(+BOM) です。"
+     "他のアセンブラとの互換性はなく、" (a [href $url-wasm-text] "テキスト形式(.wat)") "よりも冗長になります。"
+     "数値のオーバーフローや .wasm 適合などのチェック処理は行っていませんので、記述には十分注意してください。"
+     "生成された .wasm 内容の詳細を確認するために " (a [href $url-wasmdump] "wasmdump") " を用意しています。")
+  $vpad
+
+  ) ; @def

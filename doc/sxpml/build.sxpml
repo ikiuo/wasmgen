@@ -1,0 +1,28 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-build
+  (@h1 "wasmgen のビルド")
+  (p "ソースコードは C++14 を前提として記述しています。")
+
+  (@h3 "Unix 系")
+  (p (a [href $url-gnu-make] "GNU make")
+     " を使ってビルドします。"
+     "コンパイラは "
+     (a [href $url-clang] "clang++")
+     " を使用しています。")
+  (p "GNUmakefile.config で "
+     (a [href $url-zlib] "zlib")
+     " ライブラリの使用を指定すると、.wasm を gzip/defalte 圧縮形式にして出力できます。")
+  (pre
+   "# GNUmakefile.config"
+   "CXXDEFS = -DUSE_ZLIB"
+   "LIBS    = -lz")
+  $vpad
+
+  (@h3 "Windows")
+  (p "VisualStudio (2022) では wasmgen.vcxproj を使用してください。zlib 対応の設定はしていません。")
+  $vpad
+
+  ) ; @def

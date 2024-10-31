@@ -1,0 +1,47 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-table
+  (@h2 "Table Section")
+  (p "1つのテーブル領域は")
+  (ul
+   (li "参照型(" (code "reftype") ")")
+   (li "テーブル長 : 最小")
+   (li "テーブル長 : 最大 (省略可)"))
+  (p "で構成され、Table Section はテーブルのリストになります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".table"))
+  (p "WebAssembly モジュールのテーブル領域を定義します。")
+  (h4 "テーブル領域の記述形式")
+  (table
+   (tr
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td (code "テーブル名"))
+    (td (code ".table"))
+    (td (code "<reftype>, 最小長"))
+    (td (code "最大長") "を省略"))
+   (tr
+    (td (code "テーブル名"))
+    (td (code ".table"))
+    (td (code "<reftype>, 最小長, 最大長"))
+    (td))
+   ) ; table
+  (pre
+   "テーブル名   .table      <reftype>, 最小長"
+   "テーブル名   .table      <reftype>, 最小長, 最大長")
+  (p (code "テーブル名") "は名前空間" (code "tableidx") "に序数として登録され、"
+     (code "tableidx") "を指定する場面で参照できます。")
+
+  (h4 "例")
+  (pre
+   "tab1        .table      funcref, 4"
+   "tab2        .table      funcref, 8, 16")
+  $vpad
+
+  ) ; @def

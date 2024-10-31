@@ -1,0 +1,36 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-ref-name "関数ポインタ")
+
+(@def $wasmgen-instruction-ref
+  (@h2 $wasmgen-instruction-ref-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考 (" (code "𝑥 = funcidx") ")"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "ref.is_null"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "func") " == null)")))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "func"))
+    (td $vtop (code "ref.null"))
+    (td $vtop (code "reftype"))
+    (td $vtop (code (var "r") (sub (var "func")) " ← " "null")))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "func"))
+    (td $vtop (code "ref.func"))
+    (td $vtop (code "funcidx"))
+    (td $vtop (code (var "r") (sub "func") " ← " "FUNC[𝑥]")))
+   ) ; table
+  $vpad
+  ) ; @def

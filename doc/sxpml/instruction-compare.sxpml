@@ -1,0 +1,737 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-compare-eq
+  (@h3 "条件：一致")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.eqz") (br)
+	(code "s32.eqz") (br)
+	(code "u32.eqz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i32") " == 0)")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.eqz") (br)
+	(code "s64.eqz") (br)
+	(code "u64.eqz"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i64") " == 0)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.eq") (br)
+	(code "s32.eq") (br)
+	(code "u32.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i32") " == " (var "p2") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.eq") (br)
+	(code "s64.eq") (br)
+	(code "u64.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i64") " == " (var "p2") (sub "i64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " == " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " == " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.eq") (br)
+	(code "s8x16.eq") (br)
+	(code "u8x16.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "i8x16") "[𝑛] == " (var "p2") (sub "i8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.eq") (br)
+	(code "s16x8.eq") (br)
+	(code "u16x8.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "i16x8") "[𝑛] == " (var "p2") (sub "i16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.eq") (br)
+	(code "s32x4.eq") (br)
+	(code "u32x4.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "i32x4") "[𝑛] == " (var "p2") (sub "i32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.eq") (br)
+	(code "s64x2.eq") (br)
+	(code "u64x2.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "i64x2") "[𝑛] == " (var "p2") (sub "i64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] == " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.eq"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] == " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-ne
+  (@h3 "条件：不一致")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.ne") (br)
+	(code "s32.ne") (br)
+	(code "u32.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i32") " != " (var "p2") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.ne") (br)
+	(code "s64.ne") (br)
+	(code "u64.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i64") " != " (var "p2") (sub "i64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " != " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " != " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.ne") (br)
+	(code "s8x16.ne") (br)
+	(code "u8x16.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "i8x16") "[𝑛] != " (var "p2") (sub "i8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.ne") (br)
+	(code "s16x8.ne") (br)
+	(code "u16x8.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "i16x8") "[𝑛] != " (var "p2") (sub "i16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.ne") (br)
+	(code "s32x4.ne") (br)
+	(code "u32x4.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "i32x4") "[𝑛] != " (var "p2") (sub "i32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.ne") (br)
+	(code "s64x2.ne") (br)
+	(code "u64x2.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "i64x2") "[𝑛] != " (var "p2") (sub "i64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] != " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.ne"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] != " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-lt
+  (@h3 "条件：小なり")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.lt_s") (br)
+	(code "s32.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s32") " < " (var "p2") (sub "s32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.lt_u") (br)
+	(code "u32.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u32") " < " (var "p2") (sub "u32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.lt_s") (br)
+	(code "s64.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s64") " < " (var "p2") (sub "s64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.lt_u") (br)
+	(code "u64.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u64") " < " (var "p2") (sub "u64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " < " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " < " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.lt_s") (br)
+	(code "s8x16.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "s8x16") "[𝑛] < " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.lt_u") (br)
+	(code "u8x16.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "u8x16") "[𝑛] < " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.lt_s") (br)
+	(code "s16x8.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "s16x8") "[𝑛] < " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.lt_u") (br)
+	(code "u16x8.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "u16x8") "[𝑛] < " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.lt_s") (br)
+	(code "s32x4.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "s32x4") "[𝑛] < " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.lt_u") (br)
+	(code "u32x4.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "u32x4") "[𝑛] < " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.lt_s") (br)
+	(code "s64x2.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "s64x2") "[𝑛] < " (var "p2") (sub "s64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] < " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.lt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] < " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-le
+  (@h3 "条件：以下")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.le_s") (br)
+	(code "s32.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s32") " <= " (var "p2") (sub "s32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.le_u") (br)
+	(code "u32.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u32") " <= " (var "p2") (sub "u32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.le_s") (br)
+	(code "s64.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s64") " <= " (var "p2") (sub "s64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.le_u") (br)
+	(code "u64.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u64") " <= " (var "p2") (sub "u64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " <= " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " <= " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.le_s") (br)
+	(code "s8x16.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "s8x16") "[𝑛] <= " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.le_u") (br)
+	(code "u8x16.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "u8x16") "[𝑛] <= " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.le_s") (br)
+	(code "s16x8.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "s16x8") "[𝑛] <= " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.le_u") (br)
+	(code "u16x8.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "u16x8") "[𝑛] <= " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.le_s") (br)
+	(code "s32x4.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "s32x4") "[𝑛] <= " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.le_u") (br)
+	(code "u32x4.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "u32x4") "[𝑛] <= " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.le_s") (br)
+	(code "s64x2.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "s64x2") "[𝑛] <= " (var "p2") (sub "s64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] <= " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.le"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] <= " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-ge
+  (@h3 "条件：以上")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.ge_s") (br)
+	(code "s32.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s32") " >= " (var "p2") (sub "s32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.ge_u") (br)
+	(code "u32.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u32") " >= " (var "p2") (sub "u32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.ge_s") (br)
+	(code "s64.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s64") " >= " (var "p2") (sub "s64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.ge_u") (br)
+	(code "u64.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u64") " >= " (var "p2") (sub "u64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " >= " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " >= " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.ge_s") (br)
+	(code "s8x16.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "s8x16") "[𝑛] >= " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.ge_u") (br)
+	(code "u8x16.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "u8x16") "[𝑛] >= " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.ge_s") (br)
+	(code "s16x8.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "s16x8") "[𝑛] >= " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.ge_u") (br)
+	(code "u16x8.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "u16x8") "[𝑛] >= " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.ge_s") (br)
+	(code "s32x4.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "s32x4") "[𝑛] >= " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.ge_u") (br)
+	(code "u32x4.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "u32x4") "[𝑛] >= " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.ge_s") (br)
+	(code "s64x2.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "s64x2") "[𝑛] >= " (var "p2") (sub "s64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] >= " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.ge"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] >= " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-gt
+  (@h3 "条件：大なり")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.gt_s") (br)
+	(code "s32.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s32") " > " (var "p2") (sub "s32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.gt_u") (br)
+	(code "u32.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u32") " > " (var "p2") (sub "u32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.gt_s") (br)
+	(code "s64.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "s64") " > " (var "p2") (sub "s64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64.gt_u") (br)
+	(code "u64.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "u64") " > " (var "p2") (sub "u64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f32.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f32") " > " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "f64.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "f64") " > " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.gt_s") (br)
+	(code "s8x16.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "s8x16") "[𝑛] > " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.gt_u") (br)
+	(code "u8x16.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "(" (var "p1") (sub "u8x16") "[𝑛] > " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.gt_s") (br)
+	(code "s16x8.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "s16x8") "[𝑛] > " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.gt_u") (br)
+	(code "u16x8.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "(" (var "p1") (sub "u16x8") "[𝑛] > " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.gt_s") (br)
+	(code "s32x4.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "s32x4") "[𝑛] > " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.gt_u") (br)
+	(code "u32x4.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "u32x4") "[𝑛] > " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.gt_s") (br)
+	(code "s64x2.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "s64x2") "[𝑛] > " (var "p2") (sub "s64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "(" (var "p1") (sub "f32x4") "[𝑛] > " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.gt"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " "(" (var "p1") (sub "f64x2") "[𝑛] > " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-true
+  (@h3 "条件：全要素")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "v128.any_true") (br)
+	(code "i8x16.any_true") (br)
+	(code "s8x16.any_true") (br)
+	(code "u8x16.any_true") (br)
+	(code "i16x8.any_true") (br)
+	(code "s16x8.any_true") (br)
+	(code "u16x8.any_true") (br)
+	(code "i32x4.any_true") (br)
+	(code "s32x4.any_true") (br)
+	(code "u32x4.any_true") (br)
+	(code "i64x2.any_true") (br)
+	(code "s64x2.any_true") (br)
+	(code "u64x2.any_true") (br)
+	(code "f32x4.any_true") (br)
+	(code "f64x2.any_true"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i128") " != 0)")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i8x16.all_true") (br)
+	(code "s8x16.all_true") (br)
+	(code "u8x16.all_true"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i8x16") "[0] && ... && " (var "p1") (sub "i8x16") "[15])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i16x8.all_true") (br)
+	(code "s16x8.all_true") (br)
+	(code "u16x8.all_true"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i16x8") "[0] && ... && " (var "p1") (sub "i16x8") "[7])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32x4.all_true") (br)
+	(code "s32x4.all_true") (br)
+	(code "u32x4.all_true") (br)
+	(code "f32x4.all_true"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i32x4") "[0] && ... && " (var "p1") (sub "i32x4") "[3])")))
+   (tr
+    (td $topcenter (code "1"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i64x2.all_true") (br)
+	(code "s64x2.all_true") (br)
+	(code "u64x2.all_true") (br)
+	(code "f64x2.all_true"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "(" (var "p1") (sub "i64x2") "[0] && " (var "p1") (sub "i64x2") "[1])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-compare-name "数値比較")
+
+(@def $wasmgen-instruction-compare
+  (@h2 $wasmgen-instruction-compare-name)
+  $wasmgen-instruction-compare-eq
+  $wasmgen-instruction-compare-ne
+  $wasmgen-instruction-compare-lt
+  $wasmgen-instruction-compare-le
+  $wasmgen-instruction-compare-ge
+  $wasmgen-instruction-compare-gt
+  $wasmgen-instruction-compare-true
+  ) ; @def

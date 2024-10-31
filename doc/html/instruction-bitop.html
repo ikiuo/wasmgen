@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - ビット操作</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>ビット操作</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">ビット操作</a><br/>
+                <a href="#index-2">ビット計数</a><br/>
+                <a href="#index-3">符号の集積</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">ビット操作</a></h2>
+    <h3><a name="index-2">ビット計数</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.clz</code><br/><code>s32.clz</code><br/><code>u32.clz</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;clz32(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.clz</code><br/><code>s64.clz</code><br/><code>u64.clz</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;clz64(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.ctz</code><br/><code>s32.ctz</code><br/><code>u32.ctz</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ctz32(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.ctz</code><br/><code>s64.ctz</code><br/><code>u64.ctz</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ctz64(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.popcnt</code><br/><code>s32.popcnt</code><br/><code>u32.popcnt</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;popcnt(<var>p1</var><sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.popcnt</code><br/><code>s64.popcnt</code><br/><code>u64.popcnt</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;popcnt(<var>p1</var><sub>i64</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>i8x16.popcnt</code><br/><code>s8x16.popcnt</code><br/><code>u8x16.popcnt</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>[𝑛:0..15]&nbsp;←&nbsp;popcnt(<var>p1</var><sub>i8x16</sub>[𝑛])</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-3">符号の集積</a></h3>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i8x16.bitmask</code><br/><code>s8x16.bitmask</code><br/><code>u8x16.bitmask</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;0&nbsp;</code><br/><code><var>r</var><sub>i32</sub>&nbsp;|=&nbsp;sign8(<var>p1</var><sub>i8x16</sub>[𝑛:0..15])&nbsp;&lt;&lt;&nbsp;𝑛</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i16x8.bitmask</code><br/><code>s16x8.bitmask</code><br/><code>u16x8.bitmask</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;0&nbsp;</code><br/><code><var>r</var><sub>i32</sub>&nbsp;|=&nbsp;sign16(<var>p1</var><sub>i16x8</sub>[𝑛:0..7])&nbsp;&lt;&lt;&nbsp;𝑛</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32x4.bitmask</code><br/><code>s32x4.bitmask</code><br/><code>u32x4.bitmask</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;0&nbsp;</code><br/><code><var>r</var><sub>i32</sub>&nbsp;|=&nbsp;sign32(<var>p1</var><sub>i32x4</sub>[𝑛:0..3])&nbsp;&lt;&lt;&nbsp;𝑛</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i64x2.bitmask</code><br/><code>s64x2.bitmask</code><br/><code>u64x2.bitmask</code></td>
+        <td></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;0&nbsp;</code><br/><code><var>r</var><sub>i32</sub>&nbsp;|=&nbsp;sign64(<var>p1</var><sub>i64x2</sub>[𝑛:0..1])&nbsp;&lt;&lt;&nbsp;𝑛</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

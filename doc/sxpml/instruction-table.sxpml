@@ -1,0 +1,59 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-table
+  (@h2 "テーブル領域操作")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP" (code "𝑥,𝑦"))
+    (th "備考"))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "table.size"))
+    (td $vtop (code "tableidx"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "(TAB[𝑥] のサイズ)")))
+   (tr
+    (td $topcenter (code "0"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "table.grow"))
+    (td $vtop (code "tableidx"))
+    (td $vtop (code (var "r") (sub "i32") " ← " "(TAB[𝑥] のサイズ)") " " (br)
+	" " (code "TAB[𝑥]") " をサイズ " (code (var "p2") (sub "i32")) " に変更(内容は " (code (var "p1")) ")"))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "table.fill"))
+    (td $vtop (code "tableidx"))
+    (td $vtop (code "TAB[𝑥][" (var "p1") (sub "i32") " : " (var "p3") (sub "i32") "]" " ← " (var "p2"))))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "table.copy"))
+    (td $vtop (code "tableidx,tableidx"))
+    (td $vtop (code "TAB[𝑥][" (var "p1") (sub "i32") " : " (var "p3") (sub "i32") "]" " ← " "TAB[𝑦][" (var "p2") (sub "i32") " : " (var "p3") (sub "i32") "]")))
+   (tr
+    (td $topcenter (code "3"))
+    (td)
+    (td $vtop (code "table.init"))
+    (td $vtop (code "tableidx,elemidx"))
+    (td $vtop (code "TAB[𝑥][" (var "p1") (sub "i32") " : " (var "p3") (sub "i32") "]" " ← " "ELEM[𝑦][" (var "p2") (sub "i32") " : " (var "p3") (sub "i32") "]")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "0"))
+    (td)
+    (td $vtop (code "elem.drop"))
+    (td $vtop (code "elemidx"))
+    (td $vtop (code "ELEM[𝑥]") " の要素を破棄"))
+   ) ; table
+  $vpad
+  ) ; @def

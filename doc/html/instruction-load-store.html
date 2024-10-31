@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - メモリ・アクセス</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>メモリ・アクセス</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">メモリ・アクセス</a><br/>
+                <a href="#index-2">オペランド memarg</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">メモリ・アクセス</a></h2>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考 (<code>𝑚&nbsp;=&nbsp;オフセット</code>)</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.load</code><br/><code>s32.load</code><br/><code>u32.load</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load</code><br/><code>s64.load</code><br/><code>u64.load</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f32</code></td>
+        <td class="vtop"><code>f32.load</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>f32</sub>&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>f32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>f64</code></td>
+        <td class="vtop"><code>f64.load</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>f64</sub>&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>f64</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.load8_s</code><br/><code>s32.load8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext8s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.load16_s</code><br/><code>s32.load16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext16s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load8_s</code><br/><code>s64.load8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext8s&nbsp;(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load16_s</code><br/><code>s64.load16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext16s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load32_s</code><br/><code>s64.load32</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext32s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.load8_u</code><br/><code>u32.load8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext8u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i32</code></td>
+        <td class="vtop"><code>i32.load16_u</code><br/><code>u32.load16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>&nbsp;←&nbsp;ext16u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load8_u</code><br/><code>u64.load8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext8u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load16_u</code><br/><code>u64.load16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext16u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>i64</code></td>
+        <td class="vtop"><code>i64.load32_u</code><br/><code>u64.load32</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>&nbsp;←&nbsp;ext32u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i32.store</code><br/><code>s32.store</code><br/><code>u32.store</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i64.store</code><br/><code>s64.store</code><br/><code>u64.store</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub>&nbsp;←&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>f32.store</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>f32</sub>&nbsp;←&nbsp;<var>p2</var><sub>f32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>f64.store</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>f64</sub>&nbsp;←&nbsp;<var>p2</var><sub>f64</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i32.store8</code><br/><code>s32.store8</code><br/><code>u32.store8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i32.store16</code><br/><code>s32.store16</code><br/><code>u32.store16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>&nbsp;←&nbsp;<var>p2</var><sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i64.store8</code><br/><code>s64.store8</code><br/><code>u64.store8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>&nbsp;←&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i64.store16</code><br/><code>s64.store16</code><br/><code>u64.store16</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>&nbsp;←&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>i64.store32</code><br/><code>s64.store32</code><br/><code>u64.store32</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>&nbsp;←&nbsp;<var>p2</var><sub>i64</sub></code></td>
+      </tr>
+    </table>
+    <div>&nbsp;</div>
+    <table>
+      <tr>
+        <th>引数</th>
+        <th>返値</th>
+        <th>命令</th>
+        <th>OP</th>
+        <th>備考 (<code>𝑚&nbsp;=&nbsp;オフセット</code>)</th>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load</code><br/><code>i8x16.load</code><br/><code>s8x16.load</code><br/><code>u8x16.load</code><br/><code>i16x8.load</code><br/><code>s16x8.load</code><br/><code>u16x8.load</code><br/><code>i32x4.load</code><br/><code>s32x4.load</code><br/><code>u32x4.load</code><br/><code>i64x2.load</code><br/><code>s64x2.load</code><br/><code>u64x2.load</code><br/><code>f32x4.load</code><br/><code>f64x2.load</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>v128.store</code><br/><code>i8x16.store</code><br/><code>s8x16.store</code><br/><code>u8x16.store</code><br/><code>i16x8.store</code><br/><code>s16x8.store</code><br/><code>u16x8.store</code><br/><code>i32x4.store</code><br/><code>s32x4.store</code><br/><code>u32x4.store</code><br/><code>i64x2.store</code><br/><code>s64x2.store</code><br/><code>u64x2.store</code><br/><code>f32x4.store</code><br/><code>f64x2.store</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>v128</sub>&nbsp;←&nbsp;<var>p2</var><sub>v128</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load8x8_s</code><br/><code>s16x8.load8x8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i16</sub>[𝑛]&nbsp;←&nbsp;ext8s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;𝑛]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load16x4_s</code><br/><code>s32x4.load16x4</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>[𝑛]&nbsp;←&nbsp;ext16s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;2𝑛]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load32x2_s</code><br/><code>s64x2.load32x2</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>[𝑛]&nbsp;←&nbsp;ext32s(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;4𝑛]<sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load8x8_u</code><br/><code>u16x8.load8x8</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i16</sub>[𝑛]&nbsp;←&nbsp;ext8u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;𝑛]<sub>i8</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load16x4_u</code><br/><code>u32x4.load16x4</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32</sub>[𝑛]&nbsp;←&nbsp;ext16u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;2𝑛]<sub>i16</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load32x2_u</code><br/><code>u64x2.load32x2</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64</sub>[𝑛]&nbsp;←&nbsp;ext32u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>&nbsp;+&nbsp;4𝑛]<sub>i32</sub>)</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load32_zero</code><br/><code>i32x4.load_zero</code><br/><code>s32x4.load_zero</code><br/><code>u32x4.load_zero</code><br/><code>f32x4.load_zero</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;ext32u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>)</code><br/>上位96ビットはゼロ</td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load64_zero</code><br/><code>i64x2.load_zero</code><br/><code>s64x2.load_zero</code><br/><code>u64x2.load_zero</code><br/><code>f64x2.load_zero</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>v128</sub>&nbsp;←&nbsp;ext64u(MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub>)</code><br/>上位64ビットはゼロ</td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load8_splat</code><br/><code>i8x16.load_splat</code><br/><code>s8x16.load_splat</code><br/><code>u8x16.load_splat</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>[0..15]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load16_splat</code><br/><code>i16x8.load_splat</code><br/><code>s16x8.load_splat</code><br/><code>u16x8.load_splat</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>[0..7]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load32_splat</code><br/><code>i32x4.load_splat</code><br/><code>s32x4.load_splat</code><br/><code>u32x4.load_splat</code><br/><code>f32x4.load_splat</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>[0..3]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>1</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load64_splat</code><br/><code>i64x2.load_splat</code><br/><code>s64x2.load_splat</code><br/><code>u64x2.load_splat</code><br/><code>f64x2.load_splat</code></td>
+        <td class="vtop"><code>memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>[0..1]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load8_lane</code><br/><code>i8x16.load_lane</code><br/><code>s8x16.load_lane</code><br/><code>u8x16.load_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i8x16</sub>&nbsp;←&nbsp;p2<sub>v128</sub></code><br/><code><var>r</var><sub>i8x16</sub>[𝑛]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load16_lane</code><br/><code>i16x8.load_lane</code><br/><code>s16x8.load_lane</code><br/><code>u16x8.load_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i16x8</sub>&nbsp;←&nbsp;p2<sub>v128</sub></code><br/><code><var>r</var><sub>i16x8</sub>[𝑛]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load32_lane</code><br/><code>i32x4.load_lane</code><br/><code>s32x4.load_lane</code><br/><code>u32x4.load_lane</code><br/><code>f32x4.load_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i32x4</sub>&nbsp;←&nbsp;p2<sub>v128</sub></code><br/><code><var>r</var><sub>i32x4</sub>[𝑛]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub></code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td class="vtop"><code>v128</code></td>
+        <td class="vtop"><code>v128.load64_lane</code><br/><code>i64x2.load_lane</code><br/><code>s64x2.load_lane</code><br/><code>u64x2.load_lane</code><br/><code>f64x2.load_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code><var>r</var><sub>i64x2</sub>&nbsp;←&nbsp;p2<sub>v128</sub></code><br/><code><var>r</var><sub>i64x2</sub>[𝑛]&nbsp;←&nbsp;MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub></code></td>
+      </tr>
+      <tr>
+        <td colspan="5"></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>v128.store8_lane</code><br/><code>i8x16.store_lane</code><br/><code>s8x16.store_lane</code><br/><code>u8x16.store_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i8</sub>&nbsp;←&nbsp;<var>p2</var><sub>i8x16</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>v128.store16_lane</code><br/><code>i16x8.store_lane</code><br/><code>s16x8.store_lane</code><br/><code>u16x8.store_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i16</sub>&nbsp;←&nbsp;<var>p2</var><sub>i16x8</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>v128.store32_lane</code><br/><code>i32x4.store_lane</code><br/><code>s32x4.store_lane</code><br/><code>u32x4.store_lane</code><br/><code>f32x4.store_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i32</sub>&nbsp;←&nbsp;<var>p2</var><sub>i32x4</sub>[𝑛]</code></td>
+      </tr>
+      <tr>
+        <td class="vtop center"><code>2</code></td>
+        <td></td>
+        <td class="vtop"><code>v128.store64_lane</code><br/><code>i64x2.store_lane</code><br/><code>s64x2.store_lane</code><br/><code>u64x2.store_lane</code><br/><code>f64x2.store_lane</code></td>
+        <td class="vtop"><code>lane,memarg</code></td>
+        <td class="vtop"><code>MEM0[𝑚&nbsp;+&nbsp;<var>p1</var><sub>i32</sub>]<sub>i64</sub>&nbsp;←&nbsp;<var>p2</var><sub>i64x2</sub>[𝑛]</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-2">オペランド&nbsp;<code>memarg</code></a></h3>
+    <p>オペランド<code>memarg</code>は<code>offset</code>と<code>align</code>を表します。</p>
+    <table>
+      <tr>
+        <th><code>memarg</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>offset,align</code></td>
+        <td><code>offset</code>を明示、<code>align</code>も明示</td>
+      </tr>
+      <tr>
+        <td><code>offset</code></td>
+        <td><code>offset</code>を明示、<code>align</code>を省略</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>offset</code>を省略、<code>align</code>も省略</td>
+      </tr>
+    </table>
+    <p><code>offset</code>の既定値は<code>0</code>で、<code>align</code>の既定値は命令次第です。</p>
+    <p>&nbsp;</p>
+    <h4><code>align</code>の既定値</h4>
+    <h5>整数および浮動小数点型のメモリ アクセス</h5>
+    <table>
+      <tr>
+        <th><code>align</code></th>
+        <th><code>i32</code></th>
+        <th><code>i64</code></th>
+        <th><code>f32</code></th>
+        <th><code>f64</code></th>
+      </tr>
+      <tr>
+        <th><code>0</code></th>
+        <td class="vtop"><code>i32.load8_s</code><br/><code>i32.load8_u</code><br/><code>i32.store8</code><br/><br/><code>s32.load8</code><br/><code>u32.load8</code></td>
+        <td class="vtop"><code>i64.load8_s</code><br/><code>i64.load8_u</code><br/><code>i64.store8</code><br/><br/><code>s64.load8</code><br/><code>u64.load8</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th><code>1</code></th>
+        <td class="vtop"><code>i32.load16_s</code><br/><code>i32.load16_u</code><br/><code>i32.store16</code><br/><br/><code>s32.load16</code><br/><code>u32.load16</code></td>
+        <td class="vtop"><code>i64.load16_s</code><br/><code>i64.load16_u</code><br/><code>i64.store16</code><br/><br/><code>s64.load16</code><br/><code>u64.load16</code></td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th><code>2</code></th>
+        <td class="vtop"><code>i32.load</code><br/><code>i32.store</code><br/><br/><br/><br/><code>s32.load</code><br/><code>u32.load</code><br/><code>s32.store</code><br/><code>u32.store</code></td>
+        <td class="vtop"><code>i64.load32_s</code><br/><code>i64.load32_u</code><br/><code>i64.store32</code><br/><br/><br/><code>s64.load32</code><br/><code>u64.load32</code><br/><code>s64.store32</code><br/><code>u64.store32</code></td>
+        <td class="vtop"><code>f32.load</code><br/><code>f32.store</code></td>
+        <td></td>
+      </tr>
+      <tr>
+        <th><code>3</code></th>
+        <td></td>
+        <td class="vtop"><code>i64.load</code><br/><code>i64.store</code></td>
+        <td></td>
+        <td class="vtop"><code>f64.load</code><br/><code>f64.store</code></td>
+      </tr>
+    </table>
+    <h5>ベクトル型のメモリ アクセス</h5>
+    <table>
+      <tr>
+        <th><code>align=0</code></th>
+        <th><code>align=1</code></th>
+        <th><code>align=2</code></th>
+        <th><code>align=3</code></th>
+        <th><code>align=4</code></th>
+      </tr>
+      <tr>
+        <td class="vtop"><code>v128.load8_lane</code><br/><code>i8x16.load_lane</code><br/><code>s8x16.load_lane</code><br/><code>u8x16.load_lane</code><br/><br/><code>v128.load8_splat</code><br/><code>i8x16.load_splat</code><br/><code>s8x16.load_splat</code><br/><code>u8x16.load_splat</code></td>
+        <td class="vtop"><code>v128.load16_lane</code><br/><code>i16x8.load_lane</code><br/><code>s16x8.load_lane</code><br/><code>u16x8.load_lane</code><br/><br/><code>v128.load16_splat</code><br/><code>i16x8.load_splat</code><br/><code>s16x8.load_splat</code><br/><code>u16x8.load_splat</code></td>
+        <td class="vtop"><code>v128.load32_lane</code><br/><code>i32x4.load_lane</code><br/><code>s32x4.load_lane</code><br/><code>u32x4.load_lane</code><br/><code>f32x4.load_lane</code><br/><br/><code>v128.load32_splat</code><br/><code>i32x4.load_splat</code><br/><code>s32x4.load_splat</code><br/><code>u32x4.load_splat</code><br/><code>f32x4.load_splat</code><br/><br/><code>v128.load32_zero</code><br/><code>i32x4.load_zero</code><br/><code>s32x4.load_zero</code><br/><code>u32x4.load_zero</code><br/><code>f32x4.load_zero</code></td>
+        <td class="vtop"><code>v128.load64_lane</code><br/><code>i64x2.load_lane</code><br/><code>s64x2.load_lane</code><br/><code>u64x2.load_lane</code><br/><code>f64x2.load_lane</code><br/><br/><code>v128.load64_splat</code><br/><code>i64x2.load_splat</code><br/><code>s64x2.load_splat</code><br/><code>u64x2.load_splat</code><br/><code>f64x2.load_splat</code><br/><br/><code>v128.load64_zero</code><br/><code>i64x2.load_zero</code><br/><code>s64x2.load_zero</code><br/><code>u64x2.load_zero</code><br/><code>f64x2.load_zero</code><br/><br/><code>v128.load8x8_s</code><br/><code>s16x8.load8x8</code><br/><br/><code>v128.load8x8_u</code><br/><code>u16x8.load8x8</code><br/><br/><code>v128.load16x4_s</code><br/><code>s32x4.load16x4</code><br/><br/><code>v128.load16x4_u</code><br/><code>u32x4.load16x4</code><br/><br/><code>v128.load32x2_s</code><br/><code>s64x2.load32x2</code><br/><br/><code>v128.load32x2_u</code><br/><code>u64x2.load32x2</code></td>
+        <td class="vtop"><code>v128.load</code><br/><br/><code>i8x16.load</code><br/><code>s8x16.load</code><br/><code>u8x16.load</code><br/><br/><code>i16x8.load</code><br/><code>s16x8.load</code><br/><code>u16x8.load</code><br/><br/><code>i32x4.load</code><br/><code>s32x4.load</code><br/><code>u32x4.load</code><br/><br/><code>i64x2.load</code><br/><code>s64x2.load</code><br/><code>u64x2.load</code><br/><br/><code>f32x4.load</code><br/><code>f64x2.load</code></td>
+      </tr>
+      <tr>
+        <td class="vtop"><code>v128.store8_lane</code><br/><code>i8x16.store_lane</code><br/><code>s8x16.store_lane</code><br/><code>u8x16.store_lane</code></td>
+        <td class="vtop"><code>v128.store16_lane</code><br/><code>i16x8.store_lane</code><br/><code>s16x8.store_lane</code><br/><code>u16x8.store_lane</code></td>
+        <td class="vtop"><code>v128.store32_lane</code><br/><code>i32x4.store_lane</code><br/><code>s32x4.store_lane</code><br/><code>u32x4.store_lane</code><br/><code>f32x4.store_lane</code></td>
+        <td class="vtop"><code>v128.store64_lane</code><br/><code>i64x2.store_lane</code><br/><code>s64x2.store_lane</code><br/><code>u64x2.store_lane</code><br/><code>f64x2.store_lane</code></td>
+        <td class="vtop"><code>v128.store</code><br/><br/><code>i8x16.store</code><br/><code>s8x16.store</code><br/><code>u8x16.store</code><br/><br/><code>i16x8.store</code><br/><code>s16x8.store</code><br/><code>u16x8.store</code><br/><br/><code>i32x4.store</code><br/><code>s32x4.store</code><br/><code>u32x4.store</code><br/><br/><code>i64x2.store</code><br/><code>s64x2.store</code><br/><code>u64x2.store</code><br/><br/><code>f32x4.store</code><br/><code>f64x2.store</code></td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

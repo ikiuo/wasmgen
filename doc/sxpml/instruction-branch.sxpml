@@ -1,0 +1,109 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-branch-name "分岐と制御命令")
+
+(@def $wasmgen-instruction-branch
+  (@h2 $wasmgen-instruction-branch-name)
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "?"))
+    (td)
+    (td $vtop (code "block"))
+    (td $vtop (code "blocktype"))
+    (td $vtop "ブロックの開始"))
+   (tr
+    (td $topcenter (code "?"))
+    (td)
+    (td $vtop (code "loop"))
+    (td $vtop (code "blocktype"))
+    (td $vtop "ループ・ブロックの開始"))
+   (tr
+    (td $topcenter (code "1"))
+    (td)
+    (td $vtop (code "if"))
+    (td $vtop (code "blocktype"))
+    (td $vtop (code "if") "ブロックの開始"))
+   (tr
+    (td $topcenter (code "0"))
+    (td)
+    (td $vtop (code "else"))
+    (td)
+    (td $vtop (code "else") "ブロックの開始"))
+   (tr
+    (td $topcenter (code "?"))
+    (td)
+    (td $vtop (code "end") (br)
+	(code "end.block") (br)
+	(code "end.loop") (br)
+	(code "end.if"))
+    (td)
+    (td $vtop "ブロックまたはコードの終了" (br)
+	"(別名は入れ子対応表記用)"))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "0"))
+    (td)
+    (td $vtop (code "br"))
+    (td $vtop (code "labelidx"))
+    (td $vtop "ブロックからの脱出" (br)
+	(code "labelidx") "は" (code "ブロック段数-1")))
+   (tr
+    (td $topcenter (code "1"))
+    (td)
+    (td $vtop (code "br_if"))
+    (td $vtop (code "labelidx"))
+    (td $vtop (code (var "p1") (sub "i32")) "が真のとき分岐" (code "br") "が実行される"))
+   (tr
+    (td $topcenter (code "1"))
+    (td)
+    (td $vtop (code "br_table"))
+    (td $vtop (code "labelidx,..."))
+    (td $vtop (code "br  [...labelidx][" (var "p1") (sub "i32") "]")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "?"))
+    (td)
+    (td $vtop (code "return"))
+    (td)
+    (td $vtop "関数から戻る"))
+   (tr
+    (td $topcenter (code "?"))
+    (td $vtop (code "?"))
+    (td $vtop (code "call"))
+    (td $vtop (code "funcidx"))
+    (td $vtop "関数を呼び出す"))
+   (tr
+    (td $topcenter (code "1+?"))
+    (td $vtop (code "?"))
+    (td $vtop (code "call_indirect"))
+    (td $vtop (code "tableidx,typeidx"))
+    (td $vtop (code "typeidx") "型の関数" (br)
+	(code "    TAB[tableidx][" (var "p1") (sub "i32") "]") (br)
+	"を呼び出す"))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "0"))
+    (td)
+    (td $vtop (code "unreachable"))
+    (td)
+    (td $vtop "不到達(" (code "trap") "発生)"))
+   (tr
+    (td $topcenter (code "0"))
+    (td)
+    (td $vtop (code "nop"))
+    (td)
+    (td $vtop "何もしない。"))
+   ) ; table
+  $vpad
+  ) ; @def

@@ -1,0 +1,235 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-shift-name "シフト・ローテート")
+
+(@def $wasmgen-instruction-shift-left
+  (@h3 "左シフト")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.shl") (br)
+	(code "s32.shl") (br)
+	(code "u32.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " (var "p1") (sub "i32") " << (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.shl") (br)
+	(code "s64.shl") (br)
+	(code "u64.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " (var "p1") (sub "i64") " << (" (var "p2") (sub "i64") " & 63)")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.shl") (br)
+	(code "s8x16.shl") (br)
+	(code "u8x16.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " (var "p1") (sub "i8x16") "[𝑛] << (" (var "p2") (sub "i32") " & 7)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.shl") (br)
+	(code "s16x8.shl") (br)
+	(code "u16x8.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " (var "p1") (sub "i16x8") "[𝑛] << (" (var "p2") (sub "i32") " & 15)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.shl") (br)
+	(code "s32x4.shl") (br)
+	(code "u32x4.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " (var "p1") (sub "i32x4") "[𝑛] << (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.shl") (br)
+	(code "s64x2.shl") (br)
+	(code "u64x2.shl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " (var "p1") (sub "i64x2") "[𝑛] << (" (var "p2") (sub "i32") " & 63)")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-shift-right
+  (@h3 "符号あり右シフト")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.shr_s") (br)
+	(code "s32.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " (var "p1") (sub "s32") " >> (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.shr_s") (br)
+	(code "s64.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " (var "p1") (sub "s64") " >> (" (var "p2") (sub "i64") " & 63)")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.shr_s") (br)
+	(code "s8x16.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " (var "p1") (sub "s8x16") "[𝑛] >> (" (var "p2") (sub "i32") " & 7)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.shr_s") (br)
+	(code "s16x8.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " (var "p1") (sub "s16x8") "[𝑛] >> (" (var "p2") (sub "i32") " & 15)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.shr_s") (br)
+	(code "s32x4.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " (var "p1") (sub "s32x4") "[𝑛] >> (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.shr_s") (br)
+	(code "s64x2.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " (var "p1") (sub "s64x2") "[𝑛] >> (" (var "p2") (sub "i32") " & 63)")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-shift-right-unsigned
+  (@h3 "符号なし右シフト")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.shr_u") (br)
+	(code "u32.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " (var "p1") (sub "u32") " >>> (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.shr_u") (br)
+	(code "u64.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " (var "p1") (sub "u64") " >>> (" (var "p2") (sub "i64") " & 63)")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.shr_u") (br)
+	(code "u8x16.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " (var "p1") (sub "u8x16") "[𝑛] >>> (" (var "p2") (sub "i32") " & 7)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.shr_u") (br)
+	(code "u16x8.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " (var "p1") (sub "u16x8") "[𝑛] >>> (" (var "p2") (sub "i32") " & 15)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.shr_u") (br)
+	(code "u32x4.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " (var "p1") (sub "u32x4") "[𝑛] >>> (" (var "p2") (sub "i32") " & 31)")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i64x2.shr_u") (br)
+	(code "u64x2.shr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64x2") "[𝑛:0..1]" " ← " (var "p1") (sub "u64x2") "[𝑛] >>> (" (var "p2") (sub "i32") " & 63)")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-rotate
+  (@h3 "ローテート")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.rotl") (br)
+	(code "s32.rotl") (br)
+	(code "u32.rotl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "rotl32(" (var "p1") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.rotl") (br)
+	(code "s64.rotl") (br)
+	(code "u64.rotl"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " "rotl64(" (var "p1") (sub "i64") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i32"))
+    (td $vtop (code "i32.rotr") (br)
+	(code "s32.rotr") (br)
+	(code "u32.rotr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32") " ← " "rotr32(" (var "p1") (sub "i32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "i64"))
+    (td $vtop (code "i64.rotr") (br)
+	(code "s64.rotr") (br)
+	(code "u64.rotr"))
+    (td)
+    (td $vtop (code (var "r") (sub "i64") " ← " "rotr64(" (var "p1") (sub "i64") ")")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-shift
+  (@h2 $wasmgen-instruction-shift-name)
+  $wasmgen-instruction-shift-left
+  $wasmgen-instruction-shift-right
+  $wasmgen-instruction-shift-right-unsigned
+  $wasmgen-instruction-rotate
+  ) ; @def

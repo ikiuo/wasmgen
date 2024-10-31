@@ -1,0 +1,22 @@
+;; -*- Lisp -*-
+
+(@include "css.sxpml")
+
+(@def $html-title $document)
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $html-title)
+  $css)
+ (body
+  (h1 $html-title)
+  (p [style "font-size: xx-large;"] (b "ドキュメント"))
+  (blockquote
+   (a [href "full.html"] "単独 HTML ファイル") (br)
+   (a [href "wasmgen.html"] "分割 HTML ファイル") (br)
+   ) ; blockquote
+  ) ; body
+ ) ; html

@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "statement.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-statement-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-statement-name)
+  $html-index
+  $wasmgen-statement
+  ) ; body
+ ) ; html

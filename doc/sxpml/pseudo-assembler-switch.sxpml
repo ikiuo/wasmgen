@@ -1,0 +1,53 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-assembler-switch
+  (@h2 "疑似命令" $spc (code "@set,@unset"))
+  (p "疑似命令" (code "@set") "ではアセンブラ用変数(識別子)を設定します。")
+  (pre
+   "@set <識別子> = <値>")
+  (p "疑似命令" (code "@unset") "ではアセンブラ用変数(識別子)を削除します。")
+  (pre
+   "@unset <識別子>")
+  $vpad
+
+  (@h2 "疑似命令" $spc (code "@if,@elif,@else,@endif"))
+  (p "疑似命令" (code "@if,@elif,@else,@endif") "でソースのアセンブル部分を制御できます。")
+  (pre
+   "@if 式1"
+   ""
+   ";# 式1 が真のときにアセンブルされる"
+   ";# ..."
+   ""
+   "@elif 式2"
+   ""
+   ";# 式2 が真のときにアセンブルされる"
+   ";# ..."
+   ""
+   "@else"
+   ""
+   ";# 式1, 式2 ともに偽のときにアセンブルされる"
+   ";# ..."
+   ""
+   "@endif")
+  (p "式で使用できる識別子は、アセンブラ用変数、" (code ".alias") "疑似命令のラベル名、オプション名になります。")
+  $vpad
+
+  (@h2 "疑似命令" $spc (code "@message"))
+  (p "疑似命令" (code "@message") "では、アセンブル時のアセンブラ変数などをメッセージとして出力することができます。")
+  (pre
+   "@message 文字列, 識別子, 数値, ...")
+  $vpad
+
+  (@h2 "疑似命令" $spc (code "@include"))
+  (p "疑似命令" (code "@include") "では、その位置に指定ファイルの内容を挿入します。"
+     "検索パス情報として" (code "WASMGEN_INCLUDE") "環境変数を使用します。"
+     "内容は" (code "PATH") "環境変数と同様です。")
+  (pre
+   "@include ファイル, exist")
+  (p (code "exist") "は省略可能で、" (code "true") "でファイルが開けない場合にエラーとなります。"
+     "省略すると" (code "true") "です。")
+  $vpad
+
+  ) ; @def

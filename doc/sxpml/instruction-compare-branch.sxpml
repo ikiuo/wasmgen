@@ -1,0 +1,133 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-instruction-compare-branch-name "比較＋分岐命令")
+
+(@def $wasmgen-instruction-compare-branch
+  (@h2 $wasmgen-instruction-compare-branch-name)
+  (p "アセンブラの組み込みとして、比較命令と分岐命令を並べた条件分岐命令を用意しています。"
+     "比較命令を" (code "<cmp>") "とすると、オペランドを記述することで条件分岐命令のようになります。")
+  (table
+   (tr
+    (th "記述")
+    (th "展開"))
+   (tr
+    (td $vtop
+	(pre "    <cmp>   <labelidx>"))
+    (td $vtop
+	(pre "    <cmp>"
+	     "    br_if   <labelidx>")))
+   (tr
+    (td $vtop
+	(pre "    <cmp>   return"))
+    (td $vtop
+	(pre "    <cmp>"
+	     "    if"
+	     "        return"
+	     "    end")))
+   ) ; table
+  $vpad
+
+  (h3 "比較命令一覧")
+  (table
+   (tr
+    (th "比較")
+    (th (code "i32"))
+    (th (code "i64"))
+    (th (code "f32"))
+    (th (code "f64")))
+   (tr
+    (th $topleft (code "eqz"))
+    (td (code "i32.eqz") (br) (code "s32.eqz") (br) (code "u32.eqz"))
+    (td (code "i64.eqz") (br) (code "s64.eqz") (br) (code "u64.eqz"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "eq"))
+    (td (code "i32.eq") (br) (code "s32.eq") (br) (code "u32.eq"))
+    (td (code "i64.eq") (br) (code "s64.eq") (br) (code "u64.eq"))
+    (td $vtop (code "f32.eq"))
+    (td $vtop (code "f64.eq")))
+   (tr
+    (th $topleft (code "ne"))
+    (td (code "i32.ne") (br) (code "s32.ne") (br) (code "u32.ne"))
+    (td (code "i64.ne") (br) (code "s64.ne") (br) (code "u64.ne"))
+    (td $vtop (code "f32.ne"))
+    (td $vtop (code "f64.ne")))
+   (tr
+    (th $topleft (code "lt"))
+    (td (code "s32.lt") (br) (code "u32.lt"))
+    (td (code "s64.lt") (br) (code "u64.lt"))
+    (td $vtop (code "f32.lt"))
+    (td $vtop (code "f64.lt")))
+   (tr
+    (th $topleft (code "lt_s"))
+    (td (code "i32.lt_s"))
+    (td (code "i64.lt_s"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "lt_u"))
+    (td (code "i32.lt_u"))
+    (td (code "i64.lt_u"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "le"))
+    (td (code "s32.le") (br) (code "u32.le"))
+    (td (code "s64.le") (br) (code "u64.le"))
+    (td $vtop (code "f32.le"))
+    (td $vtop (code "f64.le")))
+   (tr
+    (th $topleft (code "le_s"))
+    (td (code "i32.le_s"))
+    (td (code "i64.le_s"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "le_u"))
+    (td (code "i32.le_u"))
+    (td (code "i64.le_u"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "ge"))
+    (td (code "s32.ge") (br) (code "u32.ge"))
+    (td (code "s64.ge") (br) (code "u64.ge"))
+    (td $vtop (code "f32.ge"))
+    (td $vtop (code "f64.ge")))
+   (tr
+    (th $topleft (code "ge_s"))
+    (td (code "i32.ge_s"))
+    (td (code "i64.ge_s"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "ge_u"))
+    (td (code "i32.ge_u"))
+    (td (code "i64.ge_u"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "gt"))
+    (td (code "s32.gt") (br) (code "u32.gt"))
+    (td (code "s64.gt") (br) (code "u64.gt"))
+    (td $vtop (code "f32.gt"))
+    (td $vtop (code "f64.gt")))
+   (tr
+    (th $topleft (code "gt_s"))
+    (td (code "i32.gt_s"))
+    (td (code "i64.gt_s"))
+    (td)
+    (td))
+   (tr
+    (th $topleft (code "gt_u"))
+    (td (code "i32.gt_u"))
+    (td (code "i64.gt_u"))
+    (td)
+    (td))
+   ) ; table
+  $vpad
+
+  ) ; @def

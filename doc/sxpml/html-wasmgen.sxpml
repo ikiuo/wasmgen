@@ -1,0 +1,42 @@
+;; -*- Lisp -*-
+
+(@include "full.sxpml")
+
+(@def $html-title $document)
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $html-title)
+  $css)
+ (body
+  (h1 $html-title)
+  (p [style "font-size: xx-large;"] (b "目次"))
+  (p
+   $spc4 (a [href "statement.html"] $wasmgen-statement-name) (br)
+   $spc4 (a [name "pseudo"] "疑似命令") (br)
+   $spc4 $spc4 (a [href "pseudo-assembler.html"] $wasmgen-pseudo-assembler-name) (br)
+   $spc4 $spc4 (a [href "pseudo-replace.html"] $wasmgen-pseudo-replace-name) (br)
+   $spc4 $spc4 (a [href "pseudo-section.html"] $wasmgen-pseudo-section-name) (br)
+   $spc4 (a [name "instruction"] "実行命令") (br)
+   $spc4 $spc4 (a [href "instruction-representation.html"] $wasmgen-instruction-representation-name) (br)
+   $spc4 $spc4 (a [href "instruction-table-column.html"] $wasmgen-instruction-table-column-name) (br)
+   $spc4 $spc4 (a [href "instruction-const-getset.html"] $wasmgen-instruction-const-getset-name) (br)
+   $spc4 $spc4 (a [href "instruction-load-store.html"] $wasmgen-instruction-load-store-name) (br)
+   $spc4 $spc4 (a [href "instruction-convert.html"] $wasmgen-instruction-convert-name) (br)
+   $spc4 $spc4 (a [href "instruction-arithmetic.html"] $wasmgen-instruction-arithmetic-name) (br)
+   $spc4 $spc4 (a [href "instruction-logical-shift.html"] $wasmgen-instruction-logical-shift-name) (br)
+   $spc4 $spc4 (a [href "instruction-compare.html"] $wasmgen-instruction-compare-name) (br)
+   $spc4 $spc4 (a [href "instruction-bitop.html"] $wasmgen-instruction-bitop-name) (br)
+   $spc4 $spc4 (a [href "instruction-selector.html"] $wasmgen-instruction-selector-name) (br)
+   $spc4 $spc4 (a [href "instruction-stack.html"] $wasmgen-instruction-stack-name) (br)
+   $spc4 $spc4 (a [href "instruction-ref.html"] $wasmgen-instruction-ref-name) (br)
+   $spc4 $spc4 (a [href "instruction-table-memory.html"] $wasmgen-instruction-table-memory-name) (br)
+   $spc4 $spc4 (a [href "instruction-branch.html"] $wasmgen-instruction-branch-name) (br)
+   $spc4 $spc4 (a [href "instruction-compare-branch.html"] $wasmgen-instruction-compare-branch-name) (br)
+   $spc4 $spc4 (a [href "instruction-block.html"] $wasmgen-instruction-block-name) (br)
+   ) ; p
+  ) ; body
+ ) ; html

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - アセンブラ用疑似命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>アセンブラ用疑似命令</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+        <a href="#index-1">アセンブラ用疑似命令</a><br/>
+            <a href="#index-2">アセンブラ制御用真偽値</a><br/>
+            <a href="#index-3">疑似命令 @option</a><br/>
+                <a href="#index-4">オプション include.depth</a><br/>
+                <a href="#index-5">オプション comment.nest</a><br/>
+                <a href="#index-6">オプション paren.multiline</a><br/>
+                <a href="#index-7">オプション section.datacount</a><br/>
+                <a href="#index-8">オプション type.unique</a><br/>
+            <a href="#index-9">疑似命令 @set,@unset</a><br/>
+            <a href="#index-10">疑似命令 @if,@elif,@else,@endif</a><br/>
+            <a href="#index-11">疑似命令 @message</a><br/>
+            <a href="#index-12">疑似命令 @include</a><br/>
+    <p>&nbsp;</p>
+    <h1><a name="index-1">アセンブラ用疑似命令</a></h1>
+    <p>アセンブラ用疑似命令は<code>@</code>で始まる識別子を使用します。ラベルは無視されます。</p>
+    <p>&nbsp;</p>
+    <h2><a name="index-2">アセンブラ制御用真偽値</a></h2>
+    <p>アセンブラ制御用疑似命令向けに真偽(<code>bool</code>)値が定義されています。</p>
+    <table>
+      <tr>
+        <th><code>0</code></th>
+        <th><code>1</code></th>
+      </tr>
+      <tr>
+        <th><code>false</code></th>
+        <th><code>true</code></th>
+      </tr>
+      <tr>
+        <th><code>no</code></th>
+        <th><code>yes</code></th>
+      </tr>
+      <tr>
+        <th><code>off</code></th>
+        <th><code>on</code></th>
+      </tr>
+    </table>
+    <p>注意：アセンブラ用疑似命令以外では未定義扱いです。</p>
+    <p>&nbsp;</p>
+    <h2><a name="index-3">疑似命令&nbsp;<code>@option</code></a></h2>
+    <p><code>@option</code>疑似命令ではアセンブラの動作を指定します。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-4">オプション&nbsp;<code>include.depth</code></a></h3>
+    <p>疑似命令<code>@include</code>での入れ子の深さを設定します。値は<code>0〜100</code>の範囲に制限されます。</p>
+    <pre>@option include.depth = &lt;int&gt;   ;# 既定=10</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-5">オプション&nbsp;<code>comment.nest</code></a></h3>
+    <p><code>/*&nbsp;...&nbsp;*/</code>の入れ子対応を指定します。</p>
+    <pre>@option comment.nest = &lt;bool&gt;   ;# 既定=false</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-6">オプション&nbsp;<code>paren.multiline</code></a></h3>
+    <p>括弧<code>(),[],{}</code>の間の改行許可を指定します。</p>
+    <pre>@option paren.multiline = &lt;bool&gt;   ;# 既定=false</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-7">オプション&nbsp;<code>section.datacount</code></a></h3>
+<p3>.wasm ファイルへの Data Count Section 出力を制御します。</p3>    <pre>@option section.datacount = &lt;bool&gt;   ;# 既定=false</pre>
+    <p>&nbsp;</p>
+    <h3><a name="index-8">オプション&nbsp;<code>type.unique</code></a></h3>
+    <p>.wasm のファイル サイズ縮小を目的としたオプションです。Type Section にある関数型の「引数型リストと返値型リスト」が一致するものを同一の<code>typeidx</code>とする場合は<code>true</code>を指定します。</p>
+    <pre>@option type.unique = &lt;bool&gt;   ;# 既定=false</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-9">疑似命令&nbsp;<code>@set,@unset</code></a></h2>
+    <p>疑似命令<code>@set</code>ではアセンブラ用変数(識別子)を設定します。</p>
+    <pre>@set &lt;識別子&gt; = &lt;値&gt;</pre>
+    <p>疑似命令<code>@unset</code>ではアセンブラ用変数(識別子)を削除します。</p>
+    <pre>@unset &lt;識別子&gt;</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-10">疑似命令&nbsp;<code>@if,@elif,@else,@endif</code></a></h2>
+    <p>疑似命令<code>@if,@elif,@else,@endif</code>でソースのアセンブル部分を制御できます。</p>
+    <pre>@if 式1<br/>
+<br/>
+;# 式1 が真のときにアセンブルされる<br/>
+;# ...<br/>
+<br/>
+@elif 式2<br/>
+<br/>
+;# 式2 が真のときにアセンブルされる<br/>
+;# ...<br/>
+<br/>
+@else<br/>
+<br/>
+;# 式1, 式2 ともに偽のときにアセンブルされる<br/>
+;# ...<br/>
+<br/>
+@endif</pre>
+    <p>式で使用できる識別子は、アセンブラ用変数、<code>.alias</code>疑似命令のラベル名、オプション名になります。</p>
+    <p>&nbsp;</p>
+    <h2><a name="index-11">疑似命令&nbsp;<code>@message</code></a></h2>
+    <p>疑似命令<code>@message</code>では、アセンブル時のアセンブラ変数などをメッセージとして出力することができます。</p>
+    <pre>@message 文字列, 識別子, 数値, ...</pre>
+    <p>&nbsp;</p>
+    <h2><a name="index-12">疑似命令&nbsp;<code>@include</code></a></h2>
+    <p>疑似命令<code>@include</code>では、その位置に指定ファイルの内容を挿入します。検索パス情報として<code>WASMGEN_INCLUDE</code>環境変数を使用します。内容は<code>PATH</code>環境変数と同様です。</p>
+    <pre>@include ファイル, exist</pre>
+    <p><code>exist</code>は省略可能で、<code>true</code>でファイルが開けない場合にエラーとなります。省略すると<code>true</code>です。</p>
+    <p>&nbsp;</p>
+  </body>
+</html>

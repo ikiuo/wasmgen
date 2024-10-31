@@ -1,0 +1,224 @@
+;; -*- Lisp -*-
+
+(@include "instruction-shuffle.sxpml")
+
+(@def $wasmgen-instruction-select-min
+  (@h3 "小さい方")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "min(" (var "p1") (sub "f32") ", " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "min(" (var "p1") (sub "f64") ", " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.min_s") (br)
+	(code "s8x16.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "min(" (var "p1") (sub "s8x16") "[𝑛], " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.min_u") (br)
+	(code "u8x16.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "min(" (var "p1") (sub "u8x16") "[𝑛], " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.min_s") (br)
+	(code "s16x8.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "min(" (var "p1") (sub "s16x8") "[𝑛], " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.min_u") (br)
+	(code "u16x8.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "min(" (var "p1") (sub "u16x8") "[𝑛], " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.min_s") (br)
+	(code "s32x4.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "min(" (var "p1") (sub "s32x4") "[𝑛], " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.min_u") (br)
+	(code "u32x4.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "min(" (var "p1") (sub "u32x4") "[𝑛], " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "min(" (var "p1") (sub "f32x4") "[𝑛], " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.min"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "min(" (var "p1") (sub "f64x2") "[𝑛], " (var "p2") (sub "f64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.pmin"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "pmin(" (var "p1") (sub "f32x4") "[𝑛], " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.pmin"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "pmin(" (var "p1") (sub "f64x2") "[𝑛], " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-select-max
+  (@h3 "大きい方")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f32"))
+    (td $vtop (code "f32.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32") " ← " "max(" (var "p1") (sub "f32") ", " (var "p2") (sub "f32") ")")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "f64"))
+    (td $vtop (code "f64.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64") " ← " "max(" (var "p1") (sub "f64") ", " (var "p2") (sub "f64") ")")))
+   (tr
+    (td [colspan "5"]))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.max_s") (br)
+	(code "s8x16.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "max(" (var "p1") (sub "s8x16") "[𝑛], " (var "p2") (sub "s8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i8x16.max_u") (br)
+	(code "u8x16.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i8x16") "[𝑛:0..15]" " ← " "max(" (var "p1") (sub "u8x16") "[𝑛], " (var "p2") (sub "u8x16") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.max_s") (br)
+	(code "s16x8.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "max(" (var "p1") (sub "s16x8") "[𝑛], " (var "p2") (sub "s16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i16x8.max_u") (br)
+	(code "u16x8.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i16x8") "[𝑛:0..7]" " ← " "max(" (var "p1") (sub "u16x8") "[𝑛], " (var "p2") (sub "u16x8") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.max_s") (br)
+	(code "s32x4.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "max(" (var "p1") (sub "s32x4") "[𝑛], " (var "p2") (sub "s32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "i32x4.max_u") (br)
+	(code "u32x4.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "i32x4") "[𝑛:0..3]" " ← " "max(" (var "p1") (sub "u32x4") "[𝑛], " (var "p2") (sub "u32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "max(" (var "p1") (sub "f32x4") "[𝑛], " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.max"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "max(" (var "p1") (sub "f64x2") "[𝑛], " (var "p2") (sub "f64x2") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f32x4.pmax"))
+    (td)
+    (td $vtop (code (var "r") (sub "f32x4") "[𝑛:0..3]" " ← " "pmax(" (var "p1") (sub "f32x4") "[𝑛], " (var "p2") (sub "f32x4") "[𝑛])")))
+   (tr
+    (td $topcenter (code "2"))
+    (td $vtop (code "v128"))
+    (td $vtop (code "f64x2.pmax"))
+    (td)
+    (td $vtop (code (var "r") (sub "f64x2") "[𝑛:0..1]" " ← " "pmax(" (var "p1") (sub "f64x2") "[𝑛], " (var "p2") (sub "f64x2") "[𝑛])")))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-select-bool
+  (@h3 "条件選択")
+  (table
+   (tr
+    (th "引数")
+    (th "返値")
+    (th "命令")
+    (th "OP")
+    (th "備考"))
+   (tr
+    (td $topcenter (code "3"))
+    (td $vtop (code "any"))
+    (td $vtop (code "select"))
+    (td)
+    (td $vtop (code (var "r") " ← " (var "p3") (sub "i32") " ? " (var "p1") " : " (var "p2"))))
+   (tr
+    (td $topcenter (code "3"))
+    (td $vtop (code "any"))
+    (td $vtop (code "select"))
+    (td $vtop (code "valtype,valtype,..."))
+    (td $vtop "同上 (" (code "valtype") "リスト形式は将来予約)"))
+   ) ; table
+  $vpad
+  ) ; @def
+
+(@def $wasmgen-instruction-selector-name "選択")
+
+(@def $wasmgen-instruction-selector
+  (@h2 $wasmgen-instruction-selector-name)
+  $wasmgen-instruction-select-min
+  $wasmgen-instruction-select-max
+  $wasmgen-instruction-select-bool
+  $wasmgen-instruction-shuffle
+  ) ; @def

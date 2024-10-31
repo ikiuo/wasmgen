@@ -1,0 +1,54 @@
+;; -*- Lisp -*-
+
+(@include "instruction-representation.sxpml")
+(@include "instruction-block.sxpml")
+
+(@include "instruction-table-column.sxpml")
+
+;; (@include "instruction-const.sxpml")
+;; (@include "instruction-getset.sxpml")
+(@include "instruction-const-getset.sxpml")
+(@include "instruction-load-store.sxpml")
+(@include "instruction-convert.sxpml")
+(@include "instruction-compare.sxpml")
+(@include "instruction-compare-branch.sxpml")
+
+(@include "instruction-arithmetic.sxpml")
+(@include "instruction-logical-shift.sxpml")
+(@include "instruction-bitop.sxpml")
+(@include "instruction-selector.sxpml")
+(@include "instruction-stack.sxpml")
+(@include "instruction-ref.sxpml")
+(@include "instruction-table-memory.sxpml")
+(@include "instruction-branch.sxpml")
+
+(@def $wasmgen-instruction
+  (@h1 "実行命令")
+  (p "詳細は " (a [href $url-wasm-instr] "WebAssembly - Instructions") " を参照してください。")
+  $vpad
+
+  $wasmgen-instruction-representation
+  $wasmgen-instruction-table-column
+
+  $wasmgen-instruction-const
+  $wasmgen-instruction-getset
+  $wasmgen-instruction-load-store
+  $wasmgen-instruction-convert
+
+  $wasmgen-instruction-arithmetic
+  $wasmgen-instruction-logical
+  $wasmgen-instruction-shift
+  $wasmgen-instruction-compare
+
+  $wasmgen-instruction-bitop
+  $wasmgen-instruction-selector
+
+  $wasmgen-instruction-stack
+  $wasmgen-instruction-ref
+  $wasmgen-instruction-table
+  $wasmgen-instruction-memory
+  $wasmgen-instruction-branch
+  $wasmgen-instruction-compare-branch
+
+  $wasmgen-instruction-block
+  ) ; @def

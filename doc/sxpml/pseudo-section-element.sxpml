@@ -1,0 +1,202 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-element
+  (@h2 "Element Section")
+  (p "1つのテーブル要素は")
+  (ul
+   (li "参照型(" (code "reftype") ")")
+   (li "モード")
+   (ul
+    (li "①" (code "declarative"))
+    (li "②" (code "passive"))
+    (li "③" (code "active"))
+    (ul
+     (li "テーブル位置(" (code "tableidx") "と" (code "オフセット") ")")))
+   (li "要素")
+   (ul
+    (li "Ⓐ" (code "funcidx") "のリスト")
+    (li "Ⓑ" (code "reftype") "を返すプログラムのリスト")))
+  (p "で構成され、Element Section はテーブル要素のリストになっています。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".element"))
+  (p "疑似命令" (code ".element") "でテーブル要素を開始します。")
+  (h4 "テーブル要素記述形式")
+  (table
+   (tr
+    (th "種類")
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド"))
+   (tr
+    (th "①")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "declarative")))
+   (tr
+    (th "①")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>, declarative")))
+   (tr
+    (th "②")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "passive")))
+   (tr
+    (th "②")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>, passive")))
+   (tr
+    (th "③")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td))
+   (tr
+    (th "③")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>")))
+   (tr
+    (th "③")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>, active")))
+   (tr
+    (th "③")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>, active, <tableidx>")))
+   (tr
+    (th "③")
+    (td (code "要素名"))
+    (td (code ".element"))
+    (td (code "<reftype>, active, <tableidx>, オフセット")))
+   ) ; table
+  (p (code "要素名") "は名前空間" (code "elemidx") "に序数として登録され、"
+     (code "elemidx") "を指定する場面で参照できます。")
+  (p "既定値")
+  (ul
+   (li (code "reftype = funcref"))
+   (li (code "tableidx = 0"))
+   (li (code "オフセット = 0")))
+
+  (h4 "①" (code "declarative") "モード")
+  (pre
+   "要素名      .element    declarative"
+   "要素名      .element    <reftype>, declarative")
+
+  (h4 "②" (code "passive") "モード")
+  (pre
+   "要素名      .element    passive"
+   "要素名      .element    <reftype>, passive")
+
+  (h4 "③" (code "active") "モード")
+  (pre
+   "要素名      .element"
+   "要素名      .element    <reftype>"
+   "要素名      .element    <reftype>, active"
+   "要素名      .element    <reftype>, active, <tableidx>"
+   "要素名      .element    <reftype>, active, <tableidx>, オフセット")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".reftype"))
+  (p "疑似命令" (code ".element") "で" (code "reftype") "を省略したときに使用します。")
+  (pre
+   "要素名      .element"
+   "　　　      ;# ..."
+   "　　　      .reftype    <reftype>")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".tableidx"))
+  (p "疑似命令" (code ".element") "で" (code "tableidx") "を省略したときに使用します。")
+  (pre
+   "要素名      .element    <reftype>, active"
+   "　　　      ;# ..."
+   "　　　      .tableidx   <tableidx>")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".offset"))
+  (p "疑似命令" (code ".element") "で" (code "オフセット") "を省略したときに使用します。")
+  (h4 "オフセット値を返すプログラムを記述する形式")
+  (pre
+   "            .offset"
+   ";# 以下、オフセット値を返すコード"
+   ";#          i32.const   値"
+   ";# などを記述する")
+  (h4 "オフセット値を返すプログラムを自動生成する形式")
+  (pre
+   "            .offset     値"
+   ";# オフセット値を返すコード"
+   ";#          i32.const   値"
+   ";# が自動生成される")
+  (p "疑似命令" (code ".offset") "もない場合は、" (code "オフセット") "は" (code "0") "になります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".funcidx"))
+  (p "オペランドに" (code "funcidx") "のリストと" (code "reftype") "を返すプログラムの開始になります。")
+  (h4 "Ⓐ" (code "funcidx") "のリスト")
+  (pre
+   "            .funcidx    <funcidx>,<funcidx>,..."
+   "            .funcidx    <funcidx>,<funcidx>,..."
+   "            ;# ...")
+  (p "疑似命令" (code ".funcidx") "の下に、"
+     (code "ref.func") "や" (code "ref.null") "などのコードが一切ない場合は、"
+     (code "funcidx") "のリスト形式になります。")
+  (h4 "Ⓑ" (code "reftype") "を返すプログラムのリスト")
+  (pre
+   "            .funcidx    <funcidx>,<funcidx>,..."
+   ";# ここに funcidx を返すプログラム"
+   ";#          ref.null    <reftype>"
+   ";# などが入る"
+   ""
+   "            .funcidx    <funcidx>,<funcidx>,..."
+   ";# ref.null の存在により <funcidx> は"
+   ";#          ref.func    <funcidx>"
+   ";# のコードに全て置換される"
+   "            ;# ...")
+  (p "疑似命令" (code ".funcidx") "の下に、"
+     (code "ref.func") "や" (code "ref.null") "などのコードが1つでもあると、"
+     (code "<funcidx>") "も" (code "reftype") "を返すプログラムに自動変換します。")
+  $vpad
+
+  (h3 "例")
+  (pre
+   ";# mode active その1"
+   "elem0       .element"
+   "            .reftype    funcref"
+   "            .tableidx   tab1"
+   "            .offset     0"
+   "            .funcidx    func2, func3"
+   ""
+   ";# mode active その2"
+   "elem1       .element"
+   "            .tableidx   tab1"
+   "            .offset     1"
+   "            .funcidx    func2, func3"
+   ""
+   ";# mode active その3"
+   "elem2       .element    active, tab1"
+   "            .offset     2"
+   "            .funcidx    func2, func3"
+   ""
+   ";# mode active その4"
+   "elem3       .element    active, tab1, 3"
+   "            .funcidx    func2"
+   ""
+   ";# mode passive"
+   "elem4       .element    passive"
+   "            .funcidx    func2"
+   "            ref.func    func3"
+   "            .funcidx"
+   "            ref.func    func4"
+   ""
+   ";# mode declarative"
+   "elem4       .element    declarative"
+   "            .funcidx    func2, func3")
+  $vpad
+
+  ) ; @def

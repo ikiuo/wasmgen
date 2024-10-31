@@ -1,0 +1,72 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-global
+  (@h2 "Global Section")
+  (p "1つのグローバル変数は")
+  (ul
+   (li "データ型(" (code "valtype") ")")
+   (li "データ値を返すプログラム"))
+  (p "で構成され、Global Section はグローバル変数のリストになっています。")
+  (p "疑似命令" (code ".gconst") "または" (code ".gvar") "でグローバル変数を開始します。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".gconst") $spc "と" $spc (code ".gvar"))
+
+  (h4 "グローバル変数の記述形式")
+  (table
+   (tr
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td (code "グローバル名"))
+    (td (code ".gconst"))
+    (td (code "<valtype>"))
+    (td "初期化コードが必要 (変更不可)"))
+   (tr
+    (td (code "グローバル名"))
+    (td (code ".gvar"))
+    (td (code "<valtype>"))
+    (td "初期化コードが必要"))
+   (tr
+    (td (code "グローバル名"))
+    (td (code ".gconst"))
+    (td (code "<valtype>, 値"))
+    (td "初期化コードは自動生成 (変更不可)"))
+   (tr
+    (td (code "グローバル名"))
+    (td (code ".gvar"))
+    (td (code "<valtype>, 値"))
+    (td "初期化コードは自動生成 (変更不可)"))
+   ) ; table
+  (pre
+   "グローバル名  .gconst     <valtype>"
+   "グローバル名  .gvar       <valtype>"
+   "グローバル名  .gconst     <valtype>, 値"
+   "グローバル名  .gvar       <valtype>, 値")
+  (p (code "グローバル名") "は名前空間" (code "globalidx") "に序数として登録され、"
+     (code "globalidx") "を指定する場面で参照できます。"
+     "初期値を省略した場合は、初期化コードが必要です。"
+     "初期値を記述した場合は、初期化コードが自動生成されます。")
+
+  (h4 "例")
+  (pre
+   "global2     .gconst     i32, 0"
+   "global3     .gconst     f32, 1.0"
+   "global4     .gconst     f32x4, 1.0, 2.0, 3.0, 4.0"
+   ""
+   "global5     .gvar       i32"
+   "            i32.const   5"
+   ""
+   "global6     .gconst     f64"
+   "            f64.const   3.141592653589793"
+   ""
+   "global7     .gvar       i32, 0"
+   "global8     .gvar       f64, 2.0"
+   "global9     .gvar       f64x2, 0.5, 0.25")
+  $vpad
+
+  ) ; @def

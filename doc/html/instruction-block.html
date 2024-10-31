@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - ブロックと分岐命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>ブロックと分岐命令</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">ブロックと分岐命令</a><br/>
+                <a href="#index-2">ブロックの記述形式</a><br/>
+                <a href="#index-3">ブロック開始の記述形式</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">ブロックと分岐命令</a></h2>
+    <p>分岐命令はブロックからの脱出のみで、分岐するにはブロックの記述が必要です。</p>
+    <p>&nbsp;</p>
+    <h4>ブロック<code>block</code>〜<code>end</code></h4>
+    <table>
+      <tr>
+        <th><code>br</code>分岐先</th>
+        <th>命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>block</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="center">↓</td>
+        <td><code>𝑖𝑛𝑠𝑡𝑟...</code></td>
+        <td></td>
+        <td>ブロック内のコード</td>
+      </tr>
+      <tr>
+        <td class="center">✓</td>
+        <td><code>end</code></td>
+        <td></td>
+        <td>ブロックの終了</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h4>ブロック<code>loop</code>〜<code>end</code></h4>
+    <table>
+      <tr>
+        <th><code>br</code>分岐先</th>
+        <th>命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td class="center">✓</td>
+        <td><code>loop</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="center">↑</td>
+        <td><code>𝑖𝑛𝑠𝑡𝑟...</code></td>
+        <td></td>
+        <td>ブロック内のコード</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>end</code></td>
+        <td></td>
+        <td>ブロックの終了</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h4>ブロック<code>if</code>〜<code>else</code>〜<code>end</code></h4>
+    <table>
+      <tr>
+        <th colspan="2"><code>br</code>分岐先</th>
+        <th rowspan="2">命令</th>
+        <th rowspan="2">オペランド</th>
+        <th rowspan="2">備考</th>
+      </tr>
+      <tr>
+        <th><code>if</code></th>
+        <th><code>else</code></th>
+      </tr>
+      <tr>
+        <td></td>
+        <td></td>
+        <td><code>if</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td><code>if</code>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="center">↓</td>
+        <td></td>
+        <td><code>𝑖𝑛𝑠𝑡𝑟...</code></td>
+        <td></td>
+        <td>ブロック内のコード</td>
+      </tr>
+      <tr>
+        <td class="center">↓</td>
+        <td></td>
+        <td><code>else</code></td>
+        <td></td>
+        <td><code>if</code>ブロックの終了<br/><code>else</code>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="center">↓</td>
+        <td class="center">↓</td>
+        <td><code>𝑖𝑛𝑠𝑡𝑟...</code></td>
+        <td></td>
+        <td>ブロック内のコード</td>
+      </tr>
+      <tr>
+        <td class="center">✓</td>
+        <td class="center">✓</td>
+        <td><code>end</code></td>
+        <td></td>
+        <td>ブロックの終了</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+    <h3><a name="index-2">ブロックの記述形式</a></h3>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>命令</th>
+        <th>オペランド</th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>block</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>loop</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td>ループ・ブロックの開始</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>if</code></td>
+        <td><code>&lt;blocktype&gt;</code></td>
+        <td><code>if</code>ブロックの開始<br/>スタック上の<code>i32</code>が<br/>偽(<code>0</code>)ならば<code>else</code>へ分岐</td>
+      </tr>
+      <tr>
+        <td></td>
+        <td><code>else</code></td>
+        <td></td>
+        <td><code>else</code>ブロックの開始</td>
+      </tr>
+      <tr>
+        <td class="vtop"><code>ラベル名</code></td>
+        <td><code>end</code><br/><code>end.block</code><br/><code>end.loop</code><br/><code>end.if</code></td>
+        <td></td>
+        <td class="vtop">ブロックまたはコードの終端<br/>別名 end.* はブロック記述用で<br/>対でない場合に警告が出ます</td>
+      </tr>
+    </table>
+    <pre>ラベル名    block   &lt;blocktype&gt;<br/>
+ラベル名    loop    &lt;blocktype&gt;<br/>
+ラベル名    if      &lt;blocktype&gt;<br/>
+　　　　    else<br/>
+ラベル名    end</pre>
+    <p><code>ラベル名</code>は制御ブロックの<code>labelidx</code>になります。</p>
+    <p><code>block,loop,if</code>に<code>ラベル名</code>がある場合は、<code>end</code>の<code>ラベル名</code>は無視されます。<code>block,loop,if</code>に<code>ラベル名</code>がない場合は、<code>end</code>の<code>ラベル名</code>が有効になります。<code>ラベル名</code>は<code>block,loop,if</code>から<code>end</code>の期間が検索対象になるため、<code>end</code>より後で同じ識別子の<code>ラベル名</code>を使用することができます。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-3">ブロック開始の記述形式</a></h3>
+    <p><code>block,loop,if</code>を<code>&lt;instr&gt;</code>とすると、記述形式は次の通りになります。</p>
+    <table>
+      <tr>
+        <th>ラベル</th>
+        <th>命令</th>
+        <th>オペランド<code>&lt;blocktype&gt;</code></th>
+        <th>備考</th>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>&lt;instr&gt;</code></td>
+        <td></td>
+        <td>返値なしの関数相当</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>&lt;instr&gt;</code></td>
+        <td><code>&lt;typeidx&gt;</code></td>
+        <td><code>&lt;typeidx&gt;</code>の関数型</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>&lt;instr&gt;</code></td>
+        <td><code>&lt;valtype&gt;</code></td>
+        <td><code>&lt;valtype&gt;</code>が返値の関数相当</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>&lt;instr&gt;</code></td>
+        <td><code>&lt;valtype&gt;,&nbsp;&lt;valtype&gt;...</code></td>
+        <td><code>&lt;valtype&gt;</code>リストが返値の関数相当</td>
+      </tr>
+      <tr>
+        <td><code>ラベル名</code></td>
+        <td><code>&lt;instr&gt;</code></td>
+        <td><code>関数型</code></td>
+        <td>記述された<code>関数型</code></td>
+      </tr>
+    </table>
+    <pre>ラベル名    &lt;instr&gt;<br/>
+ラベル名    &lt;instr&gt;     &lt;typeidx&gt;<br/>
+ラベル名    &lt;instr&gt;     &lt;valtype&gt;<br/>
+ラベル名    &lt;instr&gt;     &lt;valtype&gt;, &lt;valtype&gt;, ...<br/>
+ラベル名    &lt;instr&gt;     関数型</pre>
+    <p><code>&lt;blocktype&gt;</code>は開始時の引数リストと終了時の返値リストの情報だから関数型相当になります。下２つの形式はアセンブラが関数型を自動生成・登録して<code>typeidx</code>を割り当てます。</p>
+    <p>&nbsp;</p>
+    <h4>ブロックの例</h4>
+    <pre>n           .param      i32<br/>
+p           .local      i32<br/>
+            block<br/>
+            local.get   n<br/>
+            local.tee   p<br/>
+            i32.eqz<br/>
+            br_if       $exit<br/>
+$cont:      loop<br/>
+;#          𝑖𝑛𝑠𝑡𝑟...<br/>
+            local.get   p<br/>
+            i32.const   1<br/>
+            i32.sub<br/>
+            local.tee   p<br/>
+            br_if       $cont<br/>
+            end.loop<br/>
+$exit:      end.block</pre>
+    <p>&nbsp;</p>
+  </body>
+</html>

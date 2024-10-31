@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 命令表の各列</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ</h1>
+    <h2><a name="index-1">命令表の各列</a></h2>
+    <table>
+      <tr>
+        <th>列</th>
+        <th>内容</th>
+      </tr>
+      <tr>
+        <td>引数</td>
+        <td>実行に必要な引数の数で、最初の引数の記号は<code><var>p1</var></code>で<code><var>p2</var>,<var>p3</var>...</code>と続く</td>
+      </tr>
+      <tr>
+        <td>返値</td>
+        <td>実行結果で、記号<code><var>r</var></code>とし、添字<code><sub>type</sub></code>は型を意味します</td>
+      </tr>
+      <tr>
+        <td>命令</td>
+        <td>コード(同一セル内に別名も列挙)</td>
+      </tr>
+      <tr>
+        <td>OP</td>
+        <td>命令のオペランド</td>
+      </tr>
+      <tr>
+        <td>備考</td>
+        <td>主に動作内容</td>
+      </tr>
+    </table>
+    <p>&nbsp;</p>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+;; -*- Lisp -*-
+
+(@include "instruction-logical.sxpml")
+(@include "instruction-shift.sxpml")
+
+(@def $wasmgen-instruction-logical-shift-name
+    $wasmgen-instruction-logical-name "、"
+    $wasmgen-instruction-shift-name)

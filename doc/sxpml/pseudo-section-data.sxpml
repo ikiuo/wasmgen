@@ -1,0 +1,198 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-section-data
+  (@h2 "Data Section")
+  (p "1つのデータ列は")
+  (ul
+   (li "モード")
+   (ul
+    (li "①" (code "active"))
+    (ul
+     (li "テーブル位置(" (code "memidx") "と" (code "オフセット") ")"))
+    (li "②" (code "passive")))
+   (li "データ列"))
+  (p "で構成され、Data Section はデータ列のリストになっています。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".data"))
+  (p "疑似命令" (code ".data") "でデータ列を開始します。")
+  (h4 "データ列記述形式")
+  (table
+   (tr
+    (th "種類")
+    (th "ラベル")
+    (th "疑似命令")
+    (th "オペランド"))
+   (tr
+    (th "①")
+    (td (code "データ名"))
+    (td (code ".data"))
+    (td))
+   (tr
+    (th "①")
+    (td (code "データ名"))
+    (td (code ".data"))
+    (td (code "<memidx>")))
+   (tr
+    (th "①")
+    (td (code "データ名"))
+    (td (code ".data"))
+    (td (code "<memidx>, オフセット")))
+   (tr
+    (th "②")
+    (td (code "データ名"))
+    (td (code ".data")))
+   ) ; table
+
+  (p (code "データ名") "は名前空間" (code "dataidx") "に序数として登録され、"
+     (code "dataidx") "を指定する場面で参照できます。")
+
+  (h4 "①" (code "active") "モード")
+  (pre
+   "データ名    .data       <memidx>, オフセット"
+   ""
+   ";# オフセットを別途記述する形式"
+   "データ名    .data       <memidx>"
+   "　　　　    ;# 以下で"
+   "　　　　    ;#   .offset   [オフセット]"
+   "　　　　    ;# を使用する"
+   ""
+   ";# <memidx>とオフセットを別途記述する形式"
+   "データ名    .data"
+   "　　　　    ;# 以下で"
+   "　　　　    ;#   .memidx   <memidx>"
+   "　　　　    ;#   .offset   [オフセット]"
+   "　　　　    ;# を使用する")
+
+  (h4 "②" (code "passive") "モード")
+  (pre
+   "データ名    .data")
+  (p "疑似命令" (code ".memidx") "および疑似命令" (code ".offset") "が使用されないとき、"
+     (code "passive") "モードになります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".memidx"))
+  (pre
+   "            .memidx     <memidx>")
+  (p "疑似命令" (code ".data") "で" (code "memidx") "を省略したときに使用します。"
+     "疑似命令" (code ".memidx") "もない場合は、" (code "memidx") "は" (code "0") "になります。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".offset"))
+  (p "疑似命令" (code ".elment") "での疑似命令" (code ".offset") "と同様です。")
+  $vpad
+
+  (@h3 "データ列用疑似命令")
+  (table
+   (tr
+    (th "疑似命令")
+    (th "オペランド")
+    (th "備考"))
+   (tr
+    (td (code ".i8"))
+    (td (code "<8ビット値>,..."))
+    (td))
+   (tr
+    (td (code ".i16"))
+    (td (code "<16ビット値>,..."))
+    (td))
+   (tr
+    (td (code ".i32"))
+    (td (code "<32ビット値>,..."))
+    (td))
+   (tr
+    (td (code ".i64"))
+    (td (code "<64ビット値>,..."))
+    (td))
+   (tr
+    (td (code ".f32"))
+    (td (code "<単精度浮動小数点値>,..."))
+    (td))
+   (tr
+    (td (code ".f64"))
+    (td (code "<倍制度浮動小数点値>,..."))
+    (td))
+   (tr
+    (td (code ".sleb"))
+    (td (code "<符号あり整数値>,..."))
+    (td "符号あり LEB128 形式"))
+   (tr
+    (td (code ".uleb"))
+    (td (code "<符号なし整数値>,..."))
+    (td "符号なし LEB128 形式"))
+   (tr
+    (td (code ".nstring"))
+    (td (code "\"文字列\",..."))
+    (td "先頭に uleb 形式で文字列長あり"))
+   (tr
+    (td (code ".string"))
+    (td (code "\"文字列\",..."))
+    (td "純粋な文字列データ" (br) "注意: null文字終端ではない"))
+   ) ; table
+  (pre
+   "            .i8         <8ビット値>,..."
+   "            .i16        <16ビット値>,..."
+   "            .i32        <32ビット値>,..."
+   "            .i64        <64ビット値>,..."
+   "            .f32        <単精度浮動小数点値>,..."
+   "            .f64        <倍制度浮動小数点値>,..."
+   "            .sleb       <符号あり整数値>,..."
+   "            .uleb       <符号なし整数値>,..."
+   "            .nstring    \"UTF-8\", \"文字列\", ..."
+   "            .string     \"UTF-8\", \"文字列\", ...")
+  $vpad
+
+  (@h3 "エンディアン別データ列用疑似命令")
+  (p "データ サイズは同じでエンディアンが異なる疑似命令があります。")
+  (table
+   (tr
+    (th "データ型")
+    (th "※i8値")
+    (th "i16値")
+    (th "i32値")
+    (th "i64値")
+    (th "f32値")
+    (th "f64値"))
+   (tr
+    (th "リトル")
+    (td (code ".i8"))
+    (td (code ".i16"))
+    (td (code ".i32"))
+    (td (code ".i64"))
+    (td (code ".f32"))
+    (td (code ".f64")))
+   (tr
+    (th "リトル")
+    (td (code ".i8le"))
+    (td (code ".i16le"))
+    (td (code ".i32le"))
+    (td (code ".i64le"))
+    (td (code ".f32le"))
+    (td (code ".f64le")))
+   (tr
+    (th "ビッグ")
+    (td (code ".i8be"))
+    (td (code ".i16be"))
+    (td (code ".i32be"))
+    (td (code ".i64be"))
+    (td (code ".f32be"))
+    (td (code ".f64be")))
+   ) ; table
+  (p "※ " (code ".i8, .i8be, .i8le") "に違いはありません。")
+  $vpad
+
+  (h3 "例")
+  (pre
+   "data1       .data       mem1"
+   "            .i8         0,1"
+   ""
+   "data2       .data       mem1, 2"
+   "            .i16        0x0302"
+   ""
+   "data3       .data       mem1, 4"
+   "            .i32be      0x04050607")
+  $vpad
+
+  ) ; @def
