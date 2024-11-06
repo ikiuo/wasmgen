@@ -125,40 +125,6 @@ namespace wasmgen
     using NewCodeList = NewPointer<CodeList>;
 
     ///////////////
-    // CodeBlock //
-    ///////////////
-
-    class CodeBlock;
-
-    using CodeBlockPtr = Pointer<CodeBlock>;
-    using CodeBlockPef = RefPointer<CodeBlock>;
-    using NewCodeBlock = NewPointer<CodeBlock>;
-
-    class CodeBlock : public CodeList
-    {
-    private:
-        using super = CodeList;
-
-    public:
-        CodeBlockPtr block;
-
-    public:
-        using super::super;
-
-        bool isblock() const noexcept;
-    };
-
-    ///////////////////
-    // CodeBlockList //
-    ///////////////////
-
-    using CodeBlockList = PointerArray<CodeBlock>;
-
-    using CodeBlockListPtr = Pointer<CodeBlockList>;
-    using CodeBlockListPef = RefPointer<CodeBlockList>;
-    using NewCodeBlockList = NewPointer<CodeBlockList>;
-
-    ///////////////
     // MacroData //
     ///////////////
 
@@ -842,15 +808,6 @@ namespace wasmgen
         , offset(0)
     {
         /*NOOP*/
-    }
-
-    ///////////////
-    // CodeBlock //
-    ///////////////
-
-    inline bool CodeBlock::isblock() const noexcept
-    {
-        return !size();
     }
 
     /////////////////
