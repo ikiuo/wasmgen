@@ -74,10 +74,46 @@
     <p><code>.defstruct</code>から<code>.endstruct</code>までを構造体情報として登録します。領域情報では、疑似命令<code>.member</code>を使用します。</p>
     <pre>構造体名    .defstruct                  ;# 構造体情報開始<br/>
 メンバ名１  .member         型 [, 数]    ;# メンバ名１の領域を指定 (型のサイズ×[数:省略時は1])<br/>
-メンバ名２  .member         型 [, 数]    ;# メンバ名２の領域を指定<br/>
+メンバ名２  .member         数 [, 数]    ;# メンバ名２の領域を指定 (型の代わりに大きさを指定可)<br/>
 ;#         ...<br/>
 [サイズ名]  .endstruct                  ;# 構造体情報終了</pre>
     <p><code>構造体名</code>は構造体型名前空間に登録され、<code>構造体名.メンバ名</code>の形式で領域へのオフセット値を参照できます。構造体のサイズは、識別子<code>.sizeof.構造体名</code>で自動登録されます。また、<code>.endstruct</code>のラベル<code>サイズ名</code>を指定すると、<code>構造体名.サイズ名</code>を使用できます。</p>
+    <p>&nbsp;</p>
+    <h4>疑似命令<code>.member</code>の既定型</h4>
+    <table>
+      <tr>
+        <th>サイズ</th>
+        <th>型</th>
+      </tr>
+      <tr>
+        <td class="right">1</td>
+        <td><code>i8,&nbsp;s8,&nbsp;u8</code></td>
+      </tr>
+      <tr>
+        <td class="right">2</td>
+        <td><code>i16,&nbsp;s16,&nbsp;u16</code></td>
+      </tr>
+      <tr>
+        <td class="right">4</td>
+        <td><code>i32,&nbsp;s32,&nbsp;u32</code></td>
+      </tr>
+      <tr>
+        <td class="right">8</td>
+        <td><code>i64,&nbsp;s64,&nbsp;u64</code></td>
+      </tr>
+      <tr>
+        <td class="right">4</td>
+        <td><code>f32</code></td>
+      </tr>
+      <tr>
+        <td class="right">8</td>
+        <td><code>f64</code></td>
+      </tr>
+      <tr>
+        <td class="right">16</td>
+        <td><code>v128</code><br/><code>i8x16,&nbsp;s8x16,&nbsp;u8x16</code><br/><code>i16x8,&nbsp;s16x8,&nbsp;u16x8</code><br/><code>i32x4,&nbsp;s32x4,&nbsp;u32x4</code><br/><code>i64x2,&nbsp;s64x2,&nbsp;u64x2</code><br/><code>f32x4,&nbsp;f64x2</code></td>
+      </tr>
+    </table>
     <p>&nbsp;</p>
     <h4>構造体使用例</h4>
     <pre>;# s1 を定義<br/>
@@ -86,7 +122,7 @@ m1          .member         i64<br/>
 m2          .member         i32,2<br/>
 m3          .member         i16<br/>
 m4          .member         i8<br/>
-            .member         i8           ;# 余白<br/>
+            .member         1+12         ;# 余白<br/>
 size        .endstruct<br/>
 <br/>
 ;# s2 を定義<br/>
@@ -96,21 +132,22 @@ m2          .member         s1<br/>
 size        .endstruct<br/>
 <br/>
 data        .data<br/>
-            .i8             .sizeof.s1   ;# = 20<br/>
-            .i8             s1.size      ;# = 20<br/>
+            .i8             .sizeof.s1   ;# = 32<br/>
+            .i8             s1.size      ;# = 32<br/>
             .i8             s1.m1        ;# = 0<br/>
             .i8             s1.m2        ;# = 8<br/>
             .i8             s1.m3        ;# = 16<br/>
             .i8             s1.m4        ;# = 18<br/>
-            .i8             0, 0<br/>
+            .i8             .sizeof.s2   ;# = 64<br/>
+            .i8             s2.size      ;# = 64<br/>
             .i8             s2.m1.m1     ;# = 0<br/>
             .i8             s2.m1.m2     ;# = 8<br/>
             .i8             s2.m1.m3     ;# = 16<br/>
             .i8             s2.m1.m4     ;# = 18<br/>
-            .i8             s2.m2.m1     ;# = 20<br/>
-            .i8             s2.m2.m2     ;# = 28<br/>
-            .i8             s2.m2.m3     ;# = 36<br/>
-            .i8             s2.m2.m4     ;# = 38</pre>
+            .i8             s2.m2.m1     ;# = 32<br/>
+            .i8             s2.m2.m2     ;# = 40<br/>
+            .i8             s2.m2.m3     ;# = 48<br/>
+            .i8             s2.m2.m4     ;# = 50</pre>
     <p>&nbsp;</p>
   </body>
 </html>

@@ -16,12 +16,47 @@
   (pre
    "構造体名    .defstruct                  ;# 構造体情報開始"
    "メンバ名１  .member         型 [, 数]    ;# メンバ名１の領域を指定 (型のサイズ×[数:省略時は1])"
-   "メンバ名２  .member         型 [, 数]    ;# メンバ名２の領域を指定"
+   "メンバ名２  .member         数 [, 数]    ;# メンバ名２の領域を指定 (型の代わりに大きさを指定可)"
    ";#         ..."
    "[サイズ名]  .endstruct                  ;# 構造体情報終了")
   (p (code "構造体名") "は構造体型名前空間に登録され、" (code "構造体名.メンバ名") "の形式で領域へのオフセット値を参照できます。"
      "構造体のサイズは、識別子" (code ".sizeof.構造体名") "で自動登録されます。"
      "また、" (code ".endstruct") "のラベル" (code "サイズ名") "を指定すると、" (code "構造体名.サイズ名") "を使用できます。")
+  $vpad
+
+  (h4 "疑似命令" (code ".member") "の既定型")
+  (table
+   (tr
+    (th "サイズ")
+    (th "型"))
+   (tr
+    (td [class "right"] "1")
+    (td (code "i8, s8, u8")))
+   (tr
+    (td [class "right"] "2")
+    (td (code "i16, s16, u16")))
+   (tr
+    (td [class "right"] "4")
+    (td (code "i32, s32, u32")))
+   (tr
+    (td [class "right"] "8")
+    (td (code "i64, s64, u64")))
+   (tr
+    (td [class "right"] "4")
+    (td (code "f32")))
+   (tr
+    (td [class "right"] "8")
+    (td (code "f64")))
+   (tr
+    (td [class "right"] "16")
+    (td
+     (code "v128") (br)
+     (code "i8x16, s8x16, u8x16") (br)
+     (code "i16x8, s16x8, u16x8") (br)
+     (code "i32x4, s32x4, u32x4") (br)
+     (code "i64x2, s64x2, u64x2") (br)
+     (code "f32x4, f64x2")))
+   ) ; table
   $vpad
 
   (h4 "構造体使用例")
@@ -32,7 +67,7 @@
    "m2          .member         i32,2"
    "m3          .member         i16"
    "m4          .member         i8"
-   "            .member         i8           ;# 余白"
+   "            .member         1+12         ;# 余白"
    "size        .endstruct"
    ""
    ";# s2 を定義"
@@ -42,21 +77,22 @@
    "size        .endstruct"
    ""
    "data        .data"
-   "            .i8             .sizeof.s1   ;# = 20"
-   "            .i8             s1.size      ;# = 20"
+   "            .i8             .sizeof.s1   ;# = 32"
+   "            .i8             s1.size      ;# = 32"
    "            .i8             s1.m1        ;# = 0"
    "            .i8             s1.m2        ;# = 8"
    "            .i8             s1.m3        ;# = 16"
    "            .i8             s1.m4        ;# = 18"
-   "            .i8             0, 0"
+   "            .i8             .sizeof.s2   ;# = 64"
+   "            .i8             s2.size      ;# = 64"
    "            .i8             s2.m1.m1     ;# = 0"
    "            .i8             s2.m1.m2     ;# = 8"
    "            .i8             s2.m1.m3     ;# = 16"
    "            .i8             s2.m1.m4     ;# = 18"
-   "            .i8             s2.m2.m1     ;# = 20"
-   "            .i8             s2.m2.m2     ;# = 28"
-   "            .i8             s2.m2.m3     ;# = 36"
-   "            .i8             s2.m2.m4     ;# = 38")
+   "            .i8             s2.m2.m1     ;# = 32"
+   "            .i8             s2.m2.m2     ;# = 40"
+   "            .i8             s2.m2.m3     ;# = 48"
+   "            .i8             s2.m2.m4     ;# = 50")
   $vpad
 
   )  ; @ def
