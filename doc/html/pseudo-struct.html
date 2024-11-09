@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8"/>
+    <title>wasmgen : WebAssembly 用アセンブラ - 構造体情報疑似命令</title>
+    <style>
+    body {
+      width: 840px;
+      margin: auto;
+      padding: 2.0em;
+      border: solid 1px lightgray;
+      font-family: "Meiryo";
+    }
+    h1, h2 {
+      border-bottom: solid 1px #eceef1;
+      padding-bottom: 0.2em;
+    }
+    table {
+      border: solid 1px #e8ebee;
+      border-collaspe: collaspe;
+      border-spacing: 0;
+    }
+    th, td {
+      border: solid 1px #e8ebee;
+      padding: 0.5em;
+    }
+    code, .code {
+      background-color: #f6f8fa;
+      padding: 0.3em 0.4em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 1.5em;
+    }
+    pre {
+      background-color: #f6f8fa;
+      padding: 1em;
+      font-family: "Courier", "MS Gothic";
+      font-size: 0.9em ;
+      line-height: 0.6em;
+    }
+    .left {
+      text-align: left;
+    }
+    .center {
+      text-align: center;
+    }
+    .right {
+       text-align: right;
+    }
+    .vtop {
+       vertical-align: top;
+    }
+    .vbase {
+       vertical-align: baseline;
+    }
+    .vmiddle {
+       vertical-align: middle;
+    }
+    .vbottom {
+       vertical-align: bottom;
+    }
+    </style>
+  </head>
+  <body>
+    <h1>wasmgen : WebAssembly 用アセンブラ<br/>構造体情報疑似命令</h1>
+    <p style="font-size: xx-large;"><b>目次</b></p>
+            <a href="#index-1">構造体情報疑似命令</a><br/>
+                <a href="#index-2">疑似命令 .defstruct / .endstruct / .member</a><br/>
+    <p>&nbsp;</p>
+    <h2><a name="index-1">構造体情報疑似命令</a></h2>
+    <p>構造体のメンバ(オフセット値)の定義するための疑似命令です。</p>
+    <p>&nbsp;</p>
+    <h3><a name="index-2">疑似命令&nbsp;<code>.defstruct</code>&nbsp;/&nbsp;<code>.endstruct</code>&nbsp;/&nbsp;<code>.member</code></a></h3>
+    <p><code>.defstruct</code>から<code>.endstruct</code>までを構造体情報として登録します。領域情報では、疑似命令<code>.member</code>を使用します。</p>
+    <pre>構造体名    .defstruct                  ;# 構造体情報開始<br/>
+メンバ名１  .member         型 [, 数]    ;# メンバ名１の領域を指定 (型のサイズ×[数:省略時は1])<br/>
+メンバ名２  .member         型 [, 数]    ;# メンバ名２の領域を指定<br/>
+;#         ...<br/>
+[サイズ名]  .endstruct                  ;# 構造体情報終了</pre>
+    <p><code>構造体名</code>は構造体型名前空間に登録され、<code>構造体名.メンバ名</code>の形式で領域へのオフセット値を参照できます。構造体のサイズは、識別子<code>.sizeof.構造体名</code>で自動登録されます。また、<code>.endstruct</code>のラベル<code>サイズ名</code>を指定すると、<code>構造体名.サイズ名</code>を使用できます。</p>
+    <p>&nbsp;</p>
+    <h4>構造体使用例</h4>
+    <pre>;# s1 を定義<br/>
+s1          .defstruct<br/>
+m1          .member         i64<br/>
+m2          .member         i32,2<br/>
+m3          .member         i16<br/>
+m4          .member         i8<br/>
+            .member         i8           ;# 余白<br/>
+size        .endstruct<br/>
+<br/>
+;# s2 を定義<br/>
+s2          .defstruct<br/>
+m1          .member         s1<br/>
+m2          .member         s1<br/>
+size        .endstruct<br/>
+<br/>
+data        .data<br/>
+            .i8             .sizeof.s1   ;# = 20<br/>
+            .i8             s1.size      ;# = 20<br/>
+            .i8             s1.m1        ;# = 0<br/>
+            .i8             s1.m2        ;# = 8<br/>
+            .i8             s1.m3        ;# = 16<br/>
+            .i8             s1.m4        ;# = 18<br/>
+            .i8             0, 0<br/>
+            .i8             s2.m1.m1     ;# = 0<br/>
+            .i8             s2.m1.m2     ;# = 8<br/>
+            .i8             s2.m1.m3     ;# = 16<br/>
+            .i8             s2.m1.m4     ;# = 18<br/>
+            .i8             s2.m2.m1     ;# = 20<br/>
+            .i8             s2.m2.m2     ;# = 28<br/>
+            .i8             s2.m2.m3     ;# = 36<br/>
+            .i8             s2.m2.m4     ;# = 38</pre>
+    <p>&nbsp;</p>
+  </body>
+</html>

@@ -1,0 +1,17 @@
+;; -*- Lisp -*-
+
+(@include "pseudo-struct.sxpml")
+
+(!DOCTYPE [html])
+(html
+ [lang "ja"]
+ (head
+  (meta [charset "utf-8"])
+  (title $document " - " $wasmgen-pseudo-struct-name)
+  $css)
+ (body
+  (h1 $document (br) $wasmgen-pseudo-struct-name)
+  $html-index
+  $wasmgen-pseudo-struct
+  ) ; body
+ ) ; html

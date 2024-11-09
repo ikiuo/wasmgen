@@ -19,6 +19,7 @@
    $spc4 (a [name "pseudo"] "疑似命令") (br)
    $spc4 $spc4 (a [href "pseudo-assembler.html"] $wasmgen-pseudo-assembler-name) (br)
    $spc4 $spc4 (a [href "pseudo-replace.html"] $wasmgen-pseudo-replace-name) (br)
+   $spc4 $spc4 (a [href "pseudo-struct.html"] $wasmgen-pseudo-struct-name) (br)
    $spc4 $spc4 (a [href "pseudo-section.html"] $wasmgen-pseudo-section-name) (br)
    $spc4 (a [name "instruction"] "実行命令") (br)
    $spc4 $spc4 (a [href "instruction-representation.html"] $wasmgen-instruction-representation-name) (br)

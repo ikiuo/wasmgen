@@ -4,7 +4,8 @@
 
 HTML  = index full \
 	wasmgen statement \
-	pseudo-wasmgen pseudo-assembler pseudo-replace pseudo-section \
+	pseudo-wasmgen pseudo-assembler \
+	pseudo-replace pseudo-struct pseudo-section \
 	instruction-representation instruction-table-column \
 	instruction-const-getset instruction-load-store instruction-convert \
 	instruction-arithmetic instruction-logical-shift instruction-compare \

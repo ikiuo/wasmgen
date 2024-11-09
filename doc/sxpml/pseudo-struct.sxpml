@@ -1,0 +1,62 @@
+;; -*- Lisp -*-
+
+(@include "variable.sxpml")
+
+(@def $wasmgen-pseudo-struct-name "構造体情報疑似命令")
+
+(@def $wasmgen-pseudo-struct
+  (@h2 $wasmgen-pseudo-struct-name)
+  (p "構造体のメンバ(オフセット値)の定義するための疑似命令です。")
+  $vpad
+
+  (@h3 "疑似命令" $spc (code ".defstruct") $spc "/" $spc (code ".endstruct") $spc "/" $spc (code ".member"))
+  (p
+   (code ".defstruct") "から" (code ".endstruct") "までを構造体情報として登録します。"
+   "領域情報では、疑似命令" (code ".member") "を使用します。")
+  (pre
+   "構造体名    .defstruct                  ;# 構造体情報開始"
+   "メンバ名１  .member         型 [, 数]    ;# メンバ名１の領域を指定 (型のサイズ×[数:省略時は1])"
+   "メンバ名２  .member         型 [, 数]    ;# メンバ名２の領域を指定"
+   ";#         ..."
+   "[サイズ名]  .endstruct                  ;# 構造体情報終了")
+  (p (code "構造体名") "は構造体型名前空間に登録され、" (code "構造体名.メンバ名") "の形式で領域へのオフセット値を参照できます。"
+     "構造体のサイズは、識別子" (code ".sizeof.構造体名") "で自動登録されます。"
+     "また、" (code ".endstruct") "のラベル" (code "サイズ名") "を指定すると、" (code "構造体名.サイズ名") "を使用できます。")
+  $vpad
+
+  (h4 "構造体使用例")
+  (pre
+   ";# s1 を定義"
+   "s1          .defstruct"
+   "m1          .member         i64"
+   "m2          .member         i32,2"
+   "m3          .member         i16"
+   "m4          .member         i8"
+   "            .member         i8           ;# 余白"
+   "size        .endstruct"
+   ""
+   ";# s2 を定義"
+   "s2          .defstruct"
+   "m1          .member         s1"
+   "m2          .member         s1"
+   "size        .endstruct"
+   ""
+   "data        .data"
+   "            .i8             .sizeof.s1   ;# = 20"
+   "            .i8             s1.size      ;# = 20"
+   "            .i8             s1.m1        ;# = 0"
+   "            .i8             s1.m2        ;# = 8"
+   "            .i8             s1.m3        ;# = 16"
+   "            .i8             s1.m4        ;# = 18"
+   "            .i8             0, 0"
+   "            .i8             s2.m1.m1     ;# = 0"
+   "            .i8             s2.m1.m2     ;# = 8"
+   "            .i8             s2.m1.m3     ;# = 16"
+   "            .i8             s2.m1.m4     ;# = 18"
+   "            .i8             s2.m2.m1     ;# = 20"
+   "            .i8             s2.m2.m2     ;# = 28"
+   "            .i8             s2.m2.m3     ;# = 36"
+   "            .i8             s2.m2.m4     ;# = 38")
+  $vpad
+
+  )  ; @ def
