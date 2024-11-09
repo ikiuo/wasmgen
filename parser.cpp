@@ -142,6 +142,10 @@ namespace wasmgen
         &Parser::parse_pseudo_message,
         &Parser::parse_pseudo_option,
         /**/
+        &Parser::parse_pseudo_struct_begin,
+        &Parser::parse_pseudo_struct_end,
+        &Parser::parse_pseudo_struct_member,
+        /**/
         &Parser::parse_pseudo_macro_begin,
         &Parser::parse_pseudo_macro_end,
         &Parser::parse_pseudo_macro_delete,
@@ -281,6 +285,7 @@ namespace wasmgen
         , option_name(new Identifier)
         , asmsw_name(new IdentifierList)
           /**/
+        , struct_name(new Identifier)
         , macro_name(new Identifier)
         , alias_name(new Identifier)
           /**/
@@ -318,11 +323,20 @@ namespace wasmgen
             set_predefined("no", false);
         }
 
+        type_size_dict = {
+            { "i8", 1 }, { "s8", 1 }, { "u8", 1 },
+            { "i16", 2 }, { "s16", 2 }, { "u16", 2 },
+            { "i32", 4 }, { "s32", 4 }, { "u32", 4 },
+            { "i64", 8 }, { "s64", 8 }, { "u64", 8 },
+            { "v128", 16 },
+        };
+
         asmsw_name->push_back(boolean_name);
         asmsw_name->push_back(option_name);
         asmsw_name->push_back(define_name);
         asmsw_name->push_back(alias_name);
 
+        global_name->push_back(struct_name);
         global_name->push_back(alias_name);
 
         typeidx_name->push_back(module->typeidx);
@@ -1937,6 +1951,231 @@ namespace wasmgen
               false))
             parse_warning(ErrorCode::IGNORE_UNKNOWN_OPTION, {tname});
         update_option();
+    }
+
+    void Parser::parse_pseudo_struct_begin()
+    {
+        WASMGEN_DEBUG(2, "DEFSTRUCT: start\n");
+
+        clear_section();
+
+        auto& line = code_line;
+        Token* label = line->label;
+
+        if (!label)
+        {
+            parse_error(ErrorCode::NO_STRUCT_LABEL, {line->instr});
+            return;
+        }
+
+        FileStringPtr name = label->text; assert(name);
+
+        if (define_struct)
+        {
+            Identifier* member = define_struct->member; assert(member);
+
+            if (member->has(*name))
+            {
+                parse_error(ErrorCode::EXIST_STRUCT_NAME, {label});
+                return;
+            }
+            (*member)[*name] = make_value(name, define_struct->offset);
+
+            name = new FileString(*define_struct->prefix + "." + *name);
+        }
+        if (struct_dict.has(*name) || global_name->has(*name))
+        {
+            parse_error(ErrorCode::EXIST_STRUCT_NAME, {label});
+            return;
+        }
+
+        WASMGEN_DEBUG(2, "  name: ", static_cast<StdString&>(*name), "\n");
+
+        struct_stack.push_back(define_struct);
+
+        define_struct = new StructData(line);
+        define_struct->prefix = name;
+        define_struct->list->push_back(line);
+
+        struct_dict[*name] = define_struct;
+    }
+
+    void Parser::parse_pseudo_struct_end()
+    {
+        WASMGEN_DEBUG(2, "DEFSTRUCT: end\n");
+
+        if (!define_struct)
+        {
+            parse_warning(ErrorCode::NO_STRUCT_DEFINITION, {code_line->instr});
+            return;
+        }
+
+        auto& line = code_line;
+        Token* label = line->label;
+        String* prefix = define_struct->prefix;
+        int64_t offset = define_struct->offset;
+
+        define_struct->list->push_back(line);
+
+        if (label)
+        {
+            FileStringPtr name = label->text; assert(name);
+            Identifier* member = define_struct->member;
+
+            if (member->has(name))
+            {
+                parse_error(ErrorCode::EXIST_STRUCT_NAME, {label});
+                return;
+            }
+            (*member)[*name] = make_value(label, offset);
+
+            name = new FileString(*prefix + "." + *name);
+            assert(!struct_name->has(*name));
+            (*struct_name)[*name] = make_value(name, offset);
+        }
+
+        NewFileString strsize(".sizeof." + *prefix);
+        {
+            FileString* text = line->instr->text;
+
+            strsize->file_name = text->file_name;
+            strsize->text_pos = text->text_pos;
+        }
+        if (struct_name->has(*strsize))
+        {
+            NewToken token(TokenID::NAME, strsize);
+
+            parse_error(ErrorCode::EXIST_STRUCT_NAME, {token});
+            return;
+        }
+        (*struct_name)[*strsize] = make_value(strsize, offset);
+        type_size_dict[*prefix] = size_t(offset);
+
+        define_struct = struct_stack.pop();
+    }
+
+    void Parser::parse_pseudo_struct_member()
+    {
+        WASMGEN_DEBUG(2, "DEFSTRUCT: member\n");
+
+        if (!define_struct)
+        {
+            parse_warning(ErrorCode::NO_STRUCT_DEFINITION, {code_line->instr});
+            return;
+        }
+
+        auto& line = code_line;
+        Token* label = line->label;
+        int64_t offset = define_struct->offset;
+        FileString* prefix = define_struct->prefix;
+        Identifier* member = define_struct->member;
+        FileStringPtr member_name;
+        FileStringPtr name;
+
+        if (label)
+        {
+            member_name = label->text; assert(member_name);
+
+            if (member->has(member_name))
+            {
+                parse_error(ErrorCode::EXIST_MEMBER_NAME, {label});
+                return;
+            }
+            (*member)[*member_name] = make_value(label, offset);
+
+            define_struct->list->push_back(line);
+
+            name = new FileString(*prefix + "." + *member_name);
+            assert(!struct_name->has(*name));
+            (*struct_name)[*name] = make_value(name, offset);
+
+            WASMGEN_DEBUG(2, "  ", static_cast<StdString&>(*name), " = ", offset, "\n");
+        }
+
+        ExpressionList* ops = line->operands; assert(ops);
+        size_t op_size = ops->size();
+        size_t data_size = 0;
+        size_t count = 1;
+
+        if (op_size == 0)
+            return;
+        if (op_size > 2)
+            parse_warning_too_many_operands(line, ops, 2);
+        if (op_size >= 2)
+        {
+            Expression* op1 = (*ops)[1]; assert(op1);
+            auto res = getvalue(op1);
+
+            if (res.isnumber())
+            {
+                int64_t cnt = int64_t(res);
+
+                if (cnt < 0)
+                    cnt = 0;
+                count = size_t(cnt);
+            }
+        }
+
+        Expression* op0 = (*ops)[0]; assert(op0);
+        String* vtname = getname(op0, global_name);
+        auto teit = type_size_dict.end(), tfit = teit;
+        auto seit = struct_dict.end(), sfit = seit;
+
+        if (vtname)
+        {
+            tfit = type_size_dict.find(*vtname);
+            if (member_name)
+                sfit = struct_dict.find(*vtname);
+        }
+        if (tfit != teit)
+            data_size = tfit->second;
+        else
+        {
+            auto res = getvalue(op0);
+
+            if (!res.isnumber())
+            {
+                parse_error(ErrorCode::NO_TYPE_NAME, {*op0});
+                return;
+            }
+            data_size = int64_t(res);
+        }
+
+        if (sfit != seit)
+        {
+            for (auto& kv : *sfit->second->member)
+            {
+                NewFileString dotname(*member_name + "." + kv.first);
+                auto res = getvalue(kv.second);
+
+                assert(res.isnumber());
+
+                if (member->has(*dotname))
+                {
+                    NewToken token(TokenID::NAME, dotname);
+
+                    parse_error(ErrorCode::EXIST_MEMBER_NAME, {token});
+                    return;
+                }
+
+                int64_t value = offset + int64_t(res);
+
+                (*member)[dotname] = make_value(dotname, value);
+
+                NewFileString strname(*prefix + "." + *dotname);
+
+                if (struct_name->has(*strname))
+                {
+                    NewToken token(TokenID::NAME, strname);
+
+                    parse_error(ErrorCode::EXIST_MEMBER_NAME, {token});
+                    return;
+                }
+                (*struct_name)[*strname] = make_value(strname, value);
+            }
+        }
+
+        define_struct->offset += data_size * count;
     }
 
     void Parser::parse_pseudo_macro_begin()
@@ -3931,7 +4170,7 @@ namespace wasmgen
         default:
             break;
         }
-        idmap->push_back(alias_name);
+        idmap->insert(idmap->end(), global_name->begin(), global_name->end());
     }
 
     /*

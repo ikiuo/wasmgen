@@ -189,6 +189,10 @@ namespace wasmgen
             PSEUDO_MESSAGE,
             PSEUDO_OPTION,
 
+            PSEUDO_STRUCT_BEGIN,
+            PSEUDO_STRUCT_END,
+            PSEUDO_STRUCT_MEMBER,
+
             PSEUDO_MACRO_BEGIN,
             PSEUDO_MACRO_END,
             PSEUDO_MACRO_DELETE,

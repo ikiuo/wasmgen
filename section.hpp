@@ -9,6 +9,11 @@
 namespace wasmgen
 {
 
+    class StructData;
+    using StructDataPtr = Pointer<StructData>;
+    using StructDataRef = RefPointer<StructData>;
+    using NewStructData = NewPointer<StructData>;
+
     class MacroData;
     using MacroDataPtr = Pointer<MacroData>;
     using MacroDataRef = RefPointer<MacroData>;
@@ -123,6 +128,23 @@ namespace wasmgen
     using CodeListPtr = Pointer<CodeList>;
     using CodeListPef = RefPointer<CodeList>;
     using NewCodeList = NewPointer<CodeList>;
+
+    ////////////////
+    // StructData //
+    ////////////////
+
+    class StructData : virtual public Object
+    {
+    public:
+        CodeLinePtr line;
+        CodeListPtr list;
+        FileStringPtr prefix;
+        IdentifierPtr member;
+        int64_t offset;
+
+    public:
+        StructData(CodeLine* line = nullptr);
+    };
 
     ///////////////
     // MacroData //

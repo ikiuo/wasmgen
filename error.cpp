@@ -29,6 +29,10 @@ namespace wasmgen
         {ErrorCode::INVALID_MACRO_NAME, {{0},{"無効なマクロ名です。"}}},
         {ErrorCode::CAN_NOT_DELETE_MACRO, {{0},{"マクロ定義中は削除できません。"}}},
         /**/
+        {ErrorCode::NO_STRUCT_LABEL, {{-1,0},{" のラベルがありません。"}}},
+        {ErrorCode::EXIST_STRUCT_NAME, {{0,-1,1},{"構造 ", " は既に定義されています。"}}},
+        {ErrorCode::EXIST_MEMBER_NAME, {{0,-1,1},{"メンバ名 ", " は既に定義されています。"}}},
+        /**/
         {ErrorCode::INVALID_ESCAPE_SEQUENCE, {{0},{"無効なエスケープ シーケンスです。"}}},
         {ErrorCode::INVALID_OCTAL_CODE, {{0},{"無効な文字コードです。"}}},
         {ErrorCode::INVALID_NUMBER_FORMAT, {{0},{"無効な数値表現です。"}}},
@@ -139,6 +143,8 @@ namespace wasmgen
         {ErrorCode::NO_MACRO_END, {{0},{"マクロ定義の終端がありません。"}}},
         {ErrorCode::NO_MACRO_DEFINITION, {{0}, {"対応する .defmacro がありません。"}}},
         {ErrorCode::MACRO_NOT_DEFINED, {{0,-1,1},{"マクロ名 \"","\" は定義されてません。"}}},
+        /**/
+        {ErrorCode::NO_STRUCT_DEFINITION, {{0}, {"対応する .defstruct がありません。"}}},
         /**/
         {ErrorCode::TOO_FEW_PARAMETERS, {{0},{"パラメータが足りません。"}}},
         {ErrorCode::PARAMETER_TYPES_DONT_MATCH, {{0},{"パラメータが足りません。"}}},

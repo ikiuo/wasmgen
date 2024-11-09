@@ -14,6 +14,8 @@ namespace wasmgen
     class Parser : public Lexer
     {
     protected:
+        using TypeSizeDict = StdStringMap<size_t>;
+        using StructDataDict = StdStringMap<StructDataPtr>;
         using MacroDataDict = StdStringMap<MacroDataPtr>;
         using SectionNameDict = StdStringMap<int8_t>;
         using ElementModeDict = StdStringMap<ElementMode>;
@@ -110,6 +112,7 @@ namespace wasmgen
         };
 
         using ASMSWStack = StdVecStack<ASMSWFlag>;
+        using StructDataStack = StdVecStack<StructDataPtr>;
 
     public:
         struct Option
@@ -191,6 +194,12 @@ namespace wasmgen
         ASMSWStack asmsw_stack;
         ASMSWFlag asmsw_flag;
 
+        TypeSizeDict type_size_dict;
+
+        StructDataDict struct_dict;
+        StructDataPtr define_struct;
+        StructDataStack struct_stack;
+
         MacroDataDict macro_dict;
         MacroDataPtr define_macro;
         StdStringSet macro_expand;
@@ -214,6 +223,7 @@ namespace wasmgen
         IdentifierPtr option_name;
         IdentifierListPtr asmsw_name;
 
+        IdentifierPtr struct_name;
         IdentifierPtr macro_name;
         IdentifierPtr alias_name;
 
@@ -295,6 +305,10 @@ namespace wasmgen
         void parse_pseudo_include();
         void parse_pseudo_message();
         void parse_pseudo_option();
+        /*-*/
+        void parse_pseudo_struct_begin();
+        void parse_pseudo_struct_end();
+        void parse_pseudo_struct_member();
         /*-*/
         void parse_pseudo_macro_begin();
         void parse_pseudo_macro_end();

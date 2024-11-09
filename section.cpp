@@ -35,6 +35,19 @@ namespace wasmgen
         /*NOOP*/
     }
 
+    ////////////////
+    // StructData //
+    ////////////////
+
+    StructData::StructData(CodeLine* line)
+        : line(line)
+        , list(new CodeList)
+        , member(new Identifier)
+        , offset()
+    {
+        /*NOOP*/
+    }
+
     ///////////////
     // MacroData //
     ///////////////

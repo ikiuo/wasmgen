@@ -73,6 +73,13 @@ namespace wasmgen
 
         /**/
 
+        _STRUCT_ = 1200,
+        NO_STRUCT_LABEL,
+        EXIST_STRUCT_NAME,
+        EXIST_MEMBER_NAME,
+
+        /**/
+
         _TOKEN = 1900,
         INVALID_ESCAPE_SEQUENCE,
         INVALID_OCTAL_CODE,
@@ -227,6 +234,9 @@ namespace wasmgen
         NO_MACRO_END,
         NO_MACRO_DEFINITION,
         MACRO_NOT_DEFINED,
+
+        _WARNING_STRUCT = 3220,
+        NO_STRUCT_DEFINITION,
 
         _WARNING_INSTR = 4000,
         TOO_FEW_PARAMETERS,

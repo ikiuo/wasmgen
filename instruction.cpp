@@ -1149,6 +1149,10 @@ namespace wasmgen
             /**/
             PSEUDO(".memidx", DPC_MEMIDX),
             /*-*/
+            PSEUDO(".defstruct", PSEUDO_STRUCT_BEGIN),
+            PSEUDO(".endstruct", PSEUDO_STRUCT_END),
+            PSEUDO(".member", PSEUDO_STRUCT_MEMBER),
+            /*-*/
             PSEUDO(".defmacro", PSEUDO_MACRO_BEGIN),
             PSEUDO(".endmacro", PSEUDO_MACRO_END),
             PSEUDO(".delmacro", PSEUDO_MACRO_DELETE),
