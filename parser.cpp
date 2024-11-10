@@ -4434,7 +4434,7 @@ namespace wasmgen
                 idmap = list->symbol;
                 break;
             case Instruction::OP_SIDn:
-                cnt = oplen;
+                cnt = std::min<size_t>(1, oplen);
                 idmap = list->symbol;
                 break;
             case Instruction::OP_TID:
@@ -4663,7 +4663,8 @@ namespace wasmgen
                 binary.append_leb128(uint32_t(opval[0]));
                 break;
             case Instruction::OP_SIDn:
-                binary.append_leb128(opval.size());
+                assert(opval.size() >= 1);
+                binary.append_leb128(opval.size() - 1);
                 for (auto n : inc_range<size_t>(opval.size()))
                     binary.append_leb128(uint32_t(opval[n]));
                 break;
