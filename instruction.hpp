@@ -47,22 +47,24 @@ namespace wasmgen
             OP_GID,   // 16
             OP_LID,   // 17
             OP_MID,   // 18
-            OP_SID,   // 19
-            OP_SIDn,  // 20
-            OP_TID,   // 21
-            OP_TID1,  // 22
-            OP_TID2,  // 23
-            OP_XID,   // 24
+            OP_MID1,  // 19
+            OP_MID2,  // 20
+            OP_SID,   // 21
+            OP_SIDn,  // 22
+            OP_TID,   // 23
+            OP_TID1,  // 24
+            OP_TID2,  // 25
+            OP_XID,   // 26
 
-            OP_REF,   // 25
-            OP_VTn,   // 26
-            OP_BT,    // 27
+            OP_REF,   // 27
+            OP_VTn,   // 28
+            OP_BT,    // 29
 
-            OP_MA0,   // 28
-            OP_MA1,   // 29
-            OP_MA2,   // 30
-            OP_MA3,   // 31
-            OP_MA4,   // 32
+            OP_MA0,   // 30
+            OP_MA1,   // 31
+            OP_MA2,   // 32
+            OP_MA3,   // 33
+            OP_MA4,   // 34
         };
 
         enum StackMode
@@ -71,6 +73,7 @@ namespace wasmgen
             ST_LEAVE,
             ST_ENTER,
             ST_ELSE,
+            ST_BRANCH,
 
             ST_LEAVE_BLOCK,
             ST_LEAVE_LOOP,
@@ -249,6 +252,7 @@ namespace wasmgen
             constexpr Operation(const Operation&) noexcept = default;
             constexpr Operation(int n, int p1, int p2, int p3, int res, int stack) noexcept;
             constexpr Operation(uint32_t value) noexcept;
+            constexpr Operation(StackMode smode) noexcept;
             constexpr Operation(MacroCode pcode) noexcept;
             constexpr Operation(PseudoCode pcode) noexcept;
             constexpr Operation(BinaryCode bcode) noexcept;
@@ -353,6 +357,9 @@ namespace wasmgen
 
         inline constexpr Operation::Operation(uint32_t data) noexcept
             : value(data) {}
+
+        inline constexpr Operation::Operation(StackMode smode) noexcept
+            : value(smode << 20) {}
 
         inline constexpr Operation::Operation(PseudoCode pcode) noexcept
             : value(pcode << PSEUDO_CODE_BIT) {}

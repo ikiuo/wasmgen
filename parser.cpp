@@ -4287,6 +4287,7 @@ namespace wasmgen
         switch (stm)
         {
         case Instruction::ST_NONE:
+        case Instruction::ST_BRANCH:
             break;
 
         case Instruction::ST_LEAVE_BLOCK:
@@ -4999,8 +5000,8 @@ namespace wasmgen
         assert(list);
         assert(line);
 
-        auto& instab = line->instab;
         auto& pstack = list->param_stack;
+        auto& instab = line->instab;
         auto& ins = instab->second;
         auto& instr = ins.operation;
         size_t parcnt = instr.count();

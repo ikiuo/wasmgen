@@ -47,6 +47,7 @@
     <ClInclude Include="expression.hpp" />
     <ClInclude Include="file.hpp" />
     <ClInclude Include="instruction.hpp" />
+    <ClInclude Include="instruction_table.hpp" />
     <ClInclude Include="label.hpp" />
     <ClInclude Include="leb128.hpp" />
     <ClInclude Include="lexer.hpp" />
