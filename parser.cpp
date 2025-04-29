@@ -4257,7 +4257,7 @@ namespace wasmgen
         case Instruction::PSEUDO_EMPTY:
         case Instruction::PSEUDO_BINARY:
             if (!list->binary)
-                return parse_error(ErrorCode::INVALID_INSTRUCTION, {line->instr});
+                return parse_error(ErrorCode::INVALID_INSTRUCTION, {line->label});
             return parse_data_line_operand(list, line);
 
         default:
